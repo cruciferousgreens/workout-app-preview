@@ -32,7 +32,7 @@
             <label class="rule-field"><span>${time?'Min sec':'Min reps'}</span><input type="number" min="1" value="${time?profile.timeMin:profile.min}" data-program-rule="${time?'timeMin':'min'}"></label>
             <label class="rule-field"><span>${time?'Max sec':'Max reps'}</span><input type="number" min="1" value="${time?profile.timeMax:profile.max}" data-program-rule="${time?'timeMax':'max'}"></label>
             ${time?`<label class="rule-field"><span>Step sec</span><input type="number" min="1" value="${profile.timeStep||defaults.timeStep||5}" data-program-rule="timeStep"></label>`:''}
-            <div class="load-progression ${profile.repsOnly?'is-disabled':''}"><span class="load-control-title">Load progression</span><div class="load-progression-row"><select data-program-rule="incrementType" aria-label="Load increment type"><option value="lb" ${incrementType==='lb'?'selected':''}>Pounds</option><option value="percent" ${incrementType==='percent'?'selected':''}>Percent</option></select><input type="number" min="0.5" step="0.5" value="${profile.incrementValue??progressionSetup.incrementValue}" data-program-rule="incrementValue" aria-label="Load increment value"><button class="reps-only-toggle" type="button" data-program-reps-only aria-pressed="${!!profile.repsOnly}">Increase reps only</button></div></div>
+            <div class="load-progression ${profile.repsOnly?'is-disabled':''}"><span class="load-control-title">Load progression</span><div class="load-progression-row"><select data-program-rule="incrementType" aria-label="Load increment type"><option value="lb" ${incrementType==='lb'?'selected':''}>Pounds</option><option value="percent" ${incrementType==='percent'?'selected':''}>Percent</option></select><span class="lp-value"><input type="number" min="0.5" step="0.5" value="${profile.incrementValue??progressionSetup.incrementValue}" data-program-rule="incrementValue" aria-label="Load increment value"><em class="unit">${incrementType==='percent'?'%':'lb'}</em></span><button class="reps-only-toggle" type="button" data-program-reps-only aria-pressed="${!!profile.repsOnly}">Increase reps only</button></div></div>
           </div>
           <div class="exercise-tags-builder"><div class="exercise-tag-row">${(item.exerciseTags||[]).map(tag=>`<span class="exercise-tag-chip ${workoutState.exerciseTagPresets.includes(tag)?'preset':''}">${escapeHtml(tag)}</span>`).join('')}<button class="exercise-tag-button" type="button" data-program-exercise-tags="${escapeHtml(item.exerciseId)}">${item.exerciseTags?.length?'Edit exercise tags':'+ Exercise tags'}</button></div></div>
         </div></div>
@@ -56,6 +56,8 @@
             profile.mode=control.value; item.tracking=control.value;
           }else if(field==='incrementType'){
             profile.incrementType=control.value;
+            const unitEl=row.querySelector('.lp-value .unit');
+            if(unitEl) unitEl.textContent = control.value==='percent' ? '%' : 'lb';
           }else{
             profile[field]=Number(control.value);
           }

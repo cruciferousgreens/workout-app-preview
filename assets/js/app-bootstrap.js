@@ -1,6 +1,11 @@
 
     /** Connects static controls to feature modules and performs initial rendering. */
     let deleteArmed=false;
+    /** Light unit suffix inside the increment value field; follows the type (Justin 2026-09-10). */
+    function syncSettingsIncrementUnit(){
+      const unit=$('#settingsIncrementUnit');
+      if(unit) unit.textContent = progressionSetup.incrementType==='percent' ? '%' : 'lb';
+    }
     function renderSettings(){
       const dark=document.documentElement.dataset.theme==='dark';
       const darkToggle=$('#darkModeToggle');
@@ -8,6 +13,7 @@
       $('#settingsRpeThreshold').value=progressionSetup.threshold;
       $('#settingsIncrementType').value=progressionSetup.incrementType;
       $('#settingsIncrementValue').value=progressionSetup.incrementValue;
+      syncSettingsIncrementUnit();
       $('#settingsRepMin').value=progressionSetup.defaultRange.min;
       $('#settingsRepMax').value=progressionSetup.defaultRange.max;
       $('#settingsTimeStep').value=progressionSetup.timeStep;
@@ -86,7 +92,7 @@
 
     $('#darkModeToggle').addEventListener('click',()=>applyTheme(document.documentElement.dataset.theme==='dark'?'light':'dark'));
     $('#settingsRpeThreshold').addEventListener('input',e=>{progressionSetup.threshold=Math.min(10,Math.max(1,Number(e.target.value)||8));schedulePersist();});
-    $('#settingsIncrementType').addEventListener('change',e=>{progressionSetup.incrementType=e.target.value;schedulePersist();});
+    $('#settingsIncrementType').addEventListener('change',e=>{progressionSetup.incrementType=e.target.value;syncSettingsIncrementUnit();schedulePersist();});
     $('#settingsIncrementValue').addEventListener('input',e=>{progressionSetup.incrementValue=Math.max(0,Number(e.target.value)||0);schedulePersist();});
     $('#settingsRepMin').addEventListener('input',e=>{progressionSetup.defaultRange.min=Math.max(1,Number(e.target.value)||1);progressionSetup.defaultRange.preset='custom';schedulePersist();});
     $('#settingsRepMax').addEventListener('input',e=>{progressionSetup.defaultRange.max=Math.max(progressionSetup.defaultRange.min,Number(e.target.value)||progressionSetup.defaultRange.min);progressionSetup.defaultRange.preset='custom';schedulePersist();});

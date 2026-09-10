@@ -362,8 +362,8 @@
     /* The top bar owns back/title on the exercise detail; hide the in-screen duplicates. */
     .has-top-bar #backButton { display: none; }
     .has-top-bar .detail .detail-title { display: none; }
-    .nav-item { min-height: 50px; border: 0; border-radius: 12px; background: transparent; color: var(--muted); display: grid; place-items: center; gap: 2px; cursor: pointer; font-size: 11px; }
-    .nav-item.active { background: transparent; color: var(--accent-ink); font-weight: 700; }
+    .nav-item { min-height: 50px; border: 0; border-radius: 12px; background: transparent; color: var(--muted); display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 1px; cursor: pointer; font-size: 11px; font-weight: 700; line-height: 1.25; }
+    .nav-item.active { background: transparent; color: var(--accent-ink); font-weight: 800; }
     .nav-item.has-live-draft { position: relative; }
     .nav-item.has-live-draft:not(.active) { color: var(--accent-ink); }
     .nav-item.has-live-draft::after { content: ''; position: absolute; top: 6px; left: 50%; margin-left: 12px; width: 9px; height: 9px; border-radius: 50%; background: var(--rose); box-shadow: 0 0 0 2px var(--surface-raised); pointer-events: none; }
@@ -648,23 +648,30 @@
     .rule-field input, .rule-field select { width: 100%; min-height: 38px; height: 38px; margin: 0; padding: 0 8px; border: 1px solid var(--line); border-radius: 7px; background: var(--surface); font-size: 12px; }
     .load-progression { display: grid; gap: 5px; }
     .load-progression-row { display: grid; grid-template-columns: minmax(0,1fr) 76px auto; gap: 6px; align-items: center; }
+    .lp-value { position: relative; display: block; min-width: 0; }
+    .lp-value .unit { position: absolute; right: 8px; top: 0; bottom: 0; display: inline-flex; align-items: center; font-style: normal; font-size: 11px; color: var(--muted); pointer-events: none; }
+    .lp-value input { padding-right: 28px; }
     .load-progression select, .load-progression input { width: 100%; min-width: 0; height: 38px; margin: 0; padding: 0 8px; border: 1px solid var(--line); border-radius: 7px; background: var(--surface); font-size: 12px; }
     .reps-only-toggle { min-height: 38px; padding: 0 10px; border: 1px solid var(--line); border-radius: 7px; background: var(--surface); color: var(--muted); cursor: pointer; font-size: 10px; font-weight: 800; white-space: nowrap; }
     .reps-only-toggle[aria-pressed="true"] { border-color: var(--accent); background: var(--accent-soft); color: var(--accent); }
     .load-progression.is-disabled select, .load-progression.is-disabled input { opacity: .45; pointer-events: none; }
-    /* Field labels (2026-09-10, Justin: no background pill) — small-caps plain text
-       above the field, one consistent language app-wide. */
-    .rule-field { position: relative; display: block; }
-    .rule-field > span { position: static; display: block; padding: 0; background: none; border-radius: 0; margin-bottom: 6px; }
-    /* Inline unit suffix, e.g. "sec" on the time-step field. */
-    .rule-field .unit { position: absolute; right: 10px; bottom: 0; height: 38px; display: inline-flex; align-items: center; font-style: normal; font-size: 12px; color: var(--muted); pointer-events: none; }
-    .rule-field:has(.unit) input, .rule-field:has(.unit) select { padding-right: 44px; }
-    .field { position: static; display: grid; gap: 6px; margin-top: 0; }
-    .field > label { position: static; padding: 0; background: none; border-radius: 0; }
+    /* Notched field labels (2026-09-10, Justin: keep the notch, no visible background).
+       The label sits on the field's top border; its background exactly matches the
+       local surface via --notch-bg so the border reads as interrupted, no pill. */
+    .field { position: relative; display: grid; gap: 0; margin-top: 12px; }
+    .field > label { position: absolute; top: -7px; left: 10px; z-index: 1; padding: 0 6px; background: var(--notch-bg, var(--bg)); }
     .field select { margin-top: 0; }
-    .filter-group > label { position: static; padding: 0; background: none; border-radius: 0; }
-    .filter-group:has(> label) { position: static; display: grid; gap: 6px; margin-top: 0; }
+    .rule-field { position: relative; display: block; margin-top: 12px; }
+    .rule-field > span { position: absolute; top: -7px; left: 8px; z-index: 1; padding: 0 6px; background: var(--notch-bg, var(--bg)); }
+    /* Inline unit suffix, e.g. "sec" on the time-step field, "lb"/"%" on increment. */
+    .rule-field .unit { position: absolute; right: 12px; top: 0; bottom: 0; display: inline-flex; align-items: center; font-style: normal; font-size: 12px; color: var(--muted); pointer-events: none; }
+    .rule-field:has(.unit) input, .rule-field:has(.unit) select { padding-right: 44px; }
+    .filter-group { position: relative; margin-top: 12px; }
+    .filter-group > label { position: absolute; top: -7px; left: 10px; z-index: 1; padding: 0 6px; background: var(--notch-bg, var(--bg)); }
     .filter-group > label + select { margin-top: 0; }
+    /* Surfaces the notched fields sit on: match the cutout behind each label. */
+    .program-setup, .dashboard-card, .custom-dialog { --notch-bg: var(--surface); }
+    .progression-setup { --notch-bg: var(--surface-raised); }
     @media (max-width: 700px) {
       .exercise-rule-controls { grid-template-columns: 1fr 1fr 1fr; }
       .load-progression { grid-column: 1 / -1; }
@@ -1191,7 +1198,7 @@
     .program-cover-head { position: relative; padding-right: 150px; }
     .program-cover-edit { position: absolute; right: 20px; top: 20px; min-height: 40px; padding: 0 14px; border: 1px solid var(--gold-soft); border-radius: 999px; background: var(--surface-raised); color: var(--ink-strong); cursor: pointer; font-weight: 800; }
     @media (max-width: 520px) {
-      .shell { padding: 22px 14px calc(205px + env(safe-area-inset-bottom)); }
+      .shell { padding: var(--top-bar-clearance) 14px calc(205px + env(safe-area-inset-bottom)); }
       .workout-start-options { grid-template-columns: 1fr; }
       .workout-toolbar { align-items: flex-start; }
       .workout-toolbar-actions { width: 100%; justify-content: stretch; }

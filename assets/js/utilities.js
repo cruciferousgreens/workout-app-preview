@@ -87,8 +87,8 @@
         const parentKey = { library: 'library', workout: 'workout', program: 'program', dashboard: 'dashboard', stats: 'stats', 'completed-workout': 'workout' }[ret] || 'library';
         setCrumbTitle(titleEl, TOP_BAR_TITLES[parentKey], customTitle || '', () => backFromExerciseDetail());
       } else if (view === 'settings') {
-        const parentKey = TOP_BAR_TITLES[state.settingsReturn] ? state.settingsReturn : 'dashboard';
-        setCrumbTitle(titleEl, TOP_BAR_TITLES[parentKey], 'Settings', () => goToTab(parentKey));
+        // Settings is its own page, not a breadcrumb (Justin 2026-09-10).
+        titleEl.textContent = 'Settings';
       } else {
         titleEl.textContent = customTitle || TOP_BAR_TITLES[view] || '';
       }
