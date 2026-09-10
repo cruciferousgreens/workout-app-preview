@@ -404,7 +404,7 @@
     .exercise-accordion-title small { color: var(--muted); font-size: 12px; font-variant-numeric: tabular-nums; }
     .exercise-accordion-chevron { flex: none; color: var(--muted); font-size: 20px; line-height: 1; transition: transform .18s ease; }
     .exercise-accordion-actions { flex: none; display: flex; align-items: center; gap: 10px; }
-    .exercise-info-button { flex: none; width: 32px; height: 32px; border-radius: 50%; border: 1px solid var(--border); background: var(--surface); color: var(--muted); font-size: 15px; font-weight: 700; font-style: italic; font-family: var(--font-sans); line-height: 1; cursor: pointer; }
+    .exercise-info-button { flex: none; width: 32px; height: 32px; border-radius: 50%; border: 1px solid var(--line); background: var(--surface); color: var(--muted); font-size: 15px; font-weight: 700; font-style: italic; font-family: var(--font-sans); line-height: 1; cursor: pointer; }
     .exercise-info-button:active { transform: scale(.94); }
     .exercise-accordion[open] .exercise-accordion-chevron { transform: rotate(90deg); }
     .exercise-accordion-body { padding: 2px 18px 18px; }
@@ -591,7 +591,7 @@
     /* ===== 12. Dashboard & stats ===== */
     .dashboard-view, .stats-view { display: none; }
     .dashboard-view.active, .stats-view.active { display: block; }
-    .week-strip { display: grid; grid-template-columns: repeat(7, minmax(0,1fr)); gap: 7px; margin: 0 0 22px; }
+    .week-strip { display: grid; grid-template-columns: repeat(7, minmax(0,1fr)); gap: 7px; margin: 0 0 22px; touch-action: pan-y; }
     .day-chip { min-width: 0; padding: 8px 2px; border: 1px solid var(--line); border-radius: 18px; background: var(--surface); text-align: center; }
     .day-chip span, .day-chip strong { display: block; }
     .day-chip span { color: var(--muted); font-size: 10px; font-weight: 750; text-transform: uppercase; }
