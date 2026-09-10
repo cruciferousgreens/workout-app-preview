@@ -96,7 +96,7 @@
       $('#exerciseVisual').innerHTML=visual?`<img src="${visual.src}" alt="${escapeHtml(visual.alt)}"><div class="exercise-visual-copy"><strong>Movement reference</strong><p>Use the instructions below for setup and execution. <a href="${visual.source}" target="_blank" rel="noreferrer">Image source ↗</a></p></div>`:'';
       const trendLogs = getExerciseLogs(id);
       const trend=trendLogs.slice().reverse().map(session=>({label:session.date,shortLabel:session.date.replace(/, \d{4}/,''),value:Math.round(Math.max(...session.sets.map(estimate1RM)))})).filter(p=>p.value>0);
-      $('#exerciseProgressChart').innerHTML=isBodyweight?'<div class="chart-empty">Bodyweight progress will use reps and added load from your workouts.</div>':lineChart(trend,value=>`${Math.round(value)} lb`);
+      $('#exerciseProgressChart').innerHTML=isBodyweight?'<div class="chart-empty">Bodyweight progress will use reps and added load from your workouts.</div>':lineChart(trend,value=>`${Math.round(displayWeight(value))} ${weightUnit()}`);
       renderHistory(id);
       $('#noteCard').innerHTML = `No notes for this movement yet.<span class="note-meta">Exercise-specific note</span>`;
       $('#movementCard').innerHTML = `<dl><dt>Force</dt><dd>${escapeHtml(ex.force || '—')}</dd><dt>Mechanic</dt><dd>${escapeHtml(ex.mechanic || '—')}</dd><dt>Primary</dt><dd>${escapeHtml(ex.primary.join(', ') || '—')}</dd><dt>Secondary</dt><dd>${escapeHtml(ex.secondary.join(', ') || '—')}</dd></dl>${ex.custom ? `<div class="custom-tools"><button class="custom-tool" id="editCustomExercise" type="button">Edit</button><button class="custom-tool danger" id="deleteCustomExercise" type="button">Delete</button></div>` : ''}`;

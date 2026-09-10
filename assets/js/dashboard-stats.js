@@ -57,7 +57,7 @@
         if(!prior.length)return;
         const best=Math.max(...current.map(estimate1RM)),priorBest=Math.max(...prior.map(estimate1RM)),weight=Math.max(...current.map(set=>Number(set.w))),priorWeight=Math.max(...prior.map(set=>Number(set.w)));
         const kind=best>priorBest+.5?'Estimated 1RM PR':weight>priorWeight?'Heaviest set PR':'';
-        if(kind)rows.push({exerciseId:item.exerciseId,date:workout.date,kind,sample:isSampleWorkout(workout),value:kind.startsWith('Estimated')?`${Math.round(best)} lb`:`${weight} lb`});
+        if(kind){const displayValue=kind.startsWith('Estimated')?`${Math.round(displayWeight(best))} ${weightUnit()}`:`${displayWeight(weight)} ${weightUnit()}`;rows.push({exerciseId:item.exerciseId,date:workout.date,kind,sample:isSampleWorkout(workout),value:displayValue});}
       }));
       return rows.slice(0,6);
     }
@@ -156,7 +156,7 @@
       $('#dashPeriodTabs').innerHTML=Object.entries(periodLabels).map(([key,label])=>`<button class="period-tab" type="button" data-dash-period="${key}" aria-pressed="${state.dashboardPeriod===key}">${label}</button>`).join('');
       document.querySelectorAll('[data-dash-period]').forEach(button=>button.addEventListener('click',()=>{state.dashboardPeriod=button.dataset.dashPeriod;schedulePersist();renderDashboard();}));
       const periodWorkouts=workoutsForPeriod(state.dashboardPeriod), periodSets=periodWorkouts.flatMap(w=>w.exercises.flatMap(e=>e.sets)), volume=periodSets.reduce((n,set)=>n+setVolume(set),0);
-      $('#dashboardStats').innerHTML=`<div class="stats-panel"><strong>${periodWorkouts.length}</strong><span>Completed workouts</span></div><div class="stats-panel"><strong>${periodSets.length}</strong><span>Completed sets</span></div><div class="stats-panel"><strong>${Math.round(volume).toLocaleString()}</strong><span>Total lb volume</span></div>`;
+      $('#dashboardStats').innerHTML=`<div class="stats-panel"><strong>${periodWorkouts.length}</strong><span>Completed workouts</span></div><div class="stats-panel"><strong>${periodSets.length}</strong><span>Completed sets</span></div><div class="stats-panel"><strong>${Math.round(displayVolume(volume)).toLocaleString()}</strong><span>Total ${weightUnit()} volume</span></div>`;
       const muscles=muscleCounts(periodWorkouts),volumes=muscleVolumes(periodWorkouts);$('#dashboardMuscles').innerHTML=Object.keys(muscles).length?Object.entries(muscles).sort((a,b)=>b[1]-a[1]).slice(0,6).map(([m,n])=>`<span class="tag primary">${escapeHtml(m)} · ${n}</span>`).join(''):'<span class="section-note">No muscles logged in this period.</span>';
       $('#dashboardHeatmap').innerHTML=muscleHeatmapMarkup(volumes,true);hydrateBodyMaps();
       const selDate=state.selectedDashboardDate, todayIso=localIsoDate();
@@ -170,13 +170,13 @@
       $('#statsPeriodTabs').innerHTML=Object.entries(labels).map(([key,label])=>`<button class="period-tab" type="button" data-stats-period="${key}" aria-pressed="${state.statsPeriod===key}">${label}</button>`).join('');
       document.querySelectorAll('[data-stats-period]').forEach(button=>button.addEventListener('click',()=>{state.statsPeriod=button.dataset.statsPeriod;schedulePersist();renderStats();}));
       const workouts=workoutsForPeriod(state.statsPeriod), sets=workouts.flatMap(w=>w.exercises.flatMap(e=>e.sets)), volume=sets.reduce((n,set)=>n+setVolume(set),0);
-      $('#statsGrid').innerHTML=`<div class="stats-panel"><strong>${workouts.length}</strong><span>Completed workouts</span></div><div class="stats-panel"><strong>${sets.length}</strong><span>Completed sets</span></div><div class="stats-panel"><strong>${Math.round(volume).toLocaleString()}</strong><span>Total lb volume</span></div>`;
+      $('#statsGrid').innerHTML=`<div class="stats-panel"><strong>${workouts.length}</strong><span>Completed workouts</span></div><div class="stats-panel"><strong>${sets.length}</strong><span>Completed sets</span></div><div class="stats-panel"><strong>${Math.round(displayVolume(volume)).toLocaleString()}</strong><span>Total ${weightUnit()} volume</span></div>`;
       const muscles=muscleCounts(workouts), volumes=muscleVolumes(workouts);
       $('#muscleHeatmapNote').textContent=`${labels[state.statsPeriod]} · weighted volume by primary and secondary muscle`;
       $('#muscleHeatmap').innerHTML=muscleHeatmapMarkup(volumes,false);hydrateBodyMaps();
       $('#muscleStats').innerHTML=Object.keys(muscles).length?`<div class="tag-row">${Object.entries(muscles).sort((a,b)=>b[1]-a[1]).map(([m,n])=>`<span class="tag primary">${escapeHtml(m)} · ${n} sets</span>`).join('')}</div>`:'<p class="section-note">Complete a workout to start building muscle-level stats.</p>';
       renderMuscleAnalysis(workouts,state.statsPeriod);
       const allWorkouts=workoutState.completed,monday=new Date();monday.setHours(12,0,0,0);monday.setDate(monday.getDate()-((monday.getDay()+6)%7));const weeks=Array.from({length:10},(_,i)=>{const d=new Date(monday);d.setDate(monday.getDate()-(7*(9-i)));const next=new Date(d);next.setDate(d.getDate()+7);const startIso=isoForDate(d),endIso=isoForDate(next);const value=allWorkouts.filter(w=>w.date>=startIso&&w.date<endIso).flatMap(w=>w.exercises.flatMap(e=>e.sets)).reduce((n,set)=>n+setVolume(set),0);return{label:new Intl.DateTimeFormat('en-US',{month:'short',day:'numeric'}).format(d),shortLabel:new Intl.DateTimeFormat('en-US',{month:'numeric',day:'numeric'}).format(d),value};});
-      $('#volumeChart').innerHTML=allWorkouts.length?lineChart(weeks,value=>`${Math.round(value).toLocaleString()} lb`):'<div class="chart-empty">Complete a workout to start the weekly volume chart.</div>';
+      $('#volumeChart').innerHTML=allWorkouts.length?lineChart(weeks,value=>`${Math.round(displayVolume(value)).toLocaleString()} ${weightUnit()}`):'<div class="chart-empty">Complete a workout to start the weekly volume chart.</div>';
     }
     
