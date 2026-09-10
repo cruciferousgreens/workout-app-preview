@@ -248,6 +248,9 @@
     .exercise-accordion-title strong { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 16px; letter-spacing: -.01em; }
     .exercise-accordion-title small { color: var(--muted); font-size: 12px; font-variant-numeric: tabular-nums; }
     .exercise-accordion-chevron { flex: none; color: var(--muted); font-size: 20px; line-height: 1; transition: transform .18s ease; }
+    .exercise-accordion-actions { flex: none; display: flex; align-items: center; gap: 10px; }
+    .exercise-info-button { flex: none; width: 26px; height: 26px; border-radius: 50%; border: 1px solid var(--border); background: var(--surface); color: var(--muted); font-size: 13px; font-weight: 700; font-style: italic; font-family: Georgia, serif; line-height: 1; cursor: pointer; }
+    .exercise-info-button:active { transform: scale(.94); }
     .exercise-accordion[open] .exercise-accordion-chevron { transform: rotate(90deg); }
     .exercise-accordion-body { padding: 2px 18px 18px; }
     /* Pretty date display over a native date input */

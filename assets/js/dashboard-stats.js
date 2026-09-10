@@ -56,7 +56,7 @@
         if(!prior.length)return;
         const best=Math.max(...current.map(estimate1RM)),priorBest=Math.max(...prior.map(estimate1RM)),weight=Math.max(...current.map(set=>Number(set.w))),priorWeight=Math.max(...prior.map(set=>Number(set.w)));
         const kind=best>priorBest+.5?'Estimated 1RM PR':weight>priorWeight?'Heaviest set PR':'';
-        if(kind)rows.push({exerciseId:item.exerciseId,date:workout.date,kind,value:kind.startsWith('Estimated')?`${Math.round(best)} lb`:`${weight} lb`});
+        if(kind)rows.push({exerciseId:item.exerciseId,date:workout.date,kind,sample:isSampleWorkout(workout),value:kind.startsWith('Estimated')?`${Math.round(best)} lb`:`${weight} lb`});
       }));
       return rows.slice(0,6);
     }
@@ -72,7 +72,7 @@
       const top=Object.entries(exerciseVolumes).filter(([,value])=>value>0).sort((a,b)=>b[1]-a[1]).slice(0,6);
       $('#topExercises').innerHTML=top.length?`<div class="action-list">${top.map(([id,value])=>`<button class="action-row" type="button" data-stat-exercise="${escapeHtml(id)}"><span><strong>${escapeHtml(exercises.find(ex=>ex.id===id)?.name||'Exercise')}</strong><span>Open history and trend</span></span><span class="action-row-value">${formatVolume(value)}</span></button>`).join('')}</div>`:'<p class="section-note">No weighted exercise volume in this period.</p>';
       const prs=recentPRRows(workouts);
-      $('#recentPRs').innerHTML=prs.length?`<div class="action-list">${prs.map(pr=>`<button class="action-row" type="button" data-stat-exercise="${escapeHtml(pr.exerciseId)}"><span><strong>${escapeHtml(exercises.find(ex=>ex.id===pr.exerciseId)?.name||'Exercise')}</strong><span>${escapeHtml(pr.kind)} · ${escapeHtml(formatLogDate(pr.date))}</span></span><span class="action-row-value">${escapeHtml(pr.value)}</span></button>`).join('')}</div>`:'<p class="section-note">No new PRs in this period yet. Keep logging completed sets—your next one will show here.</p>';
+      $('#recentPRs').innerHTML=prs.length?`<div class="action-list">${prs.map(pr=>`<button class="action-row" type="button" data-stat-exercise="${escapeHtml(pr.exerciseId)}"><span><strong>${escapeHtml(exercises.find(ex=>ex.id===pr.exerciseId)?.name||'Exercise')}</strong><span>${escapeHtml(pr.kind)}${pr.sample?' <span class="sample-label">Sample</span>':''} · ${escapeHtml(formatLogDate(pr.date))}</span></span><span class="action-row-value">${escapeHtml(pr.value)}</span></button>`).join('')}</div>`:'<p class="section-note">No new PRs in this period yet. Keep logging completed sets—your next one will show here.</p>';
       document.querySelectorAll('[data-stat-exercise]').forEach(button=>button.addEventListener('click',()=>openExercise(button.dataset.statExercise)));
       const comparison=comparisonPeriods(period), current=muscleVolumes(comparison.current), previous=muscleVolumes(comparison.previous);
       const trendRows=[...new Set([...Object.keys(current),...Object.keys(previous)])].map(muscle=>({muscle,current:Number(current[muscle]||0),previous:Number(previous[muscle]||0)})).filter(row=>row.current>0||row.previous>0).sort((a,b)=>b.current-a.current).slice(0,8);

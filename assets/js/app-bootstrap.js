@@ -109,7 +109,15 @@
     $('#keepCurrentDraft').addEventListener('click',()=>{pendingRepeatWorkout=null;$('#replaceDraftDialog').close();});
     $('#confirmReplaceDraft').addEventListener('click',()=>{const workout=pendingRepeatWorkout;pendingRepeatWorkout=null;$('#replaceDraftDialog').close();if(workout)repeatWorkout(workout,true);});
     $('#dashboardNav').addEventListener('click', () => showDashboard());
-    $('#workoutsNav').addEventListener('click', () => showWorkouts());
+    $('#workoutsNav').addEventListener('click', () => {
+      // Re-tapping the active Workout tab pops a completed-workout review back to the
+      // start screen; otherwise it just scrolls to top. A live draft is never disturbed.
+      if (state.activeView === 'workout' && !workoutState.draft && !$('#workoutComplete').hidden) {
+        $('#workoutComplete').hidden = true; renderWorkoutScreen(); window.scrollTo({top:0}); return;
+      }
+      if (state.activeView === 'workout') { window.scrollTo({top:0, behavior:'smooth'}); return; }
+      showWorkouts();
+    });
     $('#programNav').addEventListener('click', () => showProgram());
     $('#statsNav').addEventListener('click', () => showStats());
     $('#settingsNav').addEventListener('click', () => showSettings());
