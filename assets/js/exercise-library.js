@@ -12,10 +12,17 @@
         renderMuscleSelection();
         renderLibrary();
       }));
+      $('#favoritesToggle')?.addEventListener('click', () => {
+        state.onlyFavorites = !state.onlyFavorites;
+        renderMuscleSelection();
+        renderLibrary();
+      });
     }
 
     function renderMuscleSelection() {
       document.querySelectorAll('.muscle-option').forEach(button => button.setAttribute('aria-pressed', state.muscles.has(button.dataset.muscle)));
+      const favToggle = $('#favoritesToggle');
+      if (favToggle) favToggle.setAttribute('aria-pressed', String(state.onlyFavorites));
       $('#clearMuscles').hidden = state.muscles.size === 0;
     }
 
@@ -24,16 +31,43 @@
       return ranked.filter(x => {
         const allMuscles = [...x.primary, ...x.secondary];
         const muscleMatch = !state.muscles.size || [...state.muscles].every(muscle => allMuscles.includes(muscle));
-        return muscleMatch && (!state.equipment || x.equipment === state.equipment);
+        const favMatch = !state.onlyFavorites || state.favorites.has(x.id);
+        return muscleMatch && favMatch && (!state.equipment || x.equipment === state.equipment);
       });
+    }
+
+    const STAR_SVG = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2.6l2.9 5.9 6.5.9-4.7 4.6 1.1 6.5-5.8-3-5.8 3 1.1-6.5L2.6 9.4l6.5-.9z"/></svg>';
+    function isFavorite(id) { return state.favorites.has(id); }
+    function toggleFavorite(id) {
+      if (!id) return;
+      if (state.favorites.has(id)) state.favorites.delete(id); else state.favorites.add(id);
+      schedulePersist();
+      /* Update every visible star for this exercise in place (no re-render, no scroll loss). */
+      const fav = state.favorites.has(id);
+      document.querySelectorAll('.fav-toggle[data-id]').forEach(btn => {
+        if (btn.dataset.id !== id) return;
+        btn.setAttribute('aria-pressed', String(fav));
+        btn.setAttribute('aria-label', fav ? 'Remove from favorites' : 'Add to favorites');
+      });
+      const detailFav = $('#detailFavToggle');
+      if (detailFav && state.selected === id) {
+        detailFav.setAttribute('aria-pressed', String(fav));
+        detailFav.setAttribute('aria-label', fav ? 'Remove from favorites' : 'Add to favorites');
+      }
+      /* Unfavoriting while the Favorites filter is on removes the card. */
+      if (state.onlyFavorites) renderLibrary();
     }
 
     function exerciseCard(x) {
       const muscles = x.primary.length ? x.primary.map(muscle => `<span class="tag primary">${escapeHtml(muscle)}</span>`).join('') : '<span class="tag primary">Unspecified muscle</span>';
-      return `<button class="exercise-card" type="button" data-id="${escapeHtml(x.id)}">
-        <h2>${escapeHtml(x.name)}</h2>
-        <div class="tag-row">${muscles}<span class="tag">${escapeHtml(x.equipment || 'none')}</span>${x.custom ? '<span class="tag custom">Custom</span>' : ''}</div>
-      </button>`;
+      const fav = isFavorite(x.id);
+      return `<div class="exercise-card" data-id="${escapeHtml(x.id)}">
+        <button class="exercise-card-main" type="button" data-id="${escapeHtml(x.id)}" aria-label="Open ${escapeHtml(x.name)}">
+          <h2>${escapeHtml(x.name)}</h2>
+          <div class="tag-row">${muscles}<span class="tag">${escapeHtml(x.equipment || 'none')}</span>${x.custom ? '<span class="tag custom">Custom</span>' : ''}</div>
+        </button>
+        <button class="fav-toggle" type="button" data-id="${escapeHtml(x.id)}" aria-pressed="${fav}" aria-label="${fav ? 'Remove from favorites' : 'Add to favorites'}">${STAR_SVG}</button>
+      </div>`;
     }
 
     /** Real completed history only — sample workouts are excluded so the progression engine,
@@ -56,15 +90,19 @@
 
     function renderLibrary() {
       const rows = filteredExercises();
-      const filtered = !!state.query || state.muscles.size > 0 || !!state.equipment;
+      const filtered = !!state.query || state.muscles.size > 0 || !!state.equipment || state.onlyFavorites;
       const recentIds = recentExerciseIds();
       const recent = filtered ? [] : recentIds.map(id => rows.find(x => x.id === id)).filter(Boolean);
       const recentSet = new Set(recent.map(x => x.id));
       const rest = rows.filter(x => !recentSet.has(x.id));
       const exactQuery=normalize(state.query),hasLiteral=!state.query||rows.some(x=>normalize([x.name,x.id].join(' ')).includes(exactQuery));
       $('#resultCount').innerHTML = `${rows.length} of ${exercises.length} movements${state.query ? ` ${hasLiteral?'matching':'closest to'} <span class="active-query">“${escapeHtml(state.query)}”</span>` : ''}`;
-      $('#exerciseResults').innerHTML = rows.length ? `${recent.length ? `<section class="library-section" aria-labelledby="recentHeading"><div class="library-heading-row"><h2 class="library-heading" id="recentHeading">Recent</h2></div><div class="exercise-grid">${recent.map(exerciseCard).join('')}</div></section>` : ''}<section class="library-section" aria-labelledby="allHeading"><div class="library-heading-row"><h2 class="library-heading" id="allHeading">${recent.length ? 'All exercises' : 'Exercises'}</h2><button class="text-link" id="newExerciseLink" type="button">+ New exercise</button></div><div class="exercise-grid">${rest.map(exerciseCard).join('')}</div></section>` : `<div class="exercise-grid"><div class="empty"><strong>No movements found</strong>Try a broader name or clear one of the filters.</div></div>`;
-      document.querySelectorAll('.exercise-card').forEach(btn => btn.addEventListener('click', () => openExercise(btn.dataset.id)));
+      const emptyMsg = state.onlyFavorites && !state.favorites.size
+        ? `<div class="exercise-grid"><div class="empty"><strong>No favorites yet</strong>Tap the ☆ on any exercise to pin it here.</div></div>`
+        : `<div class="exercise-grid"><div class="empty"><strong>No movements found</strong>Try a broader name or clear one of the filters.</div></div>`;
+      $('#exerciseResults').innerHTML = rows.length ? `${recent.length ? `<section class="library-section" aria-labelledby="recentHeading"><div class="library-heading-row"><h2 class="library-heading" id="recentHeading">Recent</h2></div><div class="exercise-grid">${recent.map(exerciseCard).join('')}</div></section>` : ''}<section class="library-section" aria-labelledby="allHeading"><div class="library-heading-row"><h2 class="library-heading" id="allHeading">${recent.length ? 'All exercises' : 'Exercises'}</h2><button class="text-link" id="newExerciseLink" type="button">+ New exercise</button></div><div class="exercise-grid">${rest.map(exerciseCard).join('')}</div></section>` : emptyMsg;
+      document.querySelectorAll('.exercise-card-main').forEach(btn => btn.addEventListener('click', () => openExercise(btn.dataset.id)));
+      document.querySelectorAll('.exercise-card .fav-toggle').forEach(btn => btn.addEventListener('click', (e) => { e.stopPropagation(); toggleFavorite(btn.dataset.id); }));
       $('#newExerciseLink')?.addEventListener('click', () => openCustomDialog());
     }
 

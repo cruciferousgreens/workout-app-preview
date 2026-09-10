@@ -152,7 +152,8 @@
       const titleEl = $('#topBarTitle'); if (!titleEl) return;
       const back = $('#topBarBack'); const gear = $('#topBarSettings');
       if (back) back.hidden = !(view === 'settings' || view === 'detail');
-      if (gear) gear.hidden = view === 'settings';
+      /* The gear stays visible on Settings, shown active like an active tab (Justin 2026-09-10). */
+      if (gear) gear.classList.toggle('active', view === 'settings');
       if (view === 'detail') {
         const ret = state.exerciseDetailReturn && state.exerciseDetailReturn.view;
         const parentKey = { library: 'library', workout: 'workout', program: 'program', dashboard: 'dashboard', stats: 'stats', 'completed-workout': 'workout' }[ret] || 'library';

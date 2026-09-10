@@ -199,6 +199,7 @@
     $('#programNav').addEventListener('click', () => goTab(showProgram, 'program'));
     $('#statsNav').addEventListener('click', () => goTab(showStats, 'stats'));
     $('#topBarSettings').addEventListener('click', () => goTab(showSettings, 'settings'));
+    $('#detailFavToggle')?.addEventListener('click', () => toggleFavorite(state.selected));
     $('#topBarBack').addEventListener('click', () => {
       if (state.activeView === 'detail') backFromExerciseDetail();
       else history.back();

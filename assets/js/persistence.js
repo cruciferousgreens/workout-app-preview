@@ -14,6 +14,7 @@ function collectPersistable(){
     archivedPrograms:workoutState.archivedPrograms,
     draft:workoutState.draft,
     customExercises:state.customExercises,
+    favorites:[...state.favorites],
     progressionSetup:progressionSetup,
     dashboardPeriod:state.dashboardPeriod,
     statsPeriod:state.statsPeriod
@@ -63,6 +64,7 @@ function restorePersisted(){
   if(Array.isArray(data.archivedPrograms))workoutState.archivedPrograms=data.archivedPrograms;
   if(data.draft&&typeof data.draft==='object'&&data.draft!==null)workoutState.draft=data.draft;
   if(Array.isArray(data.customExercises))state.customExercises=data.customExercises;
+  if(Array.isArray(data.favorites))state.favorites=new Set(data.favorites.filter(x=>typeof x==='string'));
   if(data.progressionSetup&&typeof data.progressionSetup==='object'){
     const incoming=data.progressionSetup;
     Object.assign(progressionSetup,incoming);

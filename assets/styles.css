@@ -16,7 +16,6 @@
       --accent: #2e7d32;
       --accent-hover: #256429;
       --accent-soft: #ddefdc;
-      --accent-ink: #1f5c25;
       --pine: #2e7d32;
       --pine-soft: #ddefdc;
       --rose: #d7827e;
@@ -64,7 +63,6 @@
       --accent: #2e7d32;
       --accent-hover: #35923c;
       --accent-soft: #1d3323;
-      --accent-ink: #a9dcab;
       --pine: #2e7d32;
       --pine-soft: #1d3323;
       --rose: #f0a3b8;
@@ -107,7 +105,6 @@
       --accent: #b4637a;
       --accent-hover: #a2546a;
       --accent-soft: rgba(180,99,122,.12);
-      --accent-ink: #96485e;
       --pine: #286983;
       --pine-soft: rgba(40,105,131,.12);
       --rose: #d7827e;
@@ -149,7 +146,6 @@
       --accent: #f5a97f;
       --accent-hover: #f8bd99;
       --accent-soft: rgba(245,169,127,.14);
-      --accent-ink: #f5a97f;
       --pine: #8bd5ca;
       --pine-soft: rgba(139,213,202,.14);
       --rose: #f5bde6;
@@ -191,7 +187,6 @@
       --accent: #a6e3a1;
       --accent-hover: #b9ecb4;
       --accent-soft: rgba(166,227,161,.14);
-      --accent-ink: #a6e3a1;
       --pine: #94e2d5;
       --pine-soft: rgba(148,226,213,.14);
       --rose: #f5c2e7;
@@ -261,7 +256,7 @@
     .filter-clear[hidden] { display: none; }
     .muscle-options { display: flex; flex-wrap: wrap; gap: 7px; }
     .muscle-option { min-height: 34px; padding: 6px 10px; border: 1px solid var(--line); border-radius: 999px; background: var(--surface); color: var(--ink); cursor: pointer; font-size: 12px; text-transform: capitalize; }
-    .muscle-option[aria-pressed="true"] { border-color: var(--accent); background: var(--accent-soft); color: var(--accent-ink); font-weight: 700; }
+    .muscle-option[aria-pressed="true"] { border-color: var(--accent); background: var(--accent-soft); color: var(--accent); font-weight: 700; }
     select { width: 100%; min-height: 42px; margin-top: 8px; padding: 0 12px; border: 1px solid var(--line); border-radius: var(--radius-sm); background: var(--surface); color: var(--ink); font: inherit; }
     .summary-row { display: flex; align-items: center; justify-content: space-between; gap: 16px; margin: 18px 2px 12px; }
     .library-foot { margin: 20px 0 8px; }
@@ -272,13 +267,22 @@
     .active-query { font-weight: 700; color: var(--ink); }
     /* ===== 6. Exercise library cards & tags ===== */
     .exercise-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; }
-    .exercise-card { min-width: 0; min-height: 164px; padding: 18px; text-align: left; border: 1px solid var(--line); border-radius: var(--radius-md); background: var(--surface); cursor: pointer; transition: transform .14s, box-shadow .14s, border-color .14s; }
-    .exercise-card:hover { transform: translateY(-2px); border-color: var(--line-strong); box-shadow: var(--shadow); }
-    .exercise-card:focus-visible { outline: 3px solid var(--focus-ring); outline-offset: 2px; }
+    .exercise-card { position: relative; min-width: 0; border: 1px solid var(--line); border-radius: var(--radius-md); background: var(--surface); transition: transform .14s, box-shadow .14s, border-color .14s; }
+    .exercise-card-main { display: block; width: 100%; min-height: 164px; padding: 18px; padding-right: 54px; border: 0; background: none; color: inherit; font: inherit; text-align: left; cursor: pointer; }
+    .exercise-card:has(.exercise-card-main:hover) { transform: translateY(-2px); border-color: var(--line-strong); box-shadow: var(--shadow); }
+    .exercise-card:has(.exercise-card-main:focus-visible) { outline: 3px solid var(--focus-ring); outline-offset: 2px; }
+    .exercise-card-main:focus-visible { outline: none; }
     .exercise-card h2 { margin: 0 0 20px; font-size: 18px; line-height: 1.18; letter-spacing: -.02em; }
+    /* Favorite star: hollow muted by default, filled accent when favorited. */
+    .fav-toggle { display: grid; place-items: center; width: 38px; height: 38px; border: 0; border-radius: 50%; background: transparent; color: var(--muted); cursor: pointer; }
+    .fav-toggle svg { width: 20px; height: 20px; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linejoin: round; }
+    .fav-toggle:hover { background: var(--surface-2); }
+    .fav-toggle[aria-pressed="true"] { color: var(--accent); }
+    .fav-toggle[aria-pressed="true"] svg { fill: currentColor; }
+    .exercise-card .fav-toggle { position: absolute; top: 8px; right: 8px; }
     .tag-row { display: flex; flex-wrap: wrap; gap: 6px; }
     .tag { display: inline-flex; align-items: center; min-height: 24px; padding: 3px 8px; border-radius: 999px; background: var(--surface-2); color: var(--ink); font-size: 11px; text-transform: capitalize; }
-    .tag.primary { background: var(--accent-soft); color: var(--accent-ink); font-weight: 700; }
+    .tag.primary { background: var(--accent-soft); color: var(--accent); font-weight: 700; }
     .tag.custom { background: var(--gold-soft); color: var(--warning); font-weight: 700; }
     .empty { padding: 60px 20px; text-align: center; color: var(--muted); grid-column: 1 / -1; }
 
@@ -303,7 +307,7 @@
     fieldset.field legend { padding: 0; color: var(--muted); font-size: 12px; font-weight: 700; }
     .form-pill-options { display: flex; flex-wrap: wrap; gap: 7px; }
     .form-pill { min-height: 36px; padding: 6px 11px; border: 1px solid var(--line); border-radius: 999px; background: var(--surface); color: var(--ink); cursor: pointer; font-size: 12px; text-transform: capitalize; }
-    .form-pill[aria-pressed="true"] { border-color: var(--accent); background: var(--accent-soft); color: var(--accent-ink); font-weight: 700; }
+    .form-pill[aria-pressed="true"] { border-color: var(--accent); background: var(--accent-soft); color: var(--accent); font-weight: 700; }
     .form-pill:focus-visible { outline: 3px solid var(--focus-ring); outline-offset: 2px; }
     .form-error { min-height: 18px; margin: 12px 0 0; color: var(--danger); font-size: 12px; }
     .form-actions { display: flex; justify-content: flex-end; gap: 9px; margin-top: 5px; }
@@ -322,8 +326,10 @@
     .back { margin: 0 0 26px; padding: 9px 14px 9px 10px; border: 0; border-radius: 999px; background: var(--surface-2); cursor: pointer; display: inline-flex; align-items: center; gap: 4px; color: var(--ink); font-size: 14px; font-weight: 700; }
     .back:hover { background: var(--surface-2); color: var(--ink); }
     /* Top-bar back pill: same affordance as the in-content back pill (Justin 2026-09-10). */
-    #topBarBack.back-pill { grid-column: 1; display: inline-flex; align-items: center; gap: 1px; width: auto; height: auto; padding: 8px 13px 8px 8px; border-radius: 999px; background: var(--surface-2); color: var(--ink); font-size: 14px; font-weight: 700; white-space: nowrap; }
+    #topBarBack.back-pill { grid-column: 1; display: inline-flex; align-items: center; justify-content: center; gap: 1px; width: 84px; height: auto; padding: 8px 0; border-radius: 999px; background: var(--surface-2); color: var(--ink); font-size: 14px; font-weight: 700; white-space: nowrap; }
     #topBarBack.back-pill svg { width: 16px; height: 16px; }
+    /* The slot is a fixed 84px in both states, so the title sits at the exact
+       same x-position on every page — no jump when the pill appears (Justin 2026-09-10). */
     #topBarBack.back-pill[hidden] { display: inline-flex; visibility: hidden; }
     .detail-header { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 24px; align-items: start; margin-bottom: 26px; }
     .detail-title { font: 800 clamp(30px, 6vw, 44px)/1.02 var(--font-sans); letter-spacing: -.03em; margin-bottom: 16px; }
@@ -437,7 +443,7 @@
     .log-input:focus { border-color: var(--accent); box-shadow: 0 0 0 3px var(--focus-ring); }
     .selected-set-tags { grid-column: 2 / -1; display: flex; flex-wrap: wrap; gap: 5px; min-height: 0; }
     .selected-set-tags:empty { display: none; }
-    .set-tag-chip { display: inline-flex; align-items: center; min-height: 23px; padding: 3px 7px; border-radius: 999px; background: var(--accent-soft); color: var(--accent-ink); font-size: 10px; font-weight: 700; }
+    .set-tag-chip { display: inline-flex; align-items: center; min-height: 23px; padding: 3px 7px; border-radius: 999px; background: var(--accent-soft); color: var(--accent); font-size: 10px; font-weight: 700; }
     .complete-set { width: 42px; height: 42px; border: 1px solid var(--line); border-radius: 50%; background: var(--surface-raised); color: var(--muted); cursor: pointer; display: grid; place-items: center; font-size: 18px; font-weight: 900; }
     .complete-set[aria-pressed="true"] { border-color: var(--accent); background: var(--accent); color: var(--surface-raised); }
     .log-set.is-complete .log-input { background: var(--pine-soft); border-color: var(--foam); }
@@ -469,7 +475,6 @@
     .tag-list-item { display: inline-flex; align-items: center; gap: 5px; padding: 4px 6px 4px 9px; border-radius: 999px; background: var(--surface-2); font-size: 11px; }
     .tag-list-item button { width: 22px; height: 22px; padding: 0; border: 0; border-radius: 50%; background: var(--line); color: var(--muted); cursor: pointer; }
     .completed-card { max-width: 760px; padding: clamp(22px, 5vw, 38px); border: 1px solid var(--line); border-radius: var(--radius-lg); background: var(--surface); scroll-margin-bottom: var(--bottom-nav-clearance); }
-    .completed-mark { width: 44px; height: 44px; margin-bottom: 18px; display: grid; place-items: center; border-radius: 50%; background: var(--accent-soft); font-size: 22px; }
     .completed-set-cell .perf-sub { display: block; color: var(--muted); font-size: 11px; font-weight: 600; margin-top: 1px; }
     .completed-card h2 { margin-bottom: 6px; font: 800 clamp(26px, 5vw, 34px)/1.08 var(--font-sans); letter-spacing: -.025em; }
     .completed-meta { color: var(--muted); font-size: 13px; }
@@ -506,6 +511,8 @@
     #topBarBack[hidden] { display: grid; visibility: hidden; }
     .top-bar-title { grid-column: 2; margin: 0; font-size: 17px; font-weight: 750; text-align: left; padding-left: 12px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
     #topBarSettings { grid-column: 3; }
+    /* Active state when the Settings page is open: same treatment as an active tab. */
+    #topBarSettings.active { background: var(--accent-soft); color: var(--accent); }
     /* Breadcrumb title on sub-pages ("Exercises / Air Bike"): parent is tappable. */
     .top-bar-title:has(.crumb-parent) { display: flex; align-items: baseline; }
     .crumb-parent { flex: none; background: none; border: 0; padding: 0; margin: 0; font: inherit; color: var(--muted); cursor: pointer; white-space: nowrap; }
@@ -518,9 +525,9 @@
     .has-top-bar #backButton { display: none; }
     .has-top-bar .detail .detail-title { display: none; }
     .nav-item { min-height: 50px; border: 0; border-radius: 12px; background: transparent; color: var(--muted); display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 1px; cursor: pointer; font-size: 10px; font-weight: 700; line-height: 1.25; }
-    .nav-item.active { background: var(--accent-soft); color: var(--accent-ink); font-weight: 700; }
+    .nav-item.active { background: var(--accent-soft); color: var(--accent); font-weight: 700; }
     .nav-item.has-live-draft { position: relative; }
-    .nav-item.has-live-draft:not(.active) { color: var(--accent-ink); }
+    .nav-item.has-live-draft:not(.active) { color: var(--accent); }
     .nav-item.has-live-draft::after { content: ''; position: absolute; top: 6px; left: 50%; margin-left: 12px; width: 9px; height: 9px; border-radius: 50%; background: var(--accent); box-shadow: 0 0 0 2px var(--surface-raised); pointer-events: none; }
     .nav-item[disabled] { opacity: .42; cursor: default; }
     .small-button[disabled] { opacity: .45; cursor: default; }
@@ -556,9 +563,9 @@
       .muscle-options { gap: 6px; }
       .muscle-option { min-height: 36px; }
       .exercise-grid { grid-template-columns: 1fr; gap: 8px; }
-      .exercise-card { min-height: 128px; padding: 16px; }
+      .exercise-card-main { min-height: 128px; padding: 16px; padding-right: 50px; }
       .exercise-card h2 { margin-bottom: 15px; }
-      .detail-header { grid-template-columns: 1fr; gap: 12px; }
+      .detail-header { grid-template-columns: minmax(0, 1fr) auto; gap: 12px; }
       .source-id { text-align: left; max-width: none; }
       .stats { grid-template-columns: repeat(2, minmax(0, 1fr)); }
       .stat:first-child { grid-column: 1 / -1; }
@@ -914,7 +921,7 @@
     button.suggestion-card:hover { border-color: var(--accent); box-shadow: 0 3px 10px rgba(0,0,0,.06); }
     button.suggestion-card.applied { border-color: var(--accent); background: var(--accent-soft); }
     .suggestion-name { display: flex; align-items: center; justify-content: space-between; gap: 10px; margin-bottom: 8px; color: var(--muted); font-size: 11px; font-weight: 800; letter-spacing: .07em; text-transform: uppercase; }
-    .suggestion-name span { flex: none; padding: 4px 11px; border-radius: 999px; background: var(--accent-soft); color: var(--accent-ink); font-size: 10px; font-weight: 800; letter-spacing: .04em; text-transform: none; white-space: nowrap; }
+    .suggestion-name span { flex: none; padding: 4px 11px; border-radius: 999px; background: var(--accent-soft); color: var(--accent); font-size: 10px; font-weight: 800; letter-spacing: .04em; text-transform: none; white-space: nowrap; }
     .suggestion-change { display: flex; align-items: baseline; gap: 10px; color: var(--muted); font-size: 13px; font-variant-numeric: tabular-nums; }
     .suggestion-change strong { color: var(--ink); font-size: 19px; font-weight: 800; letter-spacing: -.01em; }
     .suggestion-reason { margin-top: 8px; color: var(--muted); font-size: 12px; line-height: 1.45; }
@@ -1088,7 +1095,7 @@
     .template-disclosure > summary::-webkit-details-marker { display: none; }
     .template-disclosure[open] { grid-column: 1 / -1; }
     .template-disclosure-list { margin-top: 10px; }
-    .built-in-label { display: inline-block; margin-left: 6px; padding: 1px 7px; border-radius: 999px; background: var(--accent-soft); color: var(--accent-ink); font-size: 9px; font-weight: 800; letter-spacing: .04em; text-transform: uppercase; vertical-align: middle; }
+    .built-in-label { display: inline-block; margin-left: 6px; padding: 1px 7px; border-radius: 999px; background: var(--accent-soft); color: var(--accent); font-size: 9px; font-weight: 800; letter-spacing: .04em; text-transform: uppercase; vertical-align: middle; }
     .sample-label { display: inline-block; margin-left: 6px; padding: 1px 7px; border-radius: 999px; background: var(--gold-soft); color: var(--gold); font-size: 9px; font-weight: 800; letter-spacing: .04em; text-transform: uppercase; vertical-align: middle; }
     .advanced-options summary::-webkit-details-marker { display: none; }
     .advanced-options summary::after { content: '+'; color: var(--accent); font-size: 18px; font-weight: 500; }
@@ -1159,7 +1166,7 @@
     }
     button, input, textarea, select { color: var(--ink); }
     button:focus-visible, input:focus-visible, textarea:focus-visible, select:focus-visible,
-    .exercise-card:focus-visible, .form-pill:focus-visible, .day-chip:focus-visible {
+    .form-pill:focus-visible, .day-chip:focus-visible {
       outline: 3px solid var(--focus-ring);
       outline-offset: 2px;
     }
@@ -1219,10 +1226,15 @@
     }
     .tag.primary, .exercise-tag-chip.preset, .set-tag-chip,
     .choice-pill[aria-pressed="true"], .real-data-label {
-      border-color: var(--pine);
-      background: var(--pine-soft);
-      color: var(--accent-ink);
+      border-color: var(--accent);
+      background: var(--accent-soft);
+      color: var(--accent);
     }
+    /* Design paradigm (Justin 2026-09-10, locked): emphasis treatments use ONE
+       theme accent — var(--accent) for text/border, var(--accent-soft) for the
+       fill. Never mix a second hue token (pine/rose) or a separate ink token
+       into the same element: pine border + mauve text read as broken. The old
+       --accent-ink token is retired. */
     /* Note: .period-tab[aria-pressed="true"] is deliberately NOT in the list
        above — its active state is the single-accent treatment at the
        .period-tab rule, so the border and text never come from two different
@@ -1240,7 +1252,7 @@
     .period-trigger[aria-expanded="true"] {
       border-color: var(--accent);
       background: var(--accent-soft);
-      color: var(--accent-ink);
+      color: var(--accent);
     }
     .switch[aria-pressed="true"] { background: var(--accent); }
     .switch::after { background: var(--surface-raised); box-shadow: 0 1px 4px var(--shadow-color); }
@@ -1298,7 +1310,7 @@
       background: var(--nav-bg);
     }
     .nav-item { border-radius: 18px; color: var(--muted); }
-    .nav-item.active { background: var(--accent-soft); color: var(--accent-ink); font-weight: 700; }
+    .nav-item.active { background: var(--accent-soft); color: var(--accent); font-weight: 700; }
     .day-chip { border-color: var(--line); border-radius: var(--radius-md); background: var(--surface-raised); }
     .day-chip.today { border-color: var(--accent); background: transparent; }
     .day-chip.selected { border-color: var(--accent); background: var(--accent); color: var(--on-accent); box-shadow: none; }
@@ -1368,7 +1380,7 @@
     .small-button.danger { border-color: var(--rose); color: var(--rose); }
     .small-button.armed { border-color: var(--rose); background: var(--rose-soft); color: var(--ink-strong); }
     .attribution-list { margin: 0; padding-left: 18px; display: grid; gap: 8px; color: var(--muted); font-size: 13px; line-height: 1.5; }
-    .attribution-list a { color: var(--accent-ink); }
+    .attribution-list a { color: var(--accent); }
     @media (max-width: 520px) { .settings-grid { grid-template-columns: 1fr; } }
     /* Settings polish — airy stacked headers, generous rhythm */
     #settingsView .dashboard-card { margin-bottom: 18px; padding: 22px; }
@@ -1415,7 +1427,7 @@
     .action-row { width: 100%; display: grid; grid-template-columns: minmax(0,1fr) auto; gap: 12px; align-items: center; min-height: 52px; padding: 10px 12px; border: 1px solid var(--line); border-radius: var(--radius-sm); background: var(--surface-raised); color: var(--ink); text-align: left; cursor: pointer; }
     .action-row span { color: var(--muted); font-size: 11px; }
     .action-row strong { display: block; }
-    .action-row-value { color: var(--accent-ink); font-size: 13px; font-weight: 850; }
+    .action-row-value { color: var(--accent); font-size: 13px; font-weight: 850; }
     .focus-key { display: grid; grid-template-columns: 90px minmax(0,1fr) 42px; align-items: center; gap: 9px; min-height: 38px; }
     .focus-key strong { font-size: 12px; }
     .focus-key .analysis-track { width: 100%; }

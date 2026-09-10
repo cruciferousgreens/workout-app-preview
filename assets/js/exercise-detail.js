@@ -77,6 +77,12 @@
         state.exerciseDetailReturn = {view: state.activeView};
       }
       $('#detailTitle').textContent = ex.name;
+      const detailFav = $('#detailFavToggle');
+      if (detailFav) {
+        const fav = state.favorites.has(id);
+        detailFav.setAttribute('aria-pressed', String(fav));
+        detailFav.setAttribute('aria-label', fav ? 'Remove from favorites' : 'Add to favorites');
+      }
       $('#detailTags').innerHTML = [...ex.primary.map(x => `<span class="tag primary">${escapeHtml(x)}</span>`), ...ex.secondary.map(x => `<span class="tag">${escapeHtml(x)}</span>`), `<span class="tag">${escapeHtml(ex.equipment || 'no equipment')}</span>`, ...(ex.custom ? ['<span class="tag custom">Custom</span>'] : [])].join('');
       const realStats = statsFor(id);
       const st = realStats;

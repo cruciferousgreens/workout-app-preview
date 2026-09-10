@@ -65,6 +65,12 @@
 
         <div class="filter-panel" id="filterPanel">
           <div class="filter-group">
+            <div class="filter-label-row"><span class="filter-label" id="showFilterLabel">SHOW</span></div>
+            <div class="muscle-options" role="group" aria-labelledby="showFilterLabel">
+              <button class="muscle-option" id="favoritesToggle" type="button" aria-pressed="false">★ Favorites</button>
+            </div>
+          </div>
+          <div class="filter-group">
             <div class="filter-label-row"><span class="filter-label" id="muscleFilterLabel">MUSCLES</span><button class="filter-clear" id="clearMuscles" type="button" hidden>Clear</button></div>
             <div class="muscle-options" id="muscleOptions" role="group" aria-labelledby="muscleFilterLabel"></div>
           </div>
@@ -253,6 +259,9 @@
             <h1 class="detail-title" id="detailTitle"></h1>
             <div class="detail-tags" id="detailTags"></div>
           </div>
+          <button class="fav-toggle" id="detailFavToggle" type="button" aria-pressed="false" aria-label="Add to favorites">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2.6l2.9 5.9 6.5.9-4.7 4.6 1.1 6.5-5.8-3-5.8 3 1.1-6.5L2.6 9.4l6.5-.9z"/></svg>
+          </button>
         </header>
 
         <div class="exercise-visual" id="exerciseVisual"></div>
