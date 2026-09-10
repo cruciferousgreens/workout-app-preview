@@ -69,7 +69,21 @@
       saveStatusTimer = setTimeout(() => { status.textContent = 'Changes are saved on this device'; }, 1800);
     }
 
-    function startBlankWorkout(name = 'Workout', programId = null, programWorkoutUid = null) {
+    /* Set-complete validation errors render inline under the offending set row,
+       right next to the check that triggered them — not in the footer far below. */
+    function clearSetRowErrors() { document.querySelectorAll('.set-inline-error').forEach(el => el.remove()); }
+    function showSetRowError(setRow, message) {
+      clearSetRowErrors();
+      if (!message || !setRow) return;
+      const note = document.createElement('p');
+      note.className = 'set-inline-error';
+      note.setAttribute('role', 'alert');
+      note.textContent = message;
+      setRow.after(note);
+      note.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    }
+
+    function startBlankWorkout(name = '', programId = null, programWorkoutUid = null) {
       workoutState.draft = {name, date:localIsoDate(), exercises:[], programId, programWorkoutUid, editingId:null};
       $('#workoutComplete').hidden = true;
       renderWorkoutScreen();
@@ -115,7 +129,7 @@
       if($('#repeatLastWorkout')){$('#repeatLastWorkout').disabled=!latestReal;$('#repeatLastWorkoutMeta').textContent=latestReal?`${latestReal.name} · ${formatLogDate(latestReal.date)}`:'Complete a workout to enable this.';}
       renderWorkoutRecent();
       if (!hasDraft) return;
-      $('#workoutName').value = workoutState.draft.name;
+      $('#workoutName').value = workoutState.draft.name || '';
       $('#workoutDate').value = workoutState.draft.date;
       renderWorkoutDateDisplay();
       renderWorkoutExercises();
@@ -195,7 +209,7 @@
             <summary class="exercise-accordion-head"><span class="exercise-accordion-title"><strong>${escapeHtml(ex.name)}</strong><small>${escapeHtml(cardSummary)}</small></span><span class="exercise-accordion-actions"><button class="exercise-info-button" type="button" data-exercise-info="${escapeHtml(item.exerciseId)}" aria-label="About ${escapeHtml(ex.name)}">i</button><span class="exercise-accordion-chevron" aria-hidden="true">›</span></span></summary>
             <div class="exercise-accordion-body">
             ${grouped ? `<div class="superset-band">Superset ${draft.exercises.filter((row, index) => row.supersetId && draft.exercises.findIndex(first => first.supersetId === row.supersetId) === index).findIndex(row => row.supersetId === item.supersetId) + 1}</div>` : ''}
-            <div class="workout-exercise-head"><div class="exercise-title-copy"><h3>${escapeHtml(ex.name)}</h3><p>${escapeHtml((ex.primary||[]).map(titleCase).join(', ') || 'Unspecified muscle')} · ${escapeHtml(titleCase(ex.equipment || 'No equipment'))}</p><div class="exercise-meta-row"><span class="set-count-badge">${item.sets.length} set${item.sets.length===1?'':'s'}</span></div></div><button class="drag-handle" type="button" data-drag-uid="${escapeHtml(item.uid)}" aria-label="Drag to reorder ${escapeHtml(ex.name)}">⋮⋮</button></div>
+            <div class="workout-exercise-head"><div class="exercise-title-copy"><p>${escapeHtml((ex.primary||[]).map(titleCase).join(', ') || 'Unspecified muscle')} · ${escapeHtml(titleCase(ex.equipment || 'No equipment'))}</p><div class="exercise-meta-row"><span class="set-count-badge">${item.sets.length} set${item.sets.length===1?'':'s'}</span></div></div><button class="drag-handle" type="button" data-drag-uid="${escapeHtml(item.uid)}" aria-label="Drag to reorder ${escapeHtml(ex.name)}">⋮⋮</button></div>
             <details class="advanced-options" ${item.optionsOpen?'open':''}><summary>Exercise options</summary><div class="advanced-options-body"><div class="exercise-tools"><div class="tracking-segment" role="group" aria-label="Track reps or seconds"><button type="button" data-tracking-mode="reps" data-tracking-uid="${escapeHtml(item.uid)}" aria-pressed="${tracking==='time'?'false':'true'}">Reps</button><button type="button" data-tracking-mode="seconds" data-tracking-uid="${escapeHtml(item.uid)}" aria-pressed="${tracking==='time'?'true':'false'}">Seconds</button></div>${draft.exercises.length > 1 ? `<button class="superset-button ${grouped ? 'active' : ''}" type="button" data-superset-uid="${escapeHtml(item.uid)}">${grouped ? 'Edit superset' : 'Create superset'}</button>` : ''}</div><div class="exercise-tag-row">${(item.exerciseTags||[]).map(tag=>`<span class="exercise-tag-chip ${workoutState.exerciseTagPresets.includes(tag)?'preset':''}">${escapeHtml(tag)}</span>`).join('')}<button class="exercise-tag-button" type="button" data-draft-exercise-tags="${escapeHtml(item.uid)}">${item.exerciseTags?.length?'Edit exercise tags':'+ Exercise tags'}</button></div></div></details>
             ${lastSummary?`<p class="last-session-line"><strong>${escapeHtml(lastSummary)}</strong></p>`:'<p class="last-session-line">No history for this exercise yet.</p>'}
             <div class="log-labels"><span>SET</span><span>${isBodyweight ? `ADDED ${weightUnit().toUpperCase()}` : `WEIGHT (${weightUnit().toUpperCase()})`}</span><span>${tracking === 'time' ? 'SECONDS' : 'REPS'}</span><span>RPE</span><span>ACTIONS</span></div>
@@ -227,7 +241,7 @@
         requestAnimationFrame(()=>{const feedback=document.querySelector(`[data-copy-feedback="${CSS.escape(item.uid)}"]`);if(feedback)feedback.textContent='Applied';});
       }));
       document.querySelectorAll('.delete-set').forEach(button => button.addEventListener('click', () => { const item = draft.exercises.find(row => row.uid === button.dataset.exerciseUid); if (!item) return; item.sets = item.sets.filter(set => set.uid !== button.dataset.setUid); if (!item.sets.length) item.sets.push(newSet()); renderWorkoutExercises(); markDraftSaved(); }));
-      document.querySelectorAll('.log-input').forEach(input => input.addEventListener('input', () => { const row=input.closest('.log-set'); const exerciseUid = input.closest('.workout-exercise').dataset.workoutExercise; const setUid = row.dataset.setUid; const set = draft.exercises.find(item => item.uid === exerciseUid)?.sets.find(itemSet => itemSet.uid === setUid); if (set) { set[input.dataset.field] = input.dataset.field==='w' ? storageWeight(input.value) : input.value; if (set.complete) { set.complete = false; row.classList.remove('is-complete'); const check=row.querySelector('.complete-set'); check?.setAttribute('aria-pressed','false'); check?.setAttribute('aria-label','Mark set complete'); } } $('#workoutError').textContent = ''; markDraftSaved(); }));
+      document.querySelectorAll('.log-input').forEach(input => input.addEventListener('input', () => { const row=input.closest('.log-set'); const exerciseUid = input.closest('.workout-exercise').dataset.workoutExercise; const setUid = row.dataset.setUid; const set = draft.exercises.find(item => item.uid === exerciseUid)?.sets.find(itemSet => itemSet.uid === setUid); if (set) { set[input.dataset.field] = input.dataset.field==='w' ? storageWeight(input.value) : input.value; if (set.complete) { set.complete = false; row.classList.remove('is-complete'); const check=row.querySelector('.complete-set'); check?.setAttribute('aria-pressed','false'); check?.setAttribute('aria-label','Mark set complete'); } } $('#workoutError').textContent = ''; clearSetRowErrors(); markDraftSaved(); }));
       document.querySelectorAll('.complete-set').forEach(button => button.addEventListener('click', () => {
         const set = findDraftSet(button.dataset.exerciseUid, button.dataset.setUid);
         const item=draft.exercises.find(row=>row.uid===button.dataset.exerciseUid);
@@ -248,11 +262,12 @@
         }
         const performanceValue=tracking==='time'?set.seconds:set.r;
         if (!set.complete && ((!weightOptional && set.w === '') || performanceValue === '' || Number(set.w||0) < 0 || Number(performanceValue) < 1 || (set.rpe !== '' && (Number(set.rpe) < 1 || Number(set.rpe) > 10)))) {
-          $('#workoutError').textContent = weightOptional ? `Enter ${tracking==='time'?'seconds':'reps'} before marking this set complete. Added weight and RPE are optional.` : `Enter weight and ${tracking==='time'?'seconds':'reps'} before marking this set complete. RPE is optional.`;
-          button.closest('.log-set').querySelector((!weightOptional&&set.w==='')?'.weight-input':'.reps-input')?.focus(); return;
+          const perfWord = tracking==='time'?'seconds':'reps';
+          showSetRowError(setRow, weightOptional ? `Enter ${perfWord} to complete this set. Weight and RPE are optional.` : `Enter weight and ${perfWord} to complete this set. RPE is optional.`);
+          setRow.querySelector((!weightOptional&&set.w==='')?'.weight-input':'.reps-input')?.focus(); return;
         }
         const pr=!set.complete?livePRLabel(item,set):'';
-        set.complete = !set.complete; button.setAttribute('aria-pressed', String(set.complete)); button.setAttribute('aria-label', set.complete ? 'Mark set incomplete' : 'Mark set complete'); button.closest('.log-set').classList.toggle('is-complete', set.complete); $('#workoutError').textContent = ''; if(pr)showToast(`PR · ${pr}`,'pr-toast'); markDraftSaved();
+        set.complete = !set.complete; button.setAttribute('aria-pressed', String(set.complete)); button.setAttribute('aria-label', set.complete ? 'Mark set incomplete' : 'Mark set complete'); button.closest('.log-set').classList.toggle('is-complete', set.complete); $('#workoutError').textContent = ''; clearSetRowErrors(); if(pr)showToast(`PR · ${pr}`,'pr-toast'); markDraftSaved();
       }));
       document.querySelectorAll('.advanced-options').forEach(details => details.addEventListener('toggle', () => { const item=draft.exercises.find(row=>row.uid===details.closest('.workout-exercise')?.dataset.workoutExercise); if(item)item.optionsOpen=details.open; }));
       document.querySelectorAll(".exercise-accordion").forEach(card => card.addEventListener('toggle', () => { const item=draft.exercises.find(row=>row.uid===card.dataset.workoutExercise); if(item){item.cardOpen=card.open;markDraftSaved();} }));

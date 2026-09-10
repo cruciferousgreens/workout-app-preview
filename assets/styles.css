@@ -441,6 +441,8 @@
     .add-set { margin: 12px 0 0 42px; padding: 7px 0; border: 0; background: transparent; color: var(--accent); cursor: pointer; font-size: 13px; font-weight: 750; }
     .workout-footer { display: flex; align-items: center; justify-content: space-between; gap: 16px; margin-top: 20px; padding-top: 18px; border-top: 1px solid var(--line); }
     .workout-error { margin: 0; color: var(--danger); font-size: 12px; }
+    /* Inline set-complete validation: sits directly under the row whose check triggered it. */
+    .set-inline-error { margin: 6px 0 2px 40px; color: var(--danger); font-size: 12px; line-height: 1.45; }
     .picker-search { width: 100%; height: 44px; margin-bottom: 12px; padding: 0 12px; border: 1px solid var(--line); border-radius: var(--radius-sm); outline: none; }
     .picker-list { display: grid; gap: 7px; max-height: 48vh; overflow-y: auto; overscroll-behavior: contain; scroll-padding-bottom: calc(82px + env(safe-area-inset-bottom)); }
     #exercisePickerList { padding-bottom: calc(76px + env(safe-area-inset-bottom)); }
@@ -510,8 +512,8 @@
     /* The top bar owns back/title on the exercise detail; hide the in-screen duplicates. */
     .has-top-bar #backButton { display: none; }
     .has-top-bar .detail .detail-title { display: none; }
-    .nav-item { min-height: 50px; border: 0; border-radius: 12px; background: transparent; color: var(--muted); display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 1px; cursor: pointer; font-size: 10px; font-weight: 600; line-height: 1.25; }
-    .nav-item.active { background: var(--accent-soft); color: var(--accent-ink); font-weight: 800; }
+    .nav-item { min-height: 50px; border: 0; border-radius: 12px; background: transparent; color: var(--muted); display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 1px; cursor: pointer; font-size: 10px; font-weight: 700; line-height: 1.25; }
+    .nav-item.active { background: var(--accent-soft); color: var(--accent-ink); font-weight: 700; }
     .nav-item.has-live-draft { position: relative; }
     .nav-item.has-live-draft:not(.active) { color: var(--accent-ink); }
     .nav-item.has-live-draft::after { content: ''; position: absolute; top: 6px; left: 50%; margin-left: 12px; width: 9px; height: 9px; border-radius: 50%; background: var(--accent); box-shadow: 0 0 0 2px var(--surface-raised); pointer-events: none; }
@@ -636,7 +638,7 @@
     .delete-set-inline { border: 1px solid var(--rose); background: var(--surface-raised); color: var(--danger); }
     .delete-set-inline svg { stroke: currentColor; }
     .delete-set-inline:hover, .delete-set-inline:focus-visible { border-color: var(--danger); background: var(--rose-soft); outline: none; }
-    .log-labels, .log-set { grid-template-columns: 34px minmax(82px,.8fr) minmax(72px,.65fr) minmax(72px,.65fr) 73px; }
+    .log-labels, .log-set { grid-template-columns: 34px minmax(0,.85fr) minmax(0,.7fr) minmax(0,.7fr) 73px; }
     .exercise-tools { display: flex; align-items: center; gap: 6px; }
     .drag-handle, .superset-button { min-height: 34px; padding: 0 9px; border: 1px solid var(--line); border-radius: var(--radius-sm); background: var(--surface); color: var(--muted); cursor: grab; font-size: 11px; font-weight: 750; touch-action: none; }
     .drag-handle { font-size: 18px; letter-spacing: -3px; }

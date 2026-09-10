@@ -171,7 +171,7 @@
     function renderWorkoutProgression() {
       const draft=workoutState.draft, box=$('#workoutProgression'), context=$('#workoutContext');
       const program=workoutState.activeProgram && draft?.programId===workoutState.activeProgram.id?workoutState.activeProgram:null;
-      context.hidden=!program; context.textContent=program?`${program.name} · Week ${programWeek(program)} · ${draft.name}`:'';
+      context.hidden=!program; context.textContent=program?`${program.name} · Week ${programWeek(program)} · ${draft.name||'Workout'}`:'';
       const suggestions=draft?.progressionSuggestions||[];
       if(!draft?.exercises?.length){box.hidden=true;return;}
       box.hidden=false;
