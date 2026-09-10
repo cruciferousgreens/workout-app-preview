@@ -187,7 +187,7 @@
               <button type="button" data-theme-name="cruciferous" aria-pressed="true"><i style="background:#2e7d32"></i>Cruciferous</button>
               <button type="button" data-theme-name="rosepine" aria-pressed="false"><i style="background:#b4637a"></i>Rosé</button>
               <button type="button" data-theme-name="macchiato" aria-pressed="false"><i style="background:#f5a97f"></i>Asterid</button>
-              <button type="button" data-theme-name="mocha" aria-pressed="false"><i style="background:#a6e3a1"></i>Matcha</button>
+              <button type="button" data-theme-name="mocha" aria-pressed="false"><i style="background:#a6e3a1"></i>Mocha</button>
             </div>
           </div>
         </section>
@@ -293,7 +293,7 @@
       <div class="custom-form"><div class="custom-form-head"><div><h2 id="discardDraftTitle">Discard workout?</h2><p>This permanently deletes the in-progress workout.</p></div><button class="dialog-close" id="closeDiscardDraft" type="button" aria-label="Close">×</button></div><div class="form-actions"><button class="secondary-button" id="keepDraftButton" type="button">Keep editing</button><button class="primary-button danger-button" id="confirmDiscardDraft" type="button">Discard</button></div></div>
     </dialog>
     <dialog class="custom-dialog compact-dialog" id="unfinishedSetsDialog" aria-labelledby="unfinishedSetsTitle">
-      <div class="custom-form"><div class="custom-form-head"><div><h2 id="unfinishedSetsTitle">Unfinished sets</h2><p id="unfinishedSetsCopy"></p></div><button class="dialog-close" id="closeUnfinishedSets" type="button" aria-label="Close">×</button></div><div class="form-actions"><button class="secondary-button" id="unfinishedSetsComplete" type="button">Mark all complete</button><button class="secondary-button danger-button" id="unfinishedSetsDelete" type="button">Delete them</button><button class="primary-button" id="unfinishedSetsCancel" type="button">Keep editing</button></div></div>
+      <div class="custom-form"><div class="custom-form-head"><div><h2 id="unfinishedSetsTitle">Unfinished sets</h2><p id="unfinishedSetsCopy"></p></div><button class="dialog-close" id="closeUnfinishedSets" type="button" aria-label="Close">×</button></div><div class="form-actions"><button class="primary-button" id="unfinishedSetsComplete" type="button">Mark all complete</button><button class="secondary-button" id="unfinishedSetsCancel" type="button">Keep editing</button><button class="secondary-button danger-button" id="unfinishedSetsDelete" type="button">Delete them</button></div></div>
     </dialog>
 
     <dialog class="custom-dialog" id="customExerciseDialog" aria-labelledby="customExerciseTitle">
@@ -363,9 +363,9 @@
         <div class="info-list">
           <p><strong>RPE trigger threshold</strong><span>When your top set comes in at or under this RPE, the app suggests progressing next session.</span></p>
           <p><strong>Increment type &amp; value</strong><span>How much load to add on a progression: a fixed amount (lb or kg) or a percent of the current weight.</span></p>
-          <p><strong>Time step</strong><span>For timed exercises, how many extra seconds to hold before adding weight.</span></p>
           <p><strong>Default focus</strong><span>The rep-range preset applied to new programs and exercises.</span></p>
           <p><strong>Default rep range</strong><span>Min and max reps for double progression: add reps inside the range first, then add weight and return to the bottom of the range.</span></p>
+          <p><strong>Time step</strong><span>For timed exercises, how many extra seconds to hold before adding weight.</span></p>
           <p><strong>Stall detection</strong><span>Suggests scheduling a deload week after repeated flat sessions with rising RPE. It never changes your program automatically.</span></p>
         </div>
         <div class="form-actions"><button class="form-action primary" id="doneProgressionInfo" type="button">Got it</button></div>

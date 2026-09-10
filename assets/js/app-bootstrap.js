@@ -4,7 +4,7 @@
     let deleteArmed=false;
     /** Theme state (Justin 2026-09-10): themeName is 'cruciferous', the Rosé Pine
         light flavor ('rosepine', displayed as "Rosé"), or a dark Catppuccin flavor
-        ('macchiato' displayed as "Asterid", 'mocha' displayed as "Matcha").
+        ('macchiato' displayed as "Asterid", 'mocha' displayed as "Mocha").
         darkMode flips light/dark; for non-Cruciferous themes the toggle flips
         between the remembered dark flavor (ctpDark) and the remembered light
         theme (lightTheme), so it never lands somewhere unexpected. Tapping the
@@ -125,7 +125,9 @@
     $('#darkModeToggle').addEventListener('click',()=>{darkMode=!darkMode;if(themeName!=='cruciferous')themeName=darkMode?ctpDark:lightTheme;applyTheme();});
     document.querySelectorAll('#themePills [data-theme-name]').forEach(button=>button.addEventListener('click',()=>{
       const name=button.dataset.themeName;
-      if(name===themeName){themeName='cruciferous';darkMode=false;lightTheme='cruciferous';applyTheme();return;}
+      /* Tapping the active pill toggles back to Cruciferous light — except on
+         Cruciferous itself, where it would silently kill dark mode (Justin 2026-09-10). */
+      if(name===themeName){ if(name!=='cruciferous'){themeName='cruciferous';darkMode=false;lightTheme='cruciferous';applyTheme();} return; }
       setThemeName(name);
     }));
     document.querySelectorAll('#settingsUnitPills [data-units]').forEach(button=>button.addEventListener('click',()=>{
