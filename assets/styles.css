@@ -347,8 +347,10 @@
     .session-note { margin: 12px 0 0; color: var(--muted); font-size: 11px; }
     .bottom-nav { position: fixed; left: 0; right: 0; bottom: 0; z-index: 20; width: 100%; margin: 0; display: grid; grid-template-columns: repeat(5, 1fr); padding: 6px 8px calc(6px + env(safe-area-inset-bottom)); border: 0; border-top: 1px solid var(--line); border-radius: 0; background: var(--surface-raised); }
     /* Slim persistent top bar: back chevron (non-root screens only), page title, settings gear. */
-    .top-bar { position: fixed; top: env(safe-area-inset-top); left: 0; right: 0; z-index: 30; display: grid; grid-template-columns: auto minmax(0, 1fr) auto; align-items: center; height: 54px; padding: 0 4px; border-bottom: 1px solid var(--line); background: var(--bg); }
+    .top-bar { position: fixed; top: env(safe-area-inset-top); left: 0; right: 0; z-index: 30; display: grid; grid-template-columns: 44px minmax(0, 1fr) 44px; align-items: center; height: 54px; padding: 0 4px; border-bottom: 1px solid var(--line); background: var(--bg); }
     #topBarBack { grid-column: 1; }
+    /* Reserve the back-chevron slot even when hidden so the title never jumps. */
+    #topBarBack[hidden] { display: grid; visibility: hidden; }
     .top-bar-title { grid-column: 2; margin: 0; font-size: 17px; font-weight: 750; text-align: left; padding-left: 12px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
     #topBarSettings { grid-column: 3; }
     /* Breadcrumb title on sub-pages ("Exercises / Air Bike"): parent is tappable. */
