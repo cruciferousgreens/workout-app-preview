@@ -192,6 +192,11 @@
     .section-head { display: flex; align-items: baseline; justify-content: space-between; gap: 16px; margin-bottom: 12px; }
     .section h2 { margin: 0; font-size: 18px; letter-spacing: -.02em; }
     .section-note { margin: 0; color: var(--muted); font-size: 12px; }
+    /* Exercise detail: stack section heads so notes never crowd the title on narrow screens. */
+    .detail .section-head { flex-direction: column; align-items: flex-start; gap: 3px; }
+    .detail .chart-empty { min-height: 0; padding: 30px 18px; }
+    .history-list.is-empty { border-top: none; }
+    .detail .history-empty { background: none; border-radius: 0; padding: 6px 2px 0; font-size: 13px; }
     .history-list { border-top: 1px solid var(--line); }
     .history-session { padding: 15px 0; border-bottom: 1px solid var(--line); }
     .session-head { display: flex; justify-content: space-between; gap: 16px; margin-bottom: 10px; }
