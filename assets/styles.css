@@ -321,6 +321,9 @@
     .custom-tools { display: flex; gap: 8px; margin-top: 18px; }
     .custom-tool { min-height: 38px; padding: 0 12px; border: 1px solid var(--line); border-radius: var(--radius-sm); background: var(--surface); cursor: pointer; font-size: 12px; font-weight: 700; }
     .custom-tool.danger { color: var(--danger); border-color: var(--rose); }
+    .custom-delete-row { margin-top: 26px; }
+    .custom-delete-row:empty { display: none; }
+    .custom-delete-btn { width: 100%; min-height: 46px; font-size: 14px; }
     .empty strong { display: block; color: var(--ink); font: 700 22px/1.25 var(--font-sans); margin-bottom: 8px; }
 
     /* ===== 8. Exercise detail ===== */

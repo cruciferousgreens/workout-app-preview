@@ -107,12 +107,13 @@
       $('#exerciseProgressChart').innerHTML=isBodyweight?'<div class="chart-empty">Bodyweight progress will use reps and added load from your workouts.</div>':lineChart(trend,value=>`${Math.round(displayWeight(value))} ${weightUnit()}`);
       renderHistory(id);
       $('#noteCard').innerHTML = `No notes for this movement yet.<span class="note-meta">Exercise-specific note</span>`;
-      $('#movementCard').innerHTML = `<dl><dt>Force</dt><dd>${escapeHtml(ex.force || '—')}</dd><dt>Mechanic</dt><dd>${escapeHtml(ex.mechanic || '—')}</dd><dt>Primary</dt><dd>${escapeHtml(ex.primary.join(', ') || '—')}</dd><dt>Secondary</dt><dd>${escapeHtml(ex.secondary.join(', ') || '—')}</dd></dl>${ex.custom ? `<div class="custom-tools"><button class="custom-tool" id="editCustomExercise" type="button">Edit</button><button class="custom-tool danger" id="deleteCustomExercise" type="button">Delete</button></div>` : ''}`;
+      $('#movementCard').innerHTML = `<dl><dt>Force</dt><dd>${escapeHtml(ex.force || '—')}</dd><dt>Mechanic</dt><dd>${escapeHtml(ex.mechanic || '—')}</dd><dt>Primary</dt><dd>${escapeHtml(ex.primary.join(', ') || '—')}</dd><dt>Secondary</dt><dd>${escapeHtml(ex.secondary.join(', ') || '—')}</dd></dl>${ex.custom ? `<div class="custom-tools"><button class="custom-tool" id="editCustomExercise" type="button">Edit</button></div>` : ''}`;
+      /* Delete lives at the very bottom of the exercise page (Justin 2026-09-10),
+         below the How-to instructions — not buried in the Movement card. */
+      $('#customDeleteRow').innerHTML = ex.custom ? `<button class="custom-tool danger custom-delete-btn" id="deleteCustomExercise" type="button">Delete exercise</button>` : '';
+      $('#editCustomExercise')?.addEventListener('click', () => openCustomDialog(ex));
+      $('#deleteCustomExercise')?.addEventListener('click', () => deleteCustomExercise(ex.id));
       $('#instructions').innerHTML = ex.instructions.length ? ex.instructions.map(x => `<li>${escapeHtml(x)}</li>`).join('') : '<li>No instructions added.</li>';
-      if (ex.custom) {
-        $('#editCustomExercise').addEventListener('click', () => openCustomDialog(ex));
-        $('#deleteCustomExercise').addEventListener('click', () => deleteCustomExercise(ex.id));
-      }
       $('#similarGrid').innerHTML = `<div class="action-list">${similarTo(ex).map(x => `<button class="action-row" type="button" data-id="${escapeHtml(x.id)}" aria-label="Open ${escapeHtml(x.name)}"><span><strong>${escapeHtml(x.name)}</strong><span>${escapeHtml(x.primary[0] || 'Unspecified muscle')} · ${escapeHtml(x.equipment || 'No equipment')}</span></span><span class="similar-chevron" aria-hidden="true">›</span></button>`).join('')}</div>`;
       document.querySelectorAll('#similarGrid [data-id]').forEach(btn => btn.addEventListener('click', () => openExercise(btn.dataset.id)));
       /* Anatomical muscle map for this exercise (Justin 2026-09-10). */
