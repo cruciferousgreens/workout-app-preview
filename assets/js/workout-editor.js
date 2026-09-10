@@ -197,7 +197,7 @@
           </details></div>`;
       }).join('') : '<div class="history-empty">No exercises yet. Add your first movement to begin logging.</div>';
 
-      document.querySelectorAll('.remove-workout-exercise').forEach(button => button.addEventListener('click', () => { draft.exercises = draft.exercises.filter(item => item.uid !== button.dataset.uid); prepareDraftProgression(draft, workoutState.activeProgram?.id===draft.programId?workoutState.activeProgram.progression:{...progressionSetup,stallDetection:false}); renderWorkoutExercises(); renderWorkoutProgression(); markDraftSaved(); }));
+      document.querySelectorAll('.remove-workout-exercise').forEach(button => button.addEventListener('click', () => { draft.exercises = draft.exercises.filter(item => item.uid !== button.dataset.uid); prepareDraftProgression(draft, workoutState.activeProgram?.id===draft.programId?workoutState.activeProgram.progression:freeformProgressionConfig()); renderWorkoutExercises(); renderWorkoutProgression(); markDraftSaved(); }));
       document.querySelectorAll('.add-set').forEach(button => button.addEventListener('click', () => { draft.exercises.find(item => item.uid === button.dataset.uid)?.sets.push(newSet()); renderWorkoutExercises(); markDraftSaved(); }));
       document.querySelectorAll('[data-copy-first-set]').forEach(button => button.addEventListener('click', () => {
         const item=draft.exercises.find(row=>row.uid===button.dataset.copyFirstSet); if(!item||item.sets.length<2)return;

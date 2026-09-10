@@ -10,10 +10,15 @@
       $('#exercisePickerSearch').value='';renderExercisePicker();$('#exercisePickerDialog').showModal();
       requestAnimationFrame(()=>$('#exercisePickerSearch').focus());
     }
-    function renderExercisePicker() {
-      const q = normalize($('#exercisePickerSearch').value),programMode=workoutState.pickerMode==='program',programWorkout=pickerProgramWorkout();
-      const collection=programMode?(programWorkout?.template?.exercises||[]):(workoutState.draft?.exercises||[]);
-      const chosen = new Set(collection.map(item => item.exerciseId));
+    function pickerCollection(){const programMode=workoutState.pickerMode==='program';return programMode?(pickerProgramWorkout()?.template?.exercises||[]):(workoutState.draft?.exercises||[]);}
+    // Rules section only (chosen exercises + their sets/range/load config).
+    // Re-renders without touching the exercise list below, so the list's scroll
+    // position and the search field's focus survive adding/removing exercises.
+    // Pass a selector to restore focus after the re-render (rule field edits).
+    function renderPickerRules(focusSelector) {
+      const dialog=$('#exercisePickerDialog'),prevScroll=dialog?dialog.scrollTop:0;
+      const programMode=workoutState.pickerMode==='program',programWorkout=pickerProgramWorkout();
+      const collection=pickerCollection();
       const templateBox=$('#pickerTemplateOptions');
       templateBox.hidden=false;
       const templateButtons=programMode&&workoutState.templates.length?`<strong>START FROM A TEMPLATE</strong><div class="picker-template-buttons">${workoutState.templates.map(template=>`<button class="picker-template-button" type="button" data-use-program-template="${escapeHtml(template.id)}">${escapeHtml(template.name)}</button>`).join('')}</div>`:'';
@@ -42,7 +47,7 @@
         </details>`;
       }).join('')}</div>`:'<span class="field-help">Choose exercises below, then set the number of sets, rep or time range, and load progression.</span>';
       templateBox.innerHTML=templateButtons+ruleRows;
-      document.querySelectorAll('[data-use-program-template]').forEach(button=>button.addEventListener('click',()=>{const template=workoutState.templates.find(row=>row.id===button.dataset.useProgramTemplate);if(!template||!programWorkout)return;programWorkout.template={name:programWorkout.name,exercises:cloneTemplateExercises(template.exercises)};renderExercisePicker();}));
+      document.querySelectorAll('[data-use-program-template]').forEach(button=>button.addEventListener('click',()=>{const template=workoutState.templates.find(row=>row.id===button.dataset.useProgramTemplate);if(!template||!programWorkout)return;programWorkout.template={name:programWorkout.name,exercises:cloneTemplateExercises(template.exercises)};renderPickerRules();}));
       document.querySelectorAll('[data-program-rule-id]').forEach(row=>{
         const getItem=()=>programMode?programWorkout?.template?.exercises.find(entry=>entry.exerciseId===row.dataset.programRuleId):(workoutState.draft?.exercises.find(entry=>entry.uid===row.dataset.ruleUid)||workoutState.draft?.exercises.find(entry=>entry.exerciseId===row.dataset.programRuleId));
         row.querySelectorAll('[data-program-rule]').forEach(control=>control.addEventListener('change',()=>{
@@ -72,13 +77,21 @@
           }else{
             profile[field]=Number(control.value);
           }
+          // Zone-defining fields mark the range as explicitly chosen, so the
+          // freestyle engine follows it instead of the lifter's last zone.
+          if(field==='mode'||field==='min'||field==='max'||field==='timeMin'||field==='timeMax')profile.custom=true;
           item.progression=profile;
           if(field==='min'||field==='max'||field==='timeMin'||field==='timeMax'){
             const small=row.querySelector('.exercise-rule-accordion-title small');
             if(small)small.textContent=ruleRangeSummary(profile,profile.mode==='time',Math.max(1,item.sets?.length||1));
           }
-          if(!programMode){prepareDraftProgression(workoutState.draft,{...progressionSetup,stallDetection:false});renderWorkoutExercises();renderWorkoutProgression();markDraftSaved();}
-          if(field==='setCount'||field==='mode'||field==='incrementType')renderExercisePicker();
+          if(!programMode){prepareDraftProgression(workoutState.draft,freeformProgressionConfig());renderWorkoutExercises();renderWorkoutProgression();markDraftSaved();}
+          if(field==='setCount'||field==='mode'||field==='incrementType'){
+            // Rules-only re-render keeps the exercise list's scroll; restore
+            // focus to the edited control so keyboard/VO users don't lose place.
+            const key=row.dataset.ruleUid?`[data-rule-uid="${CSS.escape(row.dataset.ruleUid)}"]`:`[data-program-rule-id="${CSS.escape(row.dataset.programRuleId)}"]`;
+            renderPickerRules(`${key} [data-program-rule="${field}"]`);
+          }
         }));
         row.querySelectorAll('[data-step-pills]').forEach(pills=>{
           const readStep=()=>{const item=getItem();return item?.progression?.timeStep||(programMode?workoutState.activeProgram?.progression?.timeStep:progressionSetup.timeStep)||5;};
@@ -88,7 +101,7 @@
             const dflt=(programMode?workoutState.activeProgram?.progression:progressionSetup)||progressionSetup,range=dflt.defaultRange||progressionSetup.defaultRange;
             const profile=item.progression||{mode:item.tracking||ex?.tracking||'reps',min:range.min,max:range.max,timeMin:30,timeMax:60,timeStep:dflt.timeStep||5,incrementType:dflt.incrementType,incrementValue:dflt.incrementValue,repsOnly:false};
             profile.timeStep=n; item.progression=profile;
-            if(!programMode){prepareDraftProgression(workoutState.draft,{...progressionSetup,stallDetection:false});renderWorkoutExercises();renderWorkoutProgression();markDraftSaved();}
+            if(!programMode){prepareDraftProgression(workoutState.draft,freeformProgressionConfig());renderWorkoutExercises();renderWorkoutProgression();markDraftSaved();}
             else syncTimeStepPills(pills,n);
           });
         });
@@ -97,31 +110,53 @@
           const ex=exercises.find(entry=>entry.id===item.exerciseId);
           const defaults=(programMode?workoutState.activeProgram?.progression:progressionSetup)||progressionSetup,range=defaults.defaultRange||progressionSetup.defaultRange;
           const profile=item.progression||{mode:item.tracking||ex?.tracking||'reps',min:range.min,max:range.max,timeMin:30,timeMax:60,timeStep:defaults.timeStep||5,incrementType:defaults.incrementType,incrementValue:defaults.incrementValue,repsOnly:false};
-          profile.repsOnly=!profile.repsOnly; item.progression=profile; if(!programMode){renderWorkoutExercises();renderWorkoutProgression();markDraftSaved();} renderExercisePicker();
+          profile.repsOnly=!profile.repsOnly; item.progression=profile; if(!programMode){renderWorkoutExercises();renderWorkoutProgression();markDraftSaved();} renderPickerRules();
         });
         row.querySelector('[data-program-exercise-tags]')?.addEventListener('click',()=>openExerciseTagDialog(programMode?{mode:'program',exerciseId:row.dataset.programRuleId}:{mode:'draft',exerciseUid:row.dataset.ruleUid}));
       });
+      if(dialog)dialog.scrollTop=prevScroll;
+      if(focusSelector){const el=document.querySelector(focusSelector);if(el)el.focus({preventScroll:true});}
+    }
+    // Exercise list only. Re-rendered on search typing and dialog open; the
+    // toggle handler updates rows in place instead, so scrolling the list to
+    // tap exercises no longer jumps back to the top on every tap.
+    function renderPickerList() {
+      const list=$('#exercisePickerList'),prevScroll=list?list.scrollTop:0;
+      const programMode=workoutState.pickerMode==='program',programWorkout=pickerProgramWorkout();
+      const q=normalize($('#exercisePickerSearch').value);
+      const collection=pickerCollection();
+      const chosen=new Set(collection.map(item=>item.exerciseId));
       const matches = q ? rankedExerciseMatches($('#exercisePickerSearch').value,80) : exercises.slice(0,80);
       const recentIds = q ? [] : recentExerciseIds().filter(id => matches.some(ex => ex.id === id)).slice(0,5);
       const recentSet = new Set(recentIds);
       const rows = [...recentIds.map(id => matches.find(ex => ex.id === id)), ...matches.filter(ex => !recentSet.has(ex.id))].filter(Boolean);
-      $('#exercisePickerList').innerHTML = rows.length ? rows.map((ex,index) => `${index === 0 && recentIds.length ? '<div class="picker-section-label">RECENT</div>' : ''}${index === recentIds.length && recentIds.length && rows.length > recentIds.length ? '<div class="picker-section-label">ALL EXERCISES</div>' : ''}<button class="picker-item" type="button" data-id="${escapeHtml(ex.id)}" aria-pressed="${chosen.has(ex.id)}"><span><strong>${escapeHtml(ex.name)}</strong><span>${escapeHtml(ex.primary.join(', ') || 'Unspecified muscle')} · ${escapeHtml(ex.equipment || 'No equipment')}</span></span><span class="picker-state">${chosen.has(ex.id) ? '✓' : '+'}</span></button>`).join('') : '<div class="dialog-empty">No matching exercises.</div>';
+      list.innerHTML = rows.length ? rows.map((ex,index) => `${index === 0 && recentIds.length ? '<div class="picker-section-label">RECENT</div>' : ''}${index === recentIds.length && recentIds.length && rows.length > recentIds.length ? '<div class="picker-section-label">ALL EXERCISES</div>' : ''}<button class="picker-item" type="button" data-id="${escapeHtml(ex.id)}" aria-pressed="${chosen.has(ex.id)}"><span><strong>${escapeHtml(ex.name)}</strong><span>${escapeHtml(ex.primary.join(', ') || 'Unspecified muscle')} · ${escapeHtml(ex.equipment || 'No equipment')}</span></span><span class="picker-state">${chosen.has(ex.id) ? '✓' : '+'}</span></button>`).join('') : '<div class="dialog-empty">No matching exercises.</div>';
+      if(list)list.scrollTop=prevScroll;
       document.querySelectorAll('#exercisePickerList .picker-item').forEach(button => button.addEventListener('click', () => {
+        let nowChosen;
         if(programMode){
           if(!programWorkout)return;
           if(!programWorkout.template)programWorkout.template={name:programWorkout.name,exercises:[]};
           const existing=programWorkout.template.exercises.find(item=>item.exerciseId===button.dataset.id);
+          nowChosen=!existing;
           if(existing)programWorkout.template.exercises=programWorkout.template.exercises.filter(item=>item.exerciseId!==button.dataset.id);
           else { const ex=exercises.find(row=>row.id===button.dataset.id),program=workoutState.activeProgram,range=programRangeForWeek(program,programWeek(program)); programWorkout.template.exercises.push({exerciseId:button.dataset.id,tracking:ex?.tracking||'reps',note:'',exerciseTags:[],supersetId:null,progression:{mode:ex?.tracking||'reps',min:range.min,max:range.max,openTop:!!range.openTop,amrap:!!range.amrap,timeMin:30,timeMax:60,timeStep:program?.progression?.timeStep||5,incrementType:program?.progression?.incrementType||'lb',incrementValue:program?.progression?.incrementValue||5,repsOnly:false},sets:Array.from({length:3},()=>({w:'',r:range.amrap?'':String(range.min),seconds:'',rpe:'',tags:[],complete:false}))}); }
         }else{
           const existing = workoutState.draft.exercises.find(item => item.exerciseId === button.dataset.id);
+          nowChosen=!existing;
           if (existing) workoutState.draft.exercises = workoutState.draft.exercises.filter(item => item.exerciseId !== button.dataset.id);
-          else { const ex=exercises.find(row=>row.id===button.dataset.id),range=progressionSetup.defaultRange; workoutState.draft.exercises.push({uid:uid('exercise'), exerciseId:button.dataset.id, tracking:ex?.tracking||'reps', sets:Array.from({length:3},()=>newSet()), note:'', exerciseTags:[], supersetId:null, progression:{mode:ex?.tracking||'reps',min:range.min,max:range.max,openTop:!!range.openTop,amrap:!!range.amrap,timeMin:30,timeMax:60,timeStep:progressionSetup.timeStep||5,incrementType:progressionSetup.incrementType,incrementValue:progressionSetup.incrementValue,repsOnly:false}}); }
-          prepareDraftProgression(workoutState.draft, workoutState.activeProgram?.id===workoutState.draft.programId?workoutState.activeProgram.progression:{...progressionSetup,stallDetection:false});
+          else { const ex=exercises.find(row=>row.id===button.dataset.id),range=progressionSetup.defaultRange; workoutState.draft.exercises.push({uid:uid('exercise'), exerciseId:button.dataset.id, tracking:ex?.tracking||'reps', sets:Array.from({length:3},()=>newSet()), note:'', exerciseTags:[], supersetId:null, progression:{mode:ex?.tracking||'reps',min:range.min,max:range.max,openTop:!!range.openTop,amrap:!!range.amrap,timeMin:30,timeMax:60,timeStep:progressionSetup.timeStep||5,incrementType:progressionSetup.incrementType,incrementValue:progressionSetup.incrementValue,repsOnly:false,custom:false}}); }
+          prepareDraftProgression(workoutState.draft, workoutState.activeProgram?.id===workoutState.draft.programId?workoutState.activeProgram.progression:freeformProgressionConfig());
           renderWorkoutExercises();renderWorkoutProgression();markDraftSaved();
         }
-        renderExercisePicker();
+        // In-place row update + rules-only re-render: the list keeps its scroll
+        // position and the search field keeps focus instead of the whole dialog
+        // flashing back to the top on every tap.
+        button.setAttribute('aria-pressed',String(nowChosen));
+        const stateEl=button.querySelector('.picker-state');if(stateEl)stateEl.textContent=nowChosen?'✓':'+';
+        renderPickerRules();
       }));
     }
+    function renderExercisePicker(){renderPickerRules();renderPickerList();}
 
     

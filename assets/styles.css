@@ -88,88 +88,47 @@
       --heat-4: #5da464;
       --heat-5: #8fce93;
     }
-    /* ===== Catppuccin flavor themes (verified palette: catppuccin/palette) ===== */
-    [data-theme="latte"] {
+    /* ===== Alt palettes: Catppuccin (verified: catppuccin/palette) + Rosé Pine Dawn (rosepinetheme.com) ===== */
+    [data-theme="rosepine"] {
       color-scheme: light;
-      --bg: #eff1f5;
-      --surface: #e6e9ef;
-      --surface-2: #ccd0da;
-      --surface-raised: #e6e9ef;
-      --ink: #4c4f69;
-      --ink-strong: #1e1e2e;
-      --muted: #6c6f85;
-      --subtle: #8c8fa1;
-      --line: #ccd0da;
-      --line-strong: #acb0be;
-      --accent: #40a02b;
-      --accent-hover: #358a24;
-      --accent-soft: rgba(64,160,43,.12);
-      --accent-ink: #2c7a1f;
-      --pine: #179299;
-      --pine-soft: rgba(23,146,153,.12);
-      --rose: #ea76cb;
-      --rose-soft: rgba(234,118,203,.12);
-      --gold: #df8e1d;
-      --gold-soft: rgba(223,142,29,.14);
-      --foam: #04a5e5;
-      --iris: #7287fd;
-      --danger: #d20f39;
-      --danger-soft: rgba(210,15,57,.10);
-      --on-accent: #ffffff;
-      --warning: #df8e1d;
-      --focus-ring: rgba(64,160,43,.25);
-      --shadow-color: rgba(76,79,105,.12);
-      --shadow-soft-color: rgba(76,79,105,.08);
-      --backdrop: rgba(76,79,105,.32);
-      --theme-color: #eff1f5;
-      --nav-bg: rgba(239,241,245,.82);
-      --heat-0: #ccd0da;
-      --heat-1: #e4f1e0;
-      --heat-2: #c6e4bc;
-      --heat-3: #93cc84;
-      --heat-4: #5fae4e;
-      --heat-5: #40a02b;
-    }
-    [data-theme="frappe"] {
-      color-scheme: dark;
-      --bg: #303446;
-      --surface: #292c3c;
-      --surface-2: #414559;
-      --surface-raised: #292c3c;
-      --ink: #c6d0f5;
-      --ink-strong: #ffffff;
-      --muted: #a5adce;
-      --subtle: #949cbb;
-      --line: #414559;
-      --line-strong: #51576d;
-      --accent: #a6d189;
-      --accent-hover: #b8de9e;
-      --accent-soft: rgba(166,209,137,.14);
-      --accent-ink: #a6d189;
-      --pine: #81c8be;
-      --pine-soft: rgba(129,200,190,.14);
-      --rose: #f4b8e4;
-      --rose-soft: rgba(244,184,228,.14);
-      --gold: #e5c890;
-      --gold-soft: rgba(229,200,144,.14);
-      --foam: #99d1db;
-      --iris: #babbf1;
-      --danger: #e78284;
-      --danger-soft: rgba(231,130,132,.14);
-      --on-accent: #232634;
-      --warning: #e5c890;
-      --focus-ring: rgba(166,209,137,.30);
-      --shadow-color: rgba(0,0,0,.35);
-      --shadow-soft-color: rgba(0,0,0,.25);
-      --backdrop: rgba(17,17,27,.60);
-      --theme-color: #303446;
-      --nav-bg: rgba(48,52,70,.82);
-      --heat-0: #414559;
-      --heat-1: #3a4a3c;
-      --heat-2: #4a5c40;
-      --heat-3: #677f52;
-      --heat-4: #87a86b;
-      --heat-5: #a6d189;
+      --bg: #faf4ed;
+      --surface: #fffaf3;
+      --surface-2: #f2e9e1;
+      --surface-raised: #fffaf3;
+      --ink: #575279;
+      --ink-strong: #393552;
+      --muted: #9893a5;
+      --subtle: #797593;
+      --line: #dfdad9;
+      --line-strong: #cecacd;
+      --accent: #b4637a;
+      --accent-hover: #a2546a;
+      --accent-soft: rgba(180,99,122,.12);
+      --accent-ink: #96485e;
+      --pine: #286983;
+      --pine-soft: rgba(40,105,131,.12);
+      --rose: #d7827e;
+      --rose-soft: rgba(215,130,126,.12);
+      --gold: #ea9d34;
+      --gold-soft: rgba(234,157,52,.14);
+      --foam: #56949f;
+      --iris: #907aa9;
+      --danger: #b4637a;
+      --danger-soft: rgba(180,99,122,.10);
+      --on-accent: #fffaf3;
+      --warning: #ea9d34;
+      --focus-ring: rgba(180,99,122,.25);
+      --shadow-color: rgba(87,82,121,.12);
+      --shadow-soft-color: rgba(87,82,121,.08);
+      --backdrop: rgba(87,82,121,.32);
+      --theme-color: #faf4ed;
+      --nav-bg: rgba(250,244,237,.82);
+      --heat-0: #dfdad9;
+      --heat-1: #f3e3e6;
+      --heat-2: #e9c6cd;
+      --heat-3: #d89cab;
+      --heat-4: #c47384;
+      --heat-5: #b4637a;
     }
     [data-theme="macchiato"] {
       color-scheme: dark;
@@ -183,10 +142,10 @@
       --subtle: #939ab7;
       --line: #363a4f;
       --line-strong: #494d64;
-      --accent: #a6da95;
-      --accent-hover: #b9e5a9;
-      --accent-soft: rgba(166,218,149,.14);
-      --accent-ink: #a6da95;
+      --accent: #f5a97f;
+      --accent-hover: #f8bd99;
+      --accent-soft: rgba(245,169,127,.14);
+      --accent-ink: #f5a97f;
       --pine: #8bd5ca;
       --pine-soft: rgba(139,213,202,.14);
       --rose: #f5bde6;
@@ -199,18 +158,18 @@
       --danger-soft: rgba(237,135,150,.14);
       --on-accent: #181926;
       --warning: #eed49f;
-      --focus-ring: rgba(166,218,149,.30);
+      --focus-ring: rgba(245,169,127,.30);
       --shadow-color: rgba(0,0,0,.35);
       --shadow-soft-color: rgba(0,0,0,.25);
       --backdrop: rgba(17,17,27,.60);
       --theme-color: #24273a;
       --nav-bg: rgba(36,39,58,.82);
       --heat-0: #363a4f;
-      --heat-1: #33402f;
-      --heat-2: #43563c;
-      --heat-3: #5f7d50;
-      --heat-4: #82ad72;
-      --heat-5: #a6da95;
+      --heat-1: #42372f;
+      --heat-2: #59463a;
+      --heat-3: #79593f;
+      --heat-4: #a97e55;
+      --heat-5: #f5a97f;
     }
     [data-theme="mocha"] {
       color-scheme: dark;
@@ -440,7 +399,7 @@
     .exercise-accordion-title small { color: var(--muted); font-size: 12px; font-variant-numeric: tabular-nums; }
     .exercise-accordion-chevron { flex: none; color: var(--muted); font-size: 20px; line-height: 1; transition: transform .18s ease; }
     .exercise-accordion-actions { flex: none; display: flex; align-items: center; gap: 10px; }
-    .exercise-info-button { flex: none; width: 26px; height: 26px; border-radius: 50%; border: 1px solid var(--border); background: var(--surface); color: var(--muted); font-size: 13px; font-weight: 700; font-style: italic; font-family: var(--font-sans); line-height: 1; cursor: pointer; }
+    .exercise-info-button { flex: none; width: 32px; height: 32px; border-radius: 50%; border: 1px solid var(--border); background: var(--surface); color: var(--muted); font-size: 15px; font-weight: 700; font-style: italic; font-family: var(--font-sans); line-height: 1; cursor: pointer; }
     .exercise-info-button:active { transform: scale(.94); }
     .exercise-accordion[open] .exercise-accordion-chevron { transform: rotate(90deg); }
     .exercise-accordion-body { padding: 2px 18px 18px; }
@@ -544,13 +503,15 @@
     .has-top-bar #backButton { display: none; }
     .has-top-bar .detail .detail-title { display: none; }
     .nav-item { min-height: 50px; border: 0; border-radius: 12px; background: transparent; color: var(--muted); display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 1px; cursor: pointer; font-size: 10px; font-weight: 600; line-height: 1.25; }
-    .nav-item.active { background: transparent; color: var(--accent-ink); font-weight: 700; }
+    .nav-item.active { background: var(--accent-soft); color: var(--accent-ink); font-weight: 800; }
     .nav-item.has-live-draft { position: relative; }
     .nav-item.has-live-draft:not(.active) { color: var(--accent-ink); }
-    .nav-item.has-live-draft::after { content: ''; position: absolute; top: 6px; left: 50%; margin-left: 12px; width: 9px; height: 9px; border-radius: 50%; background: var(--rose); box-shadow: 0 0 0 2px var(--surface-raised); pointer-events: none; }
+    .nav-item.has-live-draft::after { content: ''; position: absolute; top: 6px; left: 50%; margin-left: 12px; width: 9px; height: 9px; border-radius: 50%; background: var(--accent); box-shadow: 0 0 0 2px var(--surface-raised); pointer-events: none; }
     .nav-item[disabled] { opacity: .42; cursor: default; }
     .small-button[disabled] { opacity: .45; cursor: default; }
-    .nav-item svg { width: 19px; height: 19px; }
+    .nav-item svg { width: 21px; height: 21px; }
+    /* Workout barbell sits at a slight angle for a more dynamic mark. Transform-only: no layout shift. */
+    #workoutsNav svg { transform: rotate(-16deg); }
     /* Press feedback for touch (PWA has no haptics on iOS). Transform-only: never shifts layout. */
     .nav-item, .day-chip, .period-tab, .muscle-option, .form-pill, .recent-workout { transition: transform .15s ease; }
     @media (hover: none) {
@@ -696,7 +657,7 @@
       .exercise-tools { flex-wrap: wrap; justify-content: flex-end; }
       .bottom-nav { padding: 4px 6px calc(4px + env(safe-area-inset-bottom)); }
       .nav-item { min-height: 48px; font-size: 10px; }
-      .nav-item svg { width: 17px; height: 17px; }
+      .nav-item svg { width: 19px; height: 19px; }
     }
 
     /* Interaction polish: stable tap states, native-feeling delete rails, and dashboard controls */
@@ -722,7 +683,7 @@
     .set-swipe.is-open .swipe-content { transform: translateX(-72px); }
     .swipe-content { will-change: transform; touch-action: pan-y; }
     .day-chip { width: 100%; color: inherit; cursor: pointer; appearance: none; }
-    .day-chip.selected { border-color: var(--accent); background: var(--accent-soft); color: var(--accent); }
+    .day-chip.selected { border-color: var(--accent); background: var(--accent); color: var(--on-accent); }
     .day-chip:focus-visible { outline: 3px solid var(--focus-ring); outline-offset: 2px; }
     .dashboard-card-head { position: relative; display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 12px; }
     .dashboard-card-head h2 { margin: 0; }
@@ -776,8 +737,7 @@
     .day-chip { min-width: 0; min-height: 72px; padding: 10px 4px; border-radius: 16px; }
     .day-chip span { font-size: 11px; }
     .day-chip strong { margin-top: 5px; font-size: 18px; }
-    .day-chip em { display: block; min-height: 11px; margin-top: 4px; color: var(--warning); font-size: 8px; font-style: normal; font-weight: 850; text-transform: uppercase; }
-    .day-chip.has-real-workout em { color: var(--accent); }
+    .day-chip em { display: block; min-height: 11px; margin-top: 4px; font-size: 8px; font-style: normal; font-weight: 850; text-transform: uppercase; }
     .period-tabs { display: flex; flex-wrap: wrap; gap: 6px; margin: 0 0 16px; }
     .period-tab { min-height: 34px; padding: 0 10px; border: 1px solid var(--line); border-radius: 999px; background: var(--surface); color: var(--muted); cursor: pointer; font-size: 11px; font-weight: 750; }
     .period-tab[aria-pressed="true"] { border-color: var(--accent); background: var(--accent-soft); color: var(--accent); }
@@ -1289,9 +1249,12 @@
       background: var(--nav-bg);
     }
     .nav-item { border-radius: 18px; color: var(--muted); }
-    .nav-item.active { background: transparent; color: var(--accent-ink); font-weight: 700; }
+    .nav-item.active { background: var(--accent-soft); color: var(--accent-ink); font-weight: 800; }
     .day-chip { border-color: var(--line); border-radius: var(--radius-md); background: var(--surface-raised); }
-    .day-chip.today, .day-chip.selected { border-color: var(--accent); background: var(--accent-soft); }
+    .day-chip.today { border-color: var(--accent); background: transparent; }
+    .day-chip.selected { border-color: var(--accent); background: var(--accent); color: var(--on-accent); box-shadow: none; }
+    .day-chip.selected span { color: var(--on-accent); opacity: .72; }
+    .day-chip.selected strong::after, .day-chip.selected em i { background: var(--on-accent); }
     .day-chip.has-workout strong::after { background: var(--accent); }
     .mini-stat, .workout-detail-metric { border-radius: var(--radius-md); background: var(--surface-2); }
     .period-menu { border-color: var(--line); border-radius: var(--radius-sm); background: var(--surface-raised); box-shadow: var(--shadow); }

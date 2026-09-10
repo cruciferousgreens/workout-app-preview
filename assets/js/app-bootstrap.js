@@ -2,23 +2,26 @@
 /* ===== module: app-bootstrap.js ===== */
     /** Connects static controls to feature modules and performs initial rendering. */
     let deleteArmed=false;
-    /** Theme state (Justin 2026-09-10): themeName is 'cruciferous' or a Catppuccin
-        flavor ('latte','frappe','macchiato','mocha'). darkMode flips light/dark;
-        for Catppuccin, light is always Latte and dark is the remembered dark
-        flavor (ctpDark). Persisted as workout-theme (dark/light) + workout-theme-name. */
+    /** Theme state (Justin 2026-09-10): themeName is 'cruciferous', the Rosé Pine
+        light flavor ('rosepine'), or a dark Catppuccin flavor ('macchiato',
+        'mocha' — displayed as "Matcha"). darkMode flips light/dark; for
+        non-Cruciferous themes, light is always Rosé Pine and dark is the
+        remembered dark flavor (ctpDark). Persisted as workout-theme
+        (dark/light) + workout-theme-name. */
     let themeName='cruciferous', darkMode=false, ctpDark='mocha';
+    const ROSEPINE='rosepine', DARK_FLAVORS=['macchiato','mocha'];
     function applyTheme(){
       const eff=themeName==='cruciferous'?(darkMode?'dark':'light'):themeName;
       document.documentElement.dataset.theme=eff;
       const toggle=$('#darkModeToggle');
-      if(toggle){toggle.setAttribute('aria-pressed',String(darkMode));toggle.setAttribute('aria-label',`Dark mode ${darkMode?'on':'off'}`);}
+      if(toggle){toggle.setAttribute('aria-pressed',String(darkMode));toggle.setAttribute('aria-label',`Dark mode ${darkMode?'on':'off'}`);toggle.closest('.switch-row')?.removeAttribute('hidden');}
       document.querySelectorAll('#themePills [data-theme-name]').forEach(button=>button.setAttribute('aria-pressed',String(button.dataset.themeName===themeName)));
       const color=getComputedStyle(document.documentElement).getPropertyValue('--theme-color').trim();document.querySelector('meta[name="theme-color"]').setAttribute('content',color);document.querySelector('meta[name="apple-mobile-web-app-status-bar-style"]').setAttribute('content',darkMode?'black-translucent':'default');
       try{localStorage.setItem('workout-theme',darkMode?'dark':'light');localStorage.setItem('workout-theme-name',themeName);}catch(_){}
     }
     function setThemeName(name){
       themeName=name;
-      if(name==='latte'){darkMode=false;}
+      if(name===ROSEPINE){darkMode=false;}
       else if(name!=='cruciferous'){darkMode=true;ctpDark=name;}
       applyTheme();
     }
@@ -103,7 +106,7 @@
     $('#closeCustomDialog').addEventListener('click', closeCustomDialog);
     $('#cancelCustomExercise').addEventListener('click', closeCustomDialog);
 
-    $('#darkModeToggle').addEventListener('click',()=>{darkMode=!darkMode;if(themeName!=='cruciferous')themeName=darkMode?ctpDark:'latte';applyTheme();});
+    $('#darkModeToggle').addEventListener('click',()=>{darkMode=!darkMode;if(themeName!=='cruciferous')themeName=darkMode?ctpDark:ROSEPINE;applyTheme();});
     document.querySelectorAll('#themePills [data-theme-name]').forEach(button=>button.addEventListener('click',()=>setThemeName(button.dataset.themeName)));
     $('#settingsRpeThreshold').addEventListener('input',e=>{progressionSetup.threshold=Math.min(10,Math.max(1,Number(e.target.value)||8));schedulePersist();});
     $('#settingsIncrementType').addEventListener('change',e=>{progressionSetup.incrementType=e.target.value;syncSettingsIncrementUnit();schedulePersist();});
@@ -128,8 +131,9 @@
     try{
       darkMode=(localStorage.getItem('workout-theme')||'light')==='dark';
       themeName=localStorage.getItem('workout-theme-name')||'cruciferous';
-      if(!['cruciferous','latte','frappe','macchiato','mocha'].includes(themeName))themeName='cruciferous';
-      if(['frappe','macchiato','mocha'].includes(themeName))ctpDark=themeName;
+      if(themeName==='latte')themeName='rosepine';else if(themeName==='frappe')themeName='macchiato';
+      if(!['cruciferous','rosepine','macchiato','mocha'].includes(themeName))themeName='cruciferous';
+      if(DARK_FLAVORS.includes(themeName))ctpDark=themeName;
     }catch(_){}
     applyTheme();
     $('#discardDraftBanner').addEventListener('click',()=>{workoutState.draft=null;$('#workoutError').textContent='';renderWorkoutScreen();showToast('Workout draft discarded.');});
@@ -178,7 +182,7 @@
     });
     $('#closeExercisePicker').addEventListener('click', () => {$('#exercisePickerDialog').close();if(workoutState.pickerMode==='program')renderProgram();});
     $('#doneExercisePicker').addEventListener('click', () => {$('#exercisePickerDialog').close();if(workoutState.pickerMode==='program')renderProgram();});
-    $('#exercisePickerSearch').addEventListener('input', renderExercisePicker);
+    $('#exercisePickerSearch').addEventListener('input', renderPickerList);
     $('#workoutName').addEventListener('input', event => { if (workoutState.draft) { workoutState.draft.name = event.target.value; markDraftSaved(); } });
     $('#workoutDateDisplay').addEventListener('click', () => { const input=$('#workoutDate'); if(input.showPicker)input.showPicker(); else input.focus(); });
     $('#workoutDate').addEventListener('input', event => { if (workoutState.draft) { workoutState.draft.date = event.target.value; markDraftSaved(); } renderWorkoutDateDisplay(); });

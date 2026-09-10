@@ -22,7 +22,7 @@
         const tag=button.dataset.exerciseTag;
         item.exerciseTags=item.exerciseTags.includes(tag)?item.exerciseTags.filter(value=>value!==tag):[...item.exerciseTags,tag];
         renderExerciseTagDialog();
-        if(workoutState.exerciseTagTarget?.mode==='program'){schedulePersist();renderExercisePicker();}else{renderWorkoutExercises();markDraftSaved();}
+        if(workoutState.exerciseTagTarget?.mode==='program'){schedulePersist();renderPickerRules();}else{renderWorkoutExercises();markDraftSaved();}
       }));
     }
     function addExerciseTag() {
@@ -34,7 +34,7 @@
       if(!item.exerciseTags.includes(selected))item.exerciseTags.push(selected);
       $('#newExerciseTagInput').value='';
       renderExerciseTagDialog();
-      if(workoutState.exerciseTagTarget?.mode==='program'){schedulePersist();renderExercisePicker();}else{renderWorkoutExercises();markDraftSaved();}
+      if(workoutState.exerciseTagTarget?.mode==='program'){schedulePersist();renderPickerRules();}else{renderWorkoutExercises();markDraftSaved();}
     }
 
     function findDraftSet(exerciseUid, setUid) {
