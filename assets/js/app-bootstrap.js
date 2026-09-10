@@ -166,6 +166,9 @@
       try{localStorage.removeItem(PERSIST_KEY);}catch(_){}
       workoutState.completed=[];workoutState.templates=[];workoutState.tags=[];workoutState.exerciseTagPresets=[];workoutState.draft=null;workoutState.activeProgram=null;workoutState.archivedPrograms=[];
       state.customExercises=[];exercises=exercises.filter(ex=>!ex.custom);
+      /* Favorites are user data too: clear them in memory so the pagehide
+       * persist-on-reload below can't resurrect them. */
+      state.favorites.clear();
       location.reload();
     });
     try{
