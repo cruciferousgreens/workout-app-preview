@@ -5,12 +5,12 @@
     /** Theme state (Justin 2026-09-10): two families. Cruciferous (default light)
         with Asterid as its dark; Matcha with Rosé as its light. themeName is
         'cruciferous', 'rosepine' (displayed "Rosé"), 'macchiato' (displayed
-        "Asterid"), or 'mocha' (displayed "Matcha"). darkMode flips light/dark
-        within the family: Cruciferous dark renders the Asterid palette, and the
-        toggle flips Rosé<->Matcha (remembered via ctpDark/lightTheme), so it
-        never lands somewhere unexpected. Tapping an already-active non-default
-        pill toggles back to Cruciferous light. Persisted as workout-theme
-        (dark/light) + workout-theme-name + workout-theme-light. */
+        "Asterid"), or 'mocha' (displayed "Matcha"). The dark toggle flips
+        light/dark WITHIN the current family: Cruciferous <-> Asterid (the
+        Cruciferous pill stays active in both), Rosé <-> Matcha. Tapping an
+        already-active non-default pill toggles back to Cruciferous light.
+        Persisted as workout-theme (dark/light) + workout-theme-name
+        (+ legacy workout-theme-light, kept for stored prefs). */
     let themeName='cruciferous', darkMode=false, ctpDark='mocha', lightTheme='cruciferous';
     const ROSEPINE='rosepine', DARK_FLAVORS=['macchiato','mocha'], LIGHT_THEMES=['cruciferous','rosepine'];
     function applyTheme(){
@@ -123,7 +123,12 @@
     $('#closeCustomDialog').addEventListener('click', closeCustomDialog);
     $('#cancelCustomExercise').addEventListener('click', closeCustomDialog);
 
-    $('#darkModeToggle').addEventListener('click',()=>{darkMode=!darkMode;if(themeName!=='cruciferous')themeName=darkMode?ctpDark:lightTheme;applyTheme();});
+    $('#darkModeToggle').addEventListener('click',()=>{
+      darkMode=!darkMode;
+      if(darkMode){ if(themeName===ROSEPINE)themeName='mocha'; }
+      else{ if(themeName==='mocha')themeName=ROSEPINE; else if(themeName==='macchiato')themeName='cruciferous'; }
+      applyTheme();
+    });
     document.querySelectorAll('#themePills [data-theme-name]').forEach(button=>button.addEventListener('click',()=>{
       const name=button.dataset.themeName;
       /* Tapping the active pill toggles back to Cruciferous light — except on
