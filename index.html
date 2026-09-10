@@ -95,7 +95,6 @@
           <section class="training-recent" aria-labelledby="trainingRecentTitle"><div class="section-head"><div><h2 id="trainingRecentTitle">Recent workouts</h2><p class="section-note">Open details or repeat any session</p></div></div><div class="recent-workouts" id="workoutRecent"></div></section>
         </div>
         <div id="workoutEditor" hidden>
-          <div class="resume-draft-banner" id="resumeDraftBanner"><div><strong>Workout in progress</strong><span id="resumeDraftMeta">Your draft is ready to continue.</span></div><button class="small-button" id="discardDraftBanner" type="button">Discard</button></div>
           <div class="workout-context" id="workoutContext" hidden></div>
           <div class="progression-banner" id="workoutProgression" hidden></div>
           <div class="workout-meta">
@@ -106,6 +105,11 @@
             <h2>Exercises</h2>
             <div class="workout-toolbar-actions"><button class="secondary-button" id="addWorkoutExercise" type="button">+ Add exercises</button></div>
           </div>
+          <details class="workout-focus" id="workoutFocus">
+            <summary>Workout focus</summary>
+            <div class="rep-preset-row"><button class="rep-preset" type="button" data-workout-focus="strength">Strength · 1–5</button><button class="rep-preset" type="button" data-workout-focus="hypertrophy">Hypertrophy · 6–12</button><button class="rep-preset" type="button" data-workout-focus="endurance">Endurance · 12–20</button><button class="rep-preset" type="button" data-workout-focus="open">15+</button><button class="rep-preset" type="button" data-workout-focus="amrap">AMRAP</button></div>
+            <p class="field-help">Applies the rep range to every reps-tracked exercise in this workout.</p>
+          </details>
           <div class="draft-status" id="draftStatus" role="status">Changes are saved on this device</div>
           <div class="workout-exercises" id="workoutExercises"></div>
           <div class="workout-footer">
@@ -195,6 +199,7 @@
               <label class="rule-field"><span>Increment type</span><select id="settingsIncrementType"><option value="lb">Pounds (lb)</option><option value="percent">Percent (%)</option></select></label>
               <label class="rule-field"><span>Increment value</span><input id="settingsIncrementValue" type="number" min="0" step="0.5" value="5"><em class="unit" id="settingsIncrementUnit">lb</em></label>
             </div>
+            <div class="rule-field"><span>Default focus</span><div class="rep-preset-row" id="settingsRepPresets"><button class="rep-preset" type="button" data-rep-preset="strength" aria-pressed="false">Strength · 1–5</button><button class="rep-preset" type="button" data-rep-preset="hypertrophy" aria-pressed="true">Hypertrophy · 6–12</button><button class="rep-preset" type="button" data-rep-preset="endurance" aria-pressed="false">Endurance · 12–20</button><button class="rep-preset" type="button" data-rep-preset="open" aria-pressed="false">15+</button><button class="rep-preset" type="button" data-rep-preset="amrap" aria-pressed="false">AMRAP</button></div></div>
             <div class="settings-pair">
               <label class="rule-field"><span>Default rep range min</span><input id="settingsRepMin" type="number" min="1" step="1" value="6"></label>
               <label class="rule-field"><span>Default rep range max</span><input id="settingsRepMax" type="number" min="1" step="1" value="12"></label>
@@ -202,6 +207,10 @@
             <div class="rule-field"><span>Time step (timed exercises)</span><div class="step-pills" id="settingsTimeStepPills" role="group" aria-label="Time step in seconds"></div></div>
           </div>
           <div class="switch-row wide"><span class="switch-copy"><strong>Stall detection</strong><span>Suggest a separate deload week after repeated flat sessions with rising RPE. Never changes the program automatically.</span></span><button class="switch" id="settingsStallToggle" type="button" role="switch" aria-pressed="true" aria-label="Stall detector on"></button></div>
+        </section>
+        <section class="dashboard-card">
+          <div class="section-head settings-head"><h2>Units</h2><p class="section-note">Pounds or kilograms for weight entry and display.</p></div>
+          <div class="step-pills" id="settingsUnitPills" role="group" aria-label="Weight units"><button type="button" data-units="imperial" aria-pressed="true">Pounds (lb)</button><button type="button" data-units="metric" aria-pressed="false">Kilograms (kg)</button></div>
         </section>
         <section class="dashboard-card">
           <div class="section-head settings-head"><h2>Data</h2><p class="section-note">Backups and storage on this device.</p></div>

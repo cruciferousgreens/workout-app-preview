@@ -94,7 +94,8 @@
       return volumes;
     }
     function formatVolume(value) {
-      const n=Math.round(Number(value)||0); return n>=1000?`${(n/1000).toFixed(n>=10000?0:1)}k lb`:`${n.toLocaleString()} lb`;
+      const n=displayVolume(value), unit=weightUnit(), rounded=Math.round(n);
+      return rounded>=1000?`${(rounded/1000).toFixed(rounded>=10000?0:1)}k ${unit}`:`${rounded.toLocaleString()} ${unit}`;
     }
     function heatLevel(value,max) {
       if(!value||!max)return 0;

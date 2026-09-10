@@ -14,7 +14,7 @@
       const eff=themeName==='cruciferous'?(darkMode?'dark':'light'):themeName;
       document.documentElement.dataset.theme=eff;
       const toggle=$('#darkModeToggle');
-      if(toggle){toggle.setAttribute('aria-pressed',String(darkMode));toggle.setAttribute('aria-label',`Dark mode ${darkMode?'on':'off'}`);toggle.closest('.switch-row')?.removeAttribute('hidden');}
+      if(toggle){toggle.setAttribute('aria-pressed',String(darkMode));toggle.setAttribute('aria-label',`Dark mode ${darkMode?'on':'off'}`);}
       document.querySelectorAll('#themePills [data-theme-name]').forEach(button=>button.setAttribute('aria-pressed',String(button.dataset.themeName===themeName)));
       const color=getComputedStyle(document.documentElement).getPropertyValue('--theme-color').trim();document.querySelector('meta[name="theme-color"]').setAttribute('content',color);document.querySelector('meta[name="apple-mobile-web-app-status-bar-style"]').setAttribute('content',darkMode?'black-translucent':'default');
       try{localStorage.setItem('workout-theme',darkMode?'dark':'light');localStorage.setItem('workout-theme-name',themeName);}catch(_){}
@@ -28,7 +28,12 @@
     /** Light unit suffix inside the increment value field; follows the type (Justin 2026-09-10). */
     function syncSettingsIncrementUnit(){
       const unit=$('#settingsIncrementUnit');
-      if(unit) unit.textContent = progressionSetup.incrementType==='percent' ? '%' : 'lb';
+      if(unit) unit.textContent = progressionSetup.incrementType==='percent' ? '%' : weightUnit();
+      const typeOpt=$('#settingsIncrementType option[value="lb"]');
+      if(typeOpt) typeOpt.textContent = isMetric() ? 'Kilograms (kg)' : 'Pounds (lb)';
+    }
+    function syncUnitPills(){
+      document.querySelectorAll('#settingsUnitPills [data-units]').forEach(button=>button.setAttribute('aria-pressed',String(button.dataset.units===(progressionSetup.units||'imperial'))));
     }
     function renderSettings(){
       const darkToggle=$('#darkModeToggle');
@@ -40,6 +45,9 @@
       syncSettingsIncrementUnit();
       $('#settingsRepMin').value=progressionSetup.defaultRange.min;
       $('#settingsRepMax').value=progressionSetup.defaultRange.max;
+      const activePreset=progressionSetup.defaultRange.preset||'hypertrophy';
+      document.querySelectorAll('[data-rep-preset]').forEach(button=>button.setAttribute('aria-pressed',String(button.dataset.repPreset===activePreset)));
+      syncUnitPills();
       syncTimeStepPills($('#settingsTimeStepPills'),progressionSetup.timeStep);
       const stall=$('#settingsStallToggle');
       stall.setAttribute('aria-pressed',String(!!progressionSetup.stallDetection));
@@ -108,11 +116,15 @@
 
     $('#darkModeToggle').addEventListener('click',()=>{darkMode=!darkMode;if(themeName!=='cruciferous')themeName=darkMode?ctpDark:ROSEPINE;applyTheme();});
     document.querySelectorAll('#themePills [data-theme-name]').forEach(button=>button.addEventListener('click',()=>setThemeName(button.dataset.themeName)));
+    document.querySelectorAll('#settingsUnitPills [data-units]').forEach(button=>button.addEventListener('click',()=>{
+      progressionSetup.units=button.dataset.units; syncUnitPills(); syncSettingsIncrementUnit(); schedulePersist();
+      renderDashboard(); renderStats(); renderWorkoutScreen(); renderWorkoutProgression();
+    }));
     $('#settingsRpeThreshold').addEventListener('input',e=>{progressionSetup.threshold=Math.min(10,Math.max(1,Number(e.target.value)||8));schedulePersist();});
     $('#settingsIncrementType').addEventListener('change',e=>{progressionSetup.incrementType=e.target.value;syncSettingsIncrementUnit();schedulePersist();});
     $('#settingsIncrementValue').addEventListener('input',e=>{progressionSetup.incrementValue=Math.max(0,Number(e.target.value)||0);schedulePersist();});
-    $('#settingsRepMin').addEventListener('input',e=>{progressionSetup.defaultRange.min=Math.max(1,Number(e.target.value)||1);progressionSetup.defaultRange.preset='custom';schedulePersist();});
-    $('#settingsRepMax').addEventListener('input',e=>{progressionSetup.defaultRange.max=Math.max(progressionSetup.defaultRange.min,Number(e.target.value)||progressionSetup.defaultRange.min);progressionSetup.defaultRange.preset='custom';schedulePersist();});
+    $('#settingsRepMin').addEventListener('input',e=>{progressionSetup.defaultRange.min=Math.max(1,Number(e.target.value)||1);progressionSetup.defaultRange.preset='custom';document.querySelectorAll('[data-rep-preset]').forEach(button=>button.setAttribute('aria-pressed','false'));schedulePersist();});
+    $('#settingsRepMax').addEventListener('input',e=>{progressionSetup.defaultRange.max=Math.max(progressionSetup.defaultRange.min,Number(e.target.value)||progressionSetup.defaultRange.min);progressionSetup.defaultRange.preset='custom';document.querySelectorAll('[data-rep-preset]').forEach(button=>button.setAttribute('aria-pressed','false'));schedulePersist();});
     const syncAllTimeStepPills=()=>{syncTimeStepPills($('#settingsTimeStepPills'),progressionSetup.timeStep);syncTimeStepPills($('#programTimeStepPills'),progressionSetup.timeStep);};
     wireTimeStepPills($('#settingsTimeStepPills'),()=>progressionSetup.timeStep,v=>{progressionSetup.timeStep=v;syncAllTimeStepPills();schedulePersist();});
     wireTimeStepPills($('#programTimeStepPills'),()=>progressionSetup.timeStep,v=>{progressionSetup.timeStep=v;syncAllTimeStepPills();schedulePersist();});
@@ -136,7 +148,6 @@
       if(DARK_FLAVORS.includes(themeName))ctpDark=themeName;
     }catch(_){}
     applyTheme();
-    $('#discardDraftBanner').addEventListener('click',()=>{workoutState.draft=null;$('#workoutError').textContent='';renderWorkoutScreen();showToast('Workout draft discarded.');});
     $('#closeReplaceDraft').addEventListener('click',()=>{pendingRepeatWorkout=null;$('#replaceDraftDialog').close();});
     $('#keepCurrentDraft').addEventListener('click',()=>{pendingRepeatWorkout=null;$('#replaceDraftDialog').close();});
     $('#confirmReplaceDraft').addEventListener('click',()=>{const workout=pendingRepeatWorkout;pendingRepeatWorkout=null;$('#replaceDraftDialog').close();if(workout)repeatWorkout(workout,true);});
@@ -182,6 +193,19 @@
     });
     $('#closeExercisePicker').addEventListener('click', () => {$('#exercisePickerDialog').close();if(workoutState.pickerMode==='program')renderProgram();});
     $('#doneExercisePicker').addEventListener('click', () => {$('#exercisePickerDialog').close();if(workoutState.pickerMode==='program')renderProgram();});
+    /* Workout focus (2026-09-10): one tap applies a rep-range preset to every
+       reps-tracked exercise in the draft. Explicit choice, so profiles become
+       custom (the engine follows the chosen zone instead of last session's). */
+    document.querySelectorAll('[data-workout-focus]').forEach(button=>button.addEventListener('click',()=>{
+      const preset=REP_PRESETS[button.dataset.workoutFocus]; if(!preset||!workoutState.draft)return;
+      workoutState.draft.exercises.forEach(item=>{
+        const ex=exercises.find(row=>row.id===item.exerciseId);
+        if(exerciseTracking(item,ex)==='time')return;
+        item.progression={...(item.progression||{}),preset:button.dataset.workoutFocus,min:preset.min,max:preset.max,openTop:!!preset.openTop,amrap:!!preset.amrap,custom:true};
+      });
+      prepareDraftProgression(workoutState.draft,freeformProgressionConfig());
+      renderWorkoutExercises(); renderWorkoutProgression(); markDraftSaved();
+    }));
     $('#exercisePickerSearch').addEventListener('input', renderPickerList);
     $('#workoutName').addEventListener('input', event => { if (workoutState.draft) { workoutState.draft.name = event.target.value; markDraftSaved(); } });
     $('#workoutDateDisplay').addEventListener('click', () => { const input=$('#workoutDate'); if(input.showPicker)input.showPicker(); else input.focus(); });

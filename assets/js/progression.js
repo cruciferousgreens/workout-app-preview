@@ -82,6 +82,10 @@
       }
       const incrementType=profile?.incrementType || programConfig.incrementType || 'lb';
       const incrementValue=Number(profile?.incrementValue ?? programConfig.incrementValue ?? 5);
+      /* incrementValue is entered in the user's display units; convert to the
+         canonical lb before applying it to stored weights. */
+      const incrementValueLb=incrementType==='percent'?incrementValue:(isMetric()?incrementValue/LB_TO_KG:incrementValue);
+      const incrementLabel=incrementType==='percent'?`${incrementValue}%`:`${incrementValue} ${weightUnit()}`;
       const repsOnly=!!profile?.repsOnly;
       const previousProfile=latestLog.progression;
       const previousMin=normMin(previousProfile),previousMax=normMax(previousProfile);
@@ -95,19 +99,19 @@
         const targetReps=profile?.openTop?min:Math.max(min,max),rawTarget=estimated1RM/(1+targetReps/30);
         nextWeight=Math.max(0,Math.round(rawTarget*10)/10);nextReps=min;kind='range';
         const week=Number(programConfig.currentWeek)||null,weekPrefix=config?.freeform?'This session is ':week?`Week ${week} is `:'This block is ';
-        reason=`${weekPrefix}${programRangeLabel(profile)}; suggesting ${nextWeight} lb from your estimated 1RM of ${Math.round(estimated1RM)} lb so the new rep target starts at a sensible load.`;
+        reason=`${weekPrefix}${programRangeLabel(profile)}; suggesting ${displayWeight(nextWeight)} ${weightUnit()} from your estimated 1RM of ${displayWeight(Math.round(estimated1RM))} ${weightUnit()} so the new rep target starts at a sensible load.`;
       } else if(latest.rpe!=null && latest.rpe<=threshold){
         if(mode==='time'){
           if(latest.seconds<timeMax){nextSeconds=Math.min(timeMax,Math.max(timeMin,latest.seconds+timeStep));kind='time';reason=`Top set was at or below RPE ${threshold}; add ${timeStep} seconds inside the ${timeMin}–${timeMax}s range.`;}
           else if(repsOnly){kind='hold';reason=`Time ceiling reached. Load progression is off, so hold ${timeMax} seconds.`;}
-          else{nextWeight=roundedIncrement(latest.weight,incrementType,incrementValue);nextSeconds=timeMin;kind='load';reason=`Time ceiling reached at RPE ${latest.rpe}; add ${incrementType==='percent'?`${incrementValue}%`:`${incrementValue} lb`} and reset to ${timeMin} seconds.`;}
+          else{nextWeight=roundedIncrement(latest.weight,incrementType,incrementValueLb);nextSeconds=timeMin;kind='load';reason=`Time ceiling reached at RPE ${latest.rpe}; add ${incrementLabel} and reset to ${timeMin} seconds.`;}
         } else if(profile?.amrap){nextReps=Math.max(min,latest.reps);kind='hold';reason=`AMRAP target: keep the load and take the set to the effort target (top-set RPE ${threshold} or below).`;}
         else if(profile?.openTop){nextReps=Math.max(min,latest.reps+1);kind='reps';reason=`Open-ended range: add one rep while the top set stays at or below RPE ${threshold}.`;}
         else if(latest.reps<max){nextReps=Math.max(min,latest.reps+1);kind='reps';reason=`Top set was at or below RPE ${threshold}; add one rep inside the ${min}–${max} range.`;}
-        else if(repsOnly){kind='hold';reason=`Rep ceiling reached. Load progression is off, so hold ${latest.weight||0} lb.`;}
+        else if(repsOnly){kind='hold';reason=`Rep ceiling reached. Load progression is off, so hold ${displayWeight(latest.weight)||0} ${weightUnit()}.`;}
         // A single-number zone (min===max, the freestyle follow-the-lifter retarget)
         // reads better as "add load at N reps" than "reset to N reps".
-        else{nextWeight=roundedIncrement(latest.weight,incrementType,incrementValue);nextReps=min;kind='load';reason=min===max?`Top set was at or below RPE ${threshold}; add ${incrementType==='percent'?`${incrementValue}%`:`${incrementValue} lb`} at ${min} reps.`:`Rep ceiling reached at RPE ${latest.rpe}; add ${incrementType==='percent'?`${incrementValue}%`:`${incrementValue} lb`} and reset to ${min} reps.`;}
+        else{nextWeight=roundedIncrement(latest.weight,incrementType,incrementValueLb);nextReps=min;kind='load';reason=min===max?`Top set was at or below RPE ${threshold}; add ${incrementLabel} at ${min} reps.`:`Rep ceiling reached at RPE ${latest.rpe}; add ${incrementLabel} and reset to ${min} reps.`;}
       } else if(latest.rpe==null){reason='No RPE on the latest top set, so the engine holds the target.';}
       const recent=logs.slice(0,3).map(topSetForSession).filter(Boolean).reverse();
       const flat=recent.length>=3 && recent.every((row,i)=>i===0 || (row.weight<=recent[i-1].weight && row.performance<=recent[i-1].performance));
@@ -118,7 +122,7 @@
 
     function suggestionCardMarkup(suggestion,index,interactive=true) {
       const ex=exercises.find(x=>x.id===suggestion.exerciseId);
-      const formatTarget=(weight,performance)=>`${weight ? `${weight} lb · ` : ''}${performance} ${suggestion.mode==='time'?'sec':'reps'}`;
+      const formatTarget=(weight,performance)=>`${weight ? `${displayWeight(weight)} ${weightUnit()} · ` : ''}${performance} ${suggestion.mode==='time'?'sec':'reps'}`;
       const oldTarget=formatTarget(suggestion.latest.weight,suggestion.mode==='time'?suggestion.latest.seconds:suggestion.latest.reps);
       const nextTarget=formatTarget(suggestion.nextWeight,suggestion.mode==='time'?suggestion.nextSeconds:suggestion.nextReps);
       const label=suggestion.applied?'Applied ✓':suggestion.kind==='hold'?'Hold':suggestion.kind==='load'?'Load +':suggestion.kind==='range'?(suggestion.freeform?'New range':'Week range'):suggestion.kind==='time'?'Time +':'Rep +';

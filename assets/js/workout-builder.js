@@ -40,7 +40,7 @@
             <label class="rule-field"><span>${time?'Max sec':'Max reps'}</span><input type="number" inputmode="numeric" min="1" value="${time?profile.timeMax:(profile.max??'')}" data-program-rule="${time?'timeMax':'max'}" ${time?'':`placeholder="AMRAP" aria-label="Maximum reps. Leave blank for AMRAP."`}></label>
             ${time?'':'<span class="field-help rule-amrap-hint">Leave <b>Max</b> blank for AMRAP.</span>'}
             ${time?`<div class="rule-field"><span>Step</span><div class="step-pills" data-step-pills role="group" aria-label="Time step in seconds"></div></div>`:''}
-            <div class="load-progression ${profile.repsOnly?'is-disabled':''}"><span class="load-control-title">Load progression</span><div class="load-progression-row"><select data-program-rule="incrementType" aria-label="Load increment type"><option value="lb" ${incrementType==='lb'?'selected':''}>Pounds</option><option value="percent" ${incrementType==='percent'?'selected':''}>Percent</option></select><span class="lp-value"><input type="number" min="0.5" step="0.5" value="${profile.incrementValue??progressionSetup.incrementValue}" data-program-rule="incrementValue" aria-label="Load increment value"><em class="unit">${incrementType==='percent'?'%':'lb'}</em></span><button class="reps-only-toggle" type="button" data-program-reps-only aria-pressed="${!!profile.repsOnly}">Increase reps only</button></div></div>
+            <div class="load-progression ${profile.repsOnly?'is-disabled':''}"><span class="load-control-title">Load progression</span><div class="load-progression-row"><select data-program-rule="incrementType" aria-label="Load increment type"><option value="lb" ${incrementType==='lb'?'selected':''}>${isMetric()?'Kilograms':'Pounds'}</option><option value="percent" ${incrementType==='percent'?'selected':''}>Percent</option></select><span class="lp-value"><input type="number" min="0.5" step="0.5" value="${profile.incrementValue??progressionSetup.incrementValue}" data-program-rule="incrementValue" aria-label="Load increment value"><em class="unit">${incrementType==='percent'?'%':weightUnit()}</em></span><button class="reps-only-toggle" type="button" data-program-reps-only aria-pressed="${!!profile.repsOnly}">Increase reps only</button></div></div>
           </div>
           <div class="exercise-tags-builder"><div class="exercise-tag-row">${(item.exerciseTags||[]).map(tag=>`<span class="exercise-tag-chip ${workoutState.exerciseTagPresets.includes(tag)?'preset':''}">${escapeHtml(tag)}</span>`).join('')}<button class="exercise-tag-button" type="button" data-program-exercise-tags="${escapeHtml(item.exerciseId)}">${item.exerciseTags?.length?'Edit exercise tags':'+ Exercise tags'}</button></div></div>
         </div></div>
@@ -65,7 +65,7 @@
           }else if(field==='incrementType'){
             profile.incrementType=control.value;
             const unitEl=row.querySelector('.lp-value .unit');
-            if(unitEl) unitEl.textContent = control.value==='percent' ? '%' : 'lb';
+            if(unitEl) unitEl.textContent = control.value==='percent' ? '%' : weightUnit();
           }else if(field==='min'||field==='max'){
             // Reps mode only (time mode uses timeMin/timeMax). A blank Max means
             // AMRAP: no upper rep bound, so AMRAP and open-ended are exclusive.
