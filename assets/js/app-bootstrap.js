@@ -7,8 +7,9 @@
         'cruciferous', 'rosepine' (displayed "Rosé"), 'macchiato' (displayed
         "Asterid"), or 'mocha' (displayed "Matcha"). The dark toggle flips
         light/dark WITHIN the current family: Cruciferous <-> Asterid (the
-        Cruciferous pill stays active in both), Rosé <-> Matcha. Tapping an
-        already-active non-default pill toggles back to Cruciferous light.
+        Cruciferous pill stays active in both), Rosé <-> Matcha. Tapping the
+        Cruciferous pill always lands on Cruciferous light; tapping an
+        already-active non-default pill also resets to Cruciferous light.
         Persisted as workout-theme (dark/light) + workout-theme-name
         (+ legacy workout-theme-light, kept for stored prefs). */
     let themeName='cruciferous', darkMode=false, ctpDark='mocha', lightTheme='cruciferous';
@@ -25,7 +26,10 @@
     function setThemeName(name){
       themeName=name;
       if(name===ROSEPINE){darkMode=false;lightTheme=ROSEPINE;}
-      else if(name==='cruciferous'){lightTheme='cruciferous';}
+      /* Cruciferous always means Cruciferous light — tapping the pill must show
+         the default theme, never linger in a dark palette (Justin 2026-09-10).
+         The Cruciferous<->Asterid dark relationship lives in the dark toggle. */
+      else if(name==='cruciferous'){darkMode=false;lightTheme='cruciferous';}
       else{ /* dark Catppuccin flavor */ darkMode=true;ctpDark=name;}
       applyTheme();
     }
@@ -131,9 +135,10 @@
     });
     document.querySelectorAll('#themePills [data-theme-name]').forEach(button=>button.addEventListener('click',()=>{
       const name=button.dataset.themeName;
-      /* Tapping the active pill toggles back to Cruciferous light — except on
-         Cruciferous itself, where it would silently kill dark mode (Justin 2026-09-10). */
-      if(name===themeName){ if(name!=='cruciferous'){themeName='cruciferous';darkMode=false;lightTheme='cruciferous';applyTheme();} return; }
+      /* Tapping the active pill resets to Cruciferous light. Tapping
+         "Cruciferous" always shows Cruciferous light (Justin 2026-09-10) —
+         the dark side of that family is reached via the dark toggle. */
+      if(name===themeName){ themeName='cruciferous';darkMode=false;lightTheme='cruciferous';applyTheme(); return; }
       setThemeName(name);
     }));
     document.querySelectorAll('#settingsUnitPills [data-units]').forEach(button=>button.addEventListener('click',()=>{

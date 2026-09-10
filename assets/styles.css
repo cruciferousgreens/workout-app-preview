@@ -952,7 +952,11 @@
     .calendar-toolbar strong, .calendar-toolbar span { display: block; }
     .calendar-toolbar strong { font-size: 13px; }
     .calendar-toolbar span { margin-top: 2px; color: var(--muted); font-size: 10px; }
-    .calendar-page { width: 40px; height: 40px; padding: 0; border: 1px solid var(--line); border-radius: 50%; background: var(--surface); color: var(--ink); cursor: pointer; font-size: 25px; line-height: 1; }
+    .calendar-page { width: 40px; height: 40px; padding: 0; border: 1px solid var(--line); border-radius: 50%; background: var(--surface); color: var(--ink); cursor: pointer; font-size: 25px; line-height: 1; display: inline-flex; align-items: center; justify-content: center; }
+    /* Optical centering (Justin 2026-09-10): ‹ › glyphs carry uneven side
+       bearings, so the visible chevron sits off-center without a nudge. */
+    #previousWeek { transform: translateX(-2px); }
+    #nextWeek { transform: translateX(2px); }
     .calendar-page:hover, .calendar-page:focus-visible { border-color: var(--accent); background: var(--accent-soft); color: var(--accent); outline: none; }
     /* Disabled week-pager (Justin 2026-09-10): grey out the forward control at today. */
     .calendar-page[disabled] { opacity: .35; cursor: default; }
@@ -1214,12 +1218,15 @@
       color: var(--muted);
     }
     .tag.primary, .exercise-tag-chip.preset, .set-tag-chip,
-    .choice-pill[aria-pressed="true"],
-    .period-tab[aria-pressed="true"], .real-data-label {
+    .choice-pill[aria-pressed="true"], .real-data-label {
       border-color: var(--pine);
       background: var(--pine-soft);
       color: var(--accent-ink);
     }
+    /* Note: .period-tab[aria-pressed="true"] is deliberately NOT in the list
+       above — its active state is the single-accent treatment at the
+       .period-tab rule, so the border and text never come from two different
+       tokens (Justin 2026-09-10: teal border + pink text looked broken). */
     /* Note: .switch is deliberately excluded here — its off-state track uses
        --switch-track (visible on light themes), set in the base .switch rule. */
     .form-pill, .muscle-option, .reps-only-toggle,
