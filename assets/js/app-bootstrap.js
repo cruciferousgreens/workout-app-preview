@@ -3,12 +3,13 @@
     /** Connects static controls to feature modules and performs initial rendering. */
     let deleteArmed=false;
     /** Theme state (Justin 2026-09-10): themeName is 'cruciferous', the Rosé Pine
-        light flavor ('rosepine'), or a dark Catppuccin flavor ('macchiato',
-        'mocha' — displayed as "Matcha"). darkMode flips light/dark; for
-        non-Cruciferous themes the toggle flips between the remembered dark
-        flavor (ctpDark) and the remembered light theme (lightTheme), so it
-        never lands somewhere unexpected. Persisted as workout-theme
-        (dark/light) + workout-theme-name + workout-theme-light. */
+        light flavor ('rosepine', displayed as "Rosé"), or a dark Catppuccin flavor
+        ('macchiato' displayed as "Asterid", 'mocha' displayed as "Matcha").
+        darkMode flips light/dark; for non-Cruciferous themes the toggle flips
+        between the remembered dark flavor (ctpDark) and the remembered light
+        theme (lightTheme), so it never lands somewhere unexpected. Tapping the
+        already-active theme pill toggles back to Cruciferous light. Persisted as
+        workout-theme (dark/light) + workout-theme-name + workout-theme-light. */
     let themeName='cruciferous', darkMode=false, ctpDark='mocha', lightTheme='cruciferous';
     const ROSEPINE='rosepine', DARK_FLAVORS=['macchiato','mocha'], LIGHT_THEMES=['cruciferous','rosepine'];
     function applyTheme(){
@@ -122,7 +123,11 @@
     $('#cancelCustomExercise').addEventListener('click', closeCustomDialog);
 
     $('#darkModeToggle').addEventListener('click',()=>{darkMode=!darkMode;if(themeName!=='cruciferous')themeName=darkMode?ctpDark:lightTheme;applyTheme();});
-    document.querySelectorAll('#themePills [data-theme-name]').forEach(button=>button.addEventListener('click',()=>setThemeName(button.dataset.themeName)));
+    document.querySelectorAll('#themePills [data-theme-name]').forEach(button=>button.addEventListener('click',()=>{
+      const name=button.dataset.themeName;
+      if(name===themeName){themeName='cruciferous';darkMode=false;lightTheme='cruciferous';applyTheme();return;}
+      setThemeName(name);
+    }));
     document.querySelectorAll('#settingsUnitPills [data-units]').forEach(button=>button.addEventListener('click',()=>{
       progressionSetup.units=button.dataset.units; syncUnitPills(); syncSettingsIncrementUnit(); schedulePersist();
       renderDashboard(); renderStats(); renderWorkoutScreen(); renderWorkoutProgression();
@@ -162,6 +167,12 @@
     $('#closeReplaceDraft').addEventListener('click',()=>{pendingRepeatWorkout=null;$('#replaceDraftDialog').close();});
     $('#keepCurrentDraft').addEventListener('click',()=>{pendingRepeatWorkout=null;$('#replaceDraftDialog').close();});
     $('#confirmReplaceDraft').addEventListener('click',()=>{const workout=pendingRepeatWorkout;pendingRepeatWorkout=null;$('#replaceDraftDialog').close();if(workout)repeatWorkout(workout,true);});
+    /* Unfinished sets on finish (Justin 2026-09-10): complete them all, delete
+       them (dropping exercises left with no sets), or keep editing. */
+    $('#closeUnfinishedSets').addEventListener('click',()=>$('#unfinishedSetsDialog').close());
+    $('#unfinishedSetsCancel').addEventListener('click',()=>$('#unfinishedSetsDialog').close());
+    $('#unfinishedSetsComplete').addEventListener('click',()=>{$('#unfinishedSetsDialog').close();const draft=workoutState.draft;if(draft){draft.exercises.forEach(item=>item.sets.forEach(set=>{set.complete=true;}));renderWorkoutExercises();markDraftSaved();}finishWorkout();});
+    $('#unfinishedSetsDelete').addEventListener('click',()=>{$('#unfinishedSetsDialog').close();const draft=workoutState.draft;if(draft){let removed=0;draft.exercises.forEach(item=>{const before=item.sets.length;item.sets=item.sets.filter(set=>set.complete);removed+=before-item.sets.length;});draft.exercises=draft.exercises.filter(item=>item.sets.length);renderWorkoutExercises();renderWorkoutProgression();markDraftSaved();if(removed)showToast(`Deleted ${removed} unfinished set${removed===1?'':'s'}.`);}finishWorkout();});
     $('#dashboardNav').addEventListener('click', () => goTab(showDashboard, 'dashboard'));
     $('#workoutsNav').addEventListener('click', () => {
       // Re-tapping the active Workout tab pops a completed-workout review back to the
@@ -237,13 +248,17 @@
     $('#doneSuperset').addEventListener('click', () => $('#supersetDialog').close());
     $('#addTagButton').addEventListener('click', addTag);
     $('#newTagInput').addEventListener('keydown', event => { if (event.key === 'Enter') { event.preventDefault(); addTag(); } });
-    $('#cancelWorkout').addEventListener('click', () => {
+    $('#cancelWorkout').addEventListener('click', () => { $('#discardDraftDialog').showModal(); });
+    const doDiscardDraft=() => {
       workoutState.draft = null;
       $('#workoutComplete').hidden = true;
       $('#workoutError').textContent = '';
       persistNow();
       renderWorkoutScreen();
-    });
+    };
+    $('#closeDiscardDraft').addEventListener('click', () => $('#discardDraftDialog').close());
+    $('#keepDraftButton').addEventListener('click', () => $('#discardDraftDialog').close());
+    $('#confirmDiscardDraft').addEventListener('click', () => { $('#discardDraftDialog').close(); doDiscardDraft(); });
     $('#finishWorkout').addEventListener('click', finishWorkout);
 
     $('#searchInput').addEventListener('input', e => {

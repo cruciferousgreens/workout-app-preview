@@ -21,8 +21,8 @@
   <div class="status-scrim" aria-hidden="true"></div>
   <div class="app">
     <header class="top-bar">
-      <button class="top-bar-btn" id="topBarBack" type="button" aria-label="Back" hidden>
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="m15 18-6-6 6-6"></path></svg>
+      <button class="top-bar-btn back-pill" id="topBarBack" type="button" aria-label="Back" hidden>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" aria-hidden="true"><path d="m15 18-6-6 6-6"></path></svg><span>Back</span>
       </button>
       <h1 class="top-bar-title" id="topBarTitle">Home</h1>
       <button class="top-bar-btn" id="topBarSettings" type="button" aria-label="Settings">
@@ -185,8 +185,8 @@
           <div class="theme-picker"><span class="switch-copy"><strong>Theme</strong><span>The default Cruciferous look, or an alternative palette.</span></span>
             <div class="theme-pills" id="themePills" role="group" aria-label="Color theme">
               <button type="button" data-theme-name="cruciferous" aria-pressed="true"><i style="background:#2e7d32"></i>Cruciferous</button>
-              <button type="button" data-theme-name="rosepine" aria-pressed="false"><i style="background:#b4637a"></i>Rosé Pine</button>
-              <button type="button" data-theme-name="macchiato" aria-pressed="false"><i style="background:#f5a97f"></i>Macchiato</button>
+              <button type="button" data-theme-name="rosepine" aria-pressed="false"><i style="background:#b4637a"></i>Rosé</button>
+              <button type="button" data-theme-name="macchiato" aria-pressed="false"><i style="background:#f5a97f"></i>Asterid</button>
               <button type="button" data-theme-name="mocha" aria-pressed="false"><i style="background:#a6e3a1"></i>Matcha</button>
             </div>
           </div>
@@ -199,10 +199,6 @@
               <label class="rule-field"><span>Increment type</span><select id="settingsIncrementType"><option value="lb">Pounds (lb)</option><option value="percent">Percent (%)</option></select></label>
               <label class="rule-field"><span>Increment value</span><input id="settingsIncrementValue" type="number" min="0" step="0.5" value="5"><em class="unit" id="settingsIncrementUnit">lb</em></label>
             </div>
-            <div class="settings-subsection">
-              <span class="settings-subhead">Time step · timed exercises</span>
-              <div class="step-pills" id="settingsTimeStepPills" role="group" aria-label="Time step in seconds"></div>
-            </div>
             <div class="rule-field"><span>Default focus</span><div class="rep-preset-row" id="settingsRepPresets"><button class="rep-preset" type="button" data-rep-preset="strength" aria-pressed="false">Strength · 1–5</button><button class="rep-preset" type="button" data-rep-preset="hypertrophy" aria-pressed="true">Hypertrophy · 6–12</button><button class="rep-preset" type="button" data-rep-preset="endurance" aria-pressed="false">Endurance · 12–20</button><button class="rep-preset" type="button" data-rep-preset="open" aria-pressed="false">15+</button><button class="rep-preset" type="button" data-rep-preset="amrap" aria-pressed="false">AMRAP</button></div></div>
             <div class="settings-subsection">
               <span class="settings-subhead">Default rep range</span>
@@ -210,6 +206,10 @@
                 <label class="rule-field"><span>Min</span><input id="settingsRepMin" type="number" min="1" step="1" value="6"></label>
                 <label class="rule-field"><span>Max</span><input id="settingsRepMax" type="number" min="1" step="1" value="12"></label>
               </div>
+            </div>
+            <div class="settings-subsection">
+              <span class="settings-subhead">Time step · timed exercises</span>
+              <div class="step-pills" id="settingsTimeStepPills" role="group" aria-label="Time step in seconds"></div>
             </div>
           </div>
           <div class="switch-row wide"><span class="switch-copy"><strong>Stall detection</strong><span>Suggest a separate deload week after repeated flat sessions with rising RPE. Never changes the program automatically.</span></span><button class="switch" id="settingsStallToggle" type="button" role="switch" aria-pressed="true" aria-label="Stall detector on"></button></div>
@@ -233,7 +233,7 @@
             <li>Muscle heat map uses an anatomical front/back body SVG in the style of <a href="https://github.com/Olkre/Sasha-s-Body-Map" target="_blank" rel="noreferrer">Sasha-s-Body-Map</a>, with named muscle regions.</li>
             <li>Exercise library: <a href="https://github.com/yuhonas/free-exercise-db" target="_blank" rel="noreferrer">free-exercise-db</a> — 876 exercises, public domain (Unlicense).</li>
             <li>Built-in program template: StrongLifts 5×5 (<a href="https://stronglifts.com/5x5/" target="_blank" rel="noreferrer">stronglifts.com</a>).</li>
-            <li>Extra color themes use the <a href="https://github.com/catppuccin/catppuccin" target="_blank" rel="noreferrer">Catppuccin</a> palette (Macchiato, Matcha) and the <a href="https://rosepinetheme.com" target="_blank" rel="noreferrer">Rosé Pine</a> palette (Dawn).</li>
+            <li>Extra color themes use the <a href="https://github.com/catppuccin/catppuccin" target="_blank" rel="noreferrer">Catppuccin</a> palette and the <a href="https://rosepinetheme.com" target="_blank" rel="noreferrer">Rosé Pine</a> palette (Dawn).</li>
             <li>The original color scheme was inspired by <a href="https://rosepinetheme.com" target="_blank" rel="noreferrer">Rosé Pine</a>.</li>
           </ul>
         </section>
@@ -288,6 +288,12 @@
     <div class="app-toast" id="appToast" role="status" aria-live="polite" hidden></div>
     <dialog class="custom-dialog compact-dialog" id="replaceDraftDialog" aria-labelledby="replaceDraftTitle">
       <div class="custom-form"><div class="custom-form-head"><div><h2 id="replaceDraftTitle">Replace current workout?</h2><p>Your in-progress workout will be discarded and replaced with the selected session.</p></div><button class="dialog-close" id="closeReplaceDraft" type="button" aria-label="Close">×</button></div><div class="form-actions"><button class="secondary-button" id="keepCurrentDraft" type="button">Keep current</button><button class="primary-button" id="confirmReplaceDraft" type="button">Replace workout</button></div></div>
+    </dialog>
+    <dialog class="custom-dialog compact-dialog" id="discardDraftDialog" aria-labelledby="discardDraftTitle">
+      <div class="custom-form"><div class="custom-form-head"><div><h2 id="discardDraftTitle">Discard workout?</h2><p>This permanently deletes the in-progress workout.</p></div><button class="dialog-close" id="closeDiscardDraft" type="button" aria-label="Close">×</button></div><div class="form-actions"><button class="secondary-button" id="keepDraftButton" type="button">Keep editing</button><button class="primary-button danger-button" id="confirmDiscardDraft" type="button">Discard</button></div></div>
+    </dialog>
+    <dialog class="custom-dialog compact-dialog" id="unfinishedSetsDialog" aria-labelledby="unfinishedSetsTitle">
+      <div class="custom-form"><div class="custom-form-head"><div><h2 id="unfinishedSetsTitle">Unfinished sets</h2><p id="unfinishedSetsCopy"></p></div><button class="dialog-close" id="closeUnfinishedSets" type="button" aria-label="Close">×</button></div><div class="form-actions"><button class="secondary-button" id="unfinishedSetsComplete" type="button">Mark all complete</button><button class="secondary-button danger-button" id="unfinishedSetsDelete" type="button">Delete them</button><button class="primary-button" id="unfinishedSetsCancel" type="button">Keep editing</button></div></div>
     </dialog>
 
     <dialog class="custom-dialog" id="customExerciseDialog" aria-labelledby="customExerciseTitle">
