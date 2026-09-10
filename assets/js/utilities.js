@@ -6,7 +6,7 @@
     const searchSynonyms = {
       'knee extension':'leg extension', 'knee extensions':'leg extension', 'quad extension':'leg extension',
       'smith bench':'smith machine bench press', 'smith press':'smith machine bench press',
-      'ohp':'overhead press military press', 'rdl':'romanian deadlift', 'lat pull down':'lat pulldown',
+      'ohp':'overhead press military press shoulder press', 'overhead press':'shoulder press overhead press military press', 'rdl':'romanian deadlift', 'lat pull down':'lat pulldown',
       'pull up':'pullup chinup', 'rear delt':'reverse fly posterior deltoid', 'calf raise':'calf raises'
     };
     function levenshtein(a,b){const m=a.length,n=b.length,row=Array.from({length:n+1},(_,i)=>i);for(let i=1;i<=m;i+=1){let prev=row[0];row[0]=i;for(let j=1;j<=n;j+=1){const old=row[j];row[j]=Math.min(row[j]+1,row[j-1]+1,prev+(a[i-1]===b[j-1]?0:1));prev=old;}}return row[n];}

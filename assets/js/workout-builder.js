@@ -16,21 +16,23 @@
       const templateBox=$('#pickerTemplateOptions');
       templateBox.hidden=false;
       const templateButtons=programMode&&workoutState.templates.length?`<strong>START FROM A TEMPLATE</strong><div class="picker-template-buttons">${workoutState.templates.map(template=>`<button class="picker-template-button" type="button" data-use-program-template="${escapeHtml(template.id)}">${escapeHtml(template.name)}</button>`).join('')}</div>`:'';
+      const ruleRangeSummary=(profile,time,setCount)=>`${setCount} set${setCount===1?'':'s'} · `+(time?`${profile.timeMin}–${profile.timeMax} sec`:(profile.amrap?`AMRAP from ${profile.min} reps`:profile.openTop?`${profile.min}+ reps`:`${profile.min}–${profile.max} reps`));
       const ruleRows=collection.length?`<div class="exercise-rules-list">${collection.map(item=>{
         const ex=exercises.find(row=>row.id===item.exerciseId);
         const defaults=(programMode?workoutState.activeProgram?.progression:progressionSetup)||progressionSetup;
         const range=defaults.defaultRange||progressionSetup.defaultRange;
         const profile=item.progression||{mode:item.tracking||ex?.tracking||'reps',min:range.min,max:range.max,openTop:!!range.openTop,amrap:!!range.amrap,timeMin:30,timeMax:60,timeStep:defaults.timeStep||5,incrementType:defaults.incrementType,incrementValue:defaults.incrementValue,repsOnly:false};
         const time=profile.mode==='time', setCount=Math.max(1,item.sets?.length||1), incrementType=profile.incrementType||progressionSetup.incrementType||'lb';
-        const rangeSummary=time?`${profile.timeMin}–${profile.timeMax} sec`:(profile.amrap?'AMRAP':profile.openTop?`${profile.min}+ reps`:`${profile.min}–${profile.max} reps`);
+        const rangeSummary=ruleRangeSummary(profile,time,setCount);
         return `<details class="exercise-rule-accordion" data-program-rule-id="${escapeHtml(item.exerciseId)}" data-rule-uid="${escapeHtml(item.uid||'')}" open>
-          <summary class="exercise-rule-accordion-head"><span class="exercise-rule-accordion-title"><strong>${escapeHtml(ex?.name||'Exercise')}</strong><small>${setCount} set${setCount===1?'':'s'} · ${escapeHtml(rangeSummary)}</small></span><span class="exercise-accordion-chevron" aria-hidden="true">›</span></summary>
+          <summary class="exercise-rule-accordion-head"><span class="exercise-rule-accordion-title"><strong>${escapeHtml(ex?.name||'Exercise')}</strong><small>${escapeHtml(rangeSummary)}</small></span><span class="exercise-accordion-chevron" aria-hidden="true">›</span></summary>
           <div class="exercise-rule-accordion-body"><div class="exercise-rule-row">
           <div class="exercise-rule-head"><label class="rule-field set-count-field"><span>Sets</span><input type="number" inputmode="numeric" min="1" max="20" step="1" value="${setCount}" data-program-rule="setCount" aria-label="Number of sets for ${escapeHtml(ex?.name||'exercise')}"></label></div>
           <div class="exercise-rule-controls">
             <label class="rule-field"><span>Track</span><select data-program-rule="mode"><option value="reps" ${time?'':'selected'}>Reps</option><option value="time" ${time?'selected':''}>Seconds</option></select></label>
             <label class="rule-field"><span>${time?'Min sec':'Min reps'}</span><input type="number" min="1" value="${time?profile.timeMin:profile.min}" data-program-rule="${time?'timeMin':'min'}"></label>
-            <label class="rule-field"><span>${time?'Max sec':'Max reps'}</span><input type="number" min="1" value="${time?profile.timeMax:profile.max}" data-program-rule="${time?'timeMax':'max'}"></label>
+            <label class="rule-field"><span>${time?'Max sec':'Max reps'}</span><input type="number" min="1" value="${time?profile.timeMax:profile.max}" data-program-rule="${time?'timeMax':'max'}" ${(!time&&profile.amrap)?'disabled':''}></label>
+            ${time?'':`<button class="reps-only-toggle" type="button" data-program-amrap aria-pressed="${!!profile.amrap}" aria-label="AMRAP rep target for ${escapeHtml(ex?.name||'exercise')}">AMRAP</button>`}
             ${time?`<div class="rule-field"><span>Step</span><div class="step-pills" data-step-pills role="group" aria-label="Time step in seconds"></div></div>`:''}
             <div class="load-progression ${profile.repsOnly?'is-disabled':''}"><span class="load-control-title">Load progression</span><div class="load-progression-row"><select data-program-rule="incrementType" aria-label="Load increment type"><option value="lb" ${incrementType==='lb'?'selected':''}>Pounds</option><option value="percent" ${incrementType==='percent'?'selected':''}>Percent</option></select><span class="lp-value"><input type="number" min="0.5" step="0.5" value="${profile.incrementValue??progressionSetup.incrementValue}" data-program-rule="incrementValue" aria-label="Load increment value"><em class="unit">${incrementType==='percent'?'%':'lb'}</em></span><button class="reps-only-toggle" type="button" data-program-reps-only aria-pressed="${!!profile.repsOnly}">Increase reps only</button></div></div>
           </div>
@@ -62,6 +64,10 @@
             profile[field]=Number(control.value);
           }
           item.progression=profile;
+          if(field==='min'||field==='max'||field==='timeMin'||field==='timeMax'){
+            const small=row.querySelector('.exercise-rule-accordion-title small');
+            if(small)small.textContent=ruleRangeSummary(profile,profile.mode==='time',Math.max(1,item.sets?.length||1));
+          }
           if(!programMode){prepareDraftProgression(workoutState.draft,{...progressionSetup,stallDetection:false});renderWorkoutExercises();renderWorkoutProgression();markDraftSaved();}
           if(field==='setCount'||field==='mode'||field==='incrementType')renderExercisePicker();
         }));
@@ -83,6 +89,15 @@
           const defaults=(programMode?workoutState.activeProgram?.progression:progressionSetup)||progressionSetup,range=defaults.defaultRange||progressionSetup.defaultRange;
           const profile=item.progression||{mode:item.tracking||ex?.tracking||'reps',min:range.min,max:range.max,timeMin:30,timeMax:60,timeStep:defaults.timeStep||5,incrementType:defaults.incrementType,incrementValue:defaults.incrementValue,repsOnly:false};
           profile.repsOnly=!profile.repsOnly; item.progression=profile; if(!programMode){renderWorkoutExercises();renderWorkoutProgression();markDraftSaved();} renderExercisePicker();
+        });
+        row.querySelector('[data-program-amrap]')?.addEventListener('click',()=>{
+          const item=getItem(); if(!item)return;
+          const ex=exercises.find(entry=>entry.id===item.exerciseId);
+          const defaults=(programMode?workoutState.activeProgram?.progression:progressionSetup)||progressionSetup,range=defaults.defaultRange||progressionSetup.defaultRange;
+          const profile=item.progression||{mode:item.tracking||ex?.tracking||'reps',min:range.min,max:range.max,openTop:!!range.openTop,amrap:!!range.amrap,timeMin:30,timeMax:60,timeStep:defaults.timeStep||5,incrementType:defaults.incrementType,incrementValue:defaults.incrementValue,repsOnly:false};
+          profile.amrap=!profile.amrap; item.progression=profile;
+          if(!programMode){prepareDraftProgression(workoutState.draft,{...progressionSetup,stallDetection:false});renderWorkoutExercises();renderWorkoutProgression();markDraftSaved();}
+          renderExercisePicker();
         });
         row.querySelector('[data-program-exercise-tags]')?.addEventListener('click',()=>openExerciseTagDialog(programMode?{mode:'program',exerciseId:row.dataset.programRuleId}:{mode:'draft',exerciseUid:row.dataset.ruleUid}));
       });

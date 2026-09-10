@@ -22,10 +22,21 @@
       const programConfig=config || workoutState.activeProgram?.progression || progressionSetup;
       const logs=getExerciseLogs(exerciseId).sort((a,b)=>b.isoDate.localeCompare(a.isoDate));
       if(!logs.length)return null;
-      const latestLog=logs[0],latest=topSetForSession(latestLog); if(!latest)return null;
-      const mode=profile?.mode || latest.mode || 'reps';
+      const targetMode=profile?.mode || 'reps';
       const threshold=Number(programConfig.threshold ?? 8), min=Number(profile?.min ?? 5), max=Number(profile?.max ?? 8);
       const timeMin=Number(profile?.timeMin ?? 30), timeMax=Number(profile?.timeMax ?? 60), timeStep=Number(profile?.timeStep ?? 5);
+      // Suggest from the most recent log in the SAME rep/time zone as the target.
+      // Basing the suggestion on the latest log regardless of zone produced invented
+      // loads (e.g. a Friday 4s e1RM interpolated into a Monday 8s target); the
+      // program's own zone history is the honest basis. Falls back to the latest log.
+      const zoneLog=logs.find(log=>{
+        const p=log.progression; if(!p)return false;
+        if((p.mode||'reps')!==targetMode)return false;
+        if(targetMode==='time')return Number(p.timeMin)===timeMin&&Number(p.timeMax)===timeMax;
+        return Number(p.min)===min&&Number(p.max)===max&&!!p.amrap===!!profile?.amrap&&!!p.openTop===!!profile?.openTop;
+      });
+      const latestLog=zoneLog||logs[0],latest=topSetForSession(latestLog); if(!latest)return null;
+      const mode=profile?.mode || latest.mode || 'reps';
       const incrementType=profile?.incrementType || programConfig.incrementType || 'lb';
       const incrementValue=Number(profile?.incrementValue ?? programConfig.incrementValue ?? 5);
       const repsOnly=!!profile?.repsOnly;
