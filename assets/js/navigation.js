@@ -35,7 +35,11 @@
       if (push) history.pushState({view:'stats'}, '', '#stats');
     }
     function showSettings(push = true) {
-      const from = state.activeView;
+      let from = state.activeView;
+      if (from === 'detail') {
+        const ret = state.exerciseDetailReturn && state.exerciseDetailReturn.view;
+        from = { library: 'library', workout: 'workout', program: 'program', dashboard: 'dashboard', stats: 'stats', 'completed-workout': 'workout' }[ret] || 'dashboard';
+      }
       rememberScroll(); state.selected = null; state.activeView = 'settings'; hideAllViews();
       if (from !== 'settings' && TOP_BAR_TITLES[from]) state.settingsReturn = from;
       $('#settingsView').classList.add('active'); setActiveNav('settings'); renderSettings(); restoreScroll('settings');
