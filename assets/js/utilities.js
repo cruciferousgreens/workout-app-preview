@@ -57,12 +57,41 @@
     /** Slim persistent top bar: title per view, back chevron only on non-root screens,
      *  settings gear everywhere except on Settings itself. */
     const TOP_BAR_TITLES = { dashboard: 'Home', library: 'Exercises', workout: 'Workout', program: 'Program', stats: 'Stats', settings: 'Settings' };
+    function goToTab(key) {
+      if (key === 'library') showLibrary();
+      else if (key === 'workout') showWorkouts();
+      else if (key === 'program') showProgram();
+      else if (key === 'stats') showStats();
+      else showDashboard();
+    }
+    /** Breadcrumb title on sub-pages, e.g. "Exercises / Air Bike". The parent is a
+     *  tappable button that performs the same navigation as the back chevron. */
+    function setCrumbTitle(titleEl, parentLabel, currentLabel, goParent) {
+      titleEl.textContent = '';
+      const parent = document.createElement('button');
+      parent.type = 'button'; parent.className = 'crumb-parent'; parent.textContent = parentLabel;
+      parent.setAttribute('aria-label', `Back to ${parentLabel}`);
+      parent.addEventListener('click', goParent);
+      const sep = document.createElement('span');
+      sep.className = 'crumb-sep'; sep.setAttribute('aria-hidden', 'true'); sep.textContent = '/';
+      const here = document.createElement('span'); here.className = 'crumb-here'; here.textContent = currentLabel;
+      titleEl.append(parent, sep, here);
+    }
     function updateTopBar(view, customTitle) {
       const titleEl = $('#topBarTitle'); if (!titleEl) return;
-      titleEl.textContent = customTitle || TOP_BAR_TITLES[view] || '';
       const back = $('#topBarBack'); const gear = $('#topBarSettings');
       if (back) back.hidden = !(view === 'settings' || view === 'detail');
       if (gear) gear.hidden = view === 'settings';
+      if (view === 'detail') {
+        const ret = state.exerciseDetailReturn && state.exerciseDetailReturn.view;
+        const parentKey = { library: 'library', workout: 'workout', program: 'program', dashboard: 'dashboard', stats: 'stats', 'completed-workout': 'workout' }[ret] || 'library';
+        setCrumbTitle(titleEl, TOP_BAR_TITLES[parentKey], customTitle || '', () => backFromExerciseDetail());
+      } else if (view === 'settings') {
+        const parentKey = TOP_BAR_TITLES[state.settingsReturn] ? state.settingsReturn : 'dashboard';
+        setCrumbTitle(titleEl, TOP_BAR_TITLES[parentKey], 'Settings', () => goToTab(parentKey));
+      } else {
+        titleEl.textContent = customTitle || TOP_BAR_TITLES[view] || '';
+      }
     }
 
     

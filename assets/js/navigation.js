@@ -35,7 +35,9 @@
       if (push) history.pushState({view:'stats'}, '', '#stats');
     }
     function showSettings(push = true) {
+      const from = state.activeView;
       rememberScroll(); state.selected = null; state.activeView = 'settings'; hideAllViews();
+      if (from !== 'settings' && TOP_BAR_TITLES[from]) state.settingsReturn = from;
       $('#settingsView').classList.add('active'); setActiveNav('settings'); renderSettings(); restoreScroll('settings');
       if (push) history.pushState({view:'settings'}, '', '#settings');
     }
