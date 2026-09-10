@@ -135,14 +135,18 @@
       else if (key === 'stats') showStats();
       else showDashboard();
     }
-    /** Breadcrumb title on sub-pages, e.g. "Exercises / Air Bike". The parent is a
-     *  tappable button that performs the same navigation as the back chevron. */
+    /** Breadcrumb title on sub-pages, e.g. "Exercises / Air Bike". The parent is
+     *  static context text, not a second back control: the top-bar back chevron
+     *  is the one and only back affordance. */
     function setCrumbTitle(titleEl, parentLabel, currentLabel, goParent) {
       titleEl.textContent = '';
-      const parent = document.createElement('button');
-      parent.type = 'button'; parent.className = 'crumb-parent'; parent.textContent = parentLabel;
-      parent.setAttribute('aria-label', `Back to ${parentLabel}`);
-      parent.addEventListener('click', goParent);
+      const parent = document.createElement(goParent ? 'button' : 'span');
+      parent.className = 'crumb-parent'; parent.textContent = parentLabel;
+      if (goParent) {
+        parent.type = 'button';
+        parent.setAttribute('aria-label', `Back to ${parentLabel}`);
+        parent.addEventListener('click', goParent);
+      }
       const sep = document.createElement('span');
       sep.className = 'crumb-sep'; sep.setAttribute('aria-hidden', 'true'); sep.textContent = '/';
       const here = document.createElement('span'); here.className = 'crumb-here'; here.textContent = currentLabel;
@@ -157,7 +161,7 @@
       if (view === 'detail') {
         const ret = state.exerciseDetailReturn && state.exerciseDetailReturn.view;
         const parentKey = { library: 'library', workout: 'workout', program: 'program', dashboard: 'dashboard', stats: 'stats', 'completed-workout': 'workout' }[ret] || 'library';
-        setCrumbTitle(titleEl, TOP_BAR_TITLES[parentKey], customTitle || '', () => backFromExerciseDetail());
+        setCrumbTitle(titleEl, TOP_BAR_TITLES[parentKey], customTitle || '');
       } else if (view === 'settings') {
         // Settings is its own page, not a breadcrumb (Justin 2026-09-10).
         titleEl.textContent = 'Settings';

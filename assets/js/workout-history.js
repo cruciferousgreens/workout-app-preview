@@ -66,7 +66,7 @@
       $('#repeatCompletedWorkout').addEventListener('click',()=>repeatWorkout(workout));
       $('#saveCompletedTemplate').addEventListener('click',()=>saveCompletedAsTemplate(workout,$('#completedSaveStatus')));
       $('#addCompletedToProgram').addEventListener('click',()=>addCompletedWorkoutToProgram(workout,$('#completedSaveStatus')));
-      $('#backFromWorkoutDetail').addEventListener('click',()=>{const target=state.workoutDetailReturn||'workout';if(target==='dashboard')showDashboard();else if(target==='program')showProgram();else if(target==='library')showLibrary();else{$('#workoutComplete').hidden=true;renderWorkoutScreen();}});
+      $('#backFromWorkoutDetail').addEventListener('click',()=>{const target=state.workoutDetailReturn||'workout';if(target==='dashboard')showDashboard(false);else if(target==='program')showProgram(false);else if(target==='library')showLibrary(false);else if(target==='exercise-detail'&&state.workoutDetailExerciseId){openExercise(state.workoutDetailExerciseId,false,state.workoutDetailExerciseReturn||{view:'library'});}else{$('#workoutComplete').hidden=true;renderWorkoutScreen();}});
       /* Start-new pill next to Back (Justin 2026-09-10): lands on the Workout
          tab's start screen, exactly like tapping the Workout tab itself. */
       $('#startNewWorkout').addEventListener('click',()=>{$('#workoutComplete').hidden=true;showWorkouts();window.scrollTo({top:0,behavior:'auto'});});

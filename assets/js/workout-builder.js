@@ -136,10 +136,13 @@
       const collection=pickerCollection();
       const chosen=new Set(collection.map(item=>item.exerciseId));
       const matches = q ? rankedExerciseMatches($('#exercisePickerSearch').value,80) : exercises.slice(0,80);
-      const recentIds = q ? [] : recentExerciseIds().filter(id => matches.some(ex => ex.id === id)).slice(0,5);
+      /* Recents first, favorites pinned to the top of recents (Justin 2026-09-10). */
+      const recentIds = q ? [] : recentExerciseIds().filter(id => matches.some(ex => ex.id === id))
+        .sort((a, b) => Number(state.favorites.has(b)) - Number(state.favorites.has(a))).slice(0,5);
       const recentSet = new Set(recentIds);
       const rows = [...recentIds.map(id => matches.find(ex => ex.id === id)), ...matches.filter(ex => !recentSet.has(ex.id))].filter(Boolean);
-      list.innerHTML = rows.length ? rows.map((ex,index) => `${index === 0 && recentIds.length ? '<div class="picker-section-label">RECENT</div>' : ''}${index === recentIds.length && recentIds.length && rows.length > recentIds.length ? '<div class="picker-section-label">ALL EXERCISES</div>' : ''}<button class="picker-item" type="button" data-id="${escapeHtml(ex.id)}" aria-pressed="${chosen.has(ex.id)}"><span><strong>${escapeHtml(ex.name)}</strong><span>${escapeHtml(ex.primary.join(', ') || 'Unspecified muscle')} · ${escapeHtml(ex.equipment || 'No equipment')}</span></span><span class="picker-state">${chosen.has(ex.id) ? '✓' : '+'}</span></button>`).join('') : '<div class="dialog-empty">No matching exercises.</div>';
+      const clockIcon = '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>';
+      list.innerHTML = rows.length ? rows.map((ex,index) => `${index === 0 && recentIds.length ? `<div class="picker-section-label">${clockIcon}<span>RECENT</span></div>` : ''}${index === recentIds.length && recentIds.length && rows.length > recentIds.length ? '<div class="picker-section-label">ALL EXERCISES</div>' : ''}<button class="picker-item" type="button" data-id="${escapeHtml(ex.id)}" aria-pressed="${chosen.has(ex.id)}"><span><strong>${escapeHtml(ex.name)}</strong><span>${escapeHtml(ex.primary.join(', ') || 'Unspecified muscle')} · ${escapeHtml(ex.equipment || 'No equipment')}</span></span><span class="picker-state">${chosen.has(ex.id) ? '✓' : '+'}</span></button>`).join('') : '<div class="dialog-empty">No matching exercises.</div>';
       if(list)list.scrollTop=prevScroll;
       document.querySelectorAll('#exercisePickerList .picker-item').forEach(button => button.addEventListener('click', () => {
         let nowChosen;

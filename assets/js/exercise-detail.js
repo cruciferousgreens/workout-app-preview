@@ -54,7 +54,7 @@
           <div class="sets">${session.sets.map((s,i) => `<div class="set-row"><span class="set-num">SET ${i+1}</span><span class="set-cell"><strong>${s.w == null ? '—' : displayWeight(s.w)}</strong>${s.w == null ? '' : ` ${weightUnit()}`}</span><span class="set-cell"><strong>${session.tracking === 'time' ? (s.seconds ?? '—') : s.r}</strong> ${session.tracking === 'time' ? 'sec' : 'reps'}</span><span class="set-cell">${s.rpe == null ? '—' : `RPE <strong>${s.rpe}</strong>`}${s.tags?.length ? `<br><small>${s.tags.map(escapeHtml).join(' · ')}</small>` : ''}</span></div>`).join('')}</div>
         </div>`;
       }).join('') : `<div class="history-empty">No history for this movement yet.</div>`;
-      document.querySelectorAll('[data-history-workout]').forEach(button=>button.addEventListener('click',()=>{const workout=workoutState.completed.find(row=>row.id===button.dataset.historyWorkout);if(workout){state.workoutDetailReturn='library';showWorkouts();renderCompletedWorkout(workout);}}));
+      document.querySelectorAll('[data-history-workout]').forEach(button=>button.addEventListener('click',()=>{const workout=workoutState.completed.find(row=>row.id===button.dataset.historyWorkout);if(workout){state.workoutDetailReturn='exercise-detail';state.workoutDetailExerciseId=id;state.workoutDetailExerciseReturn=state.exerciseDetailReturn;showWorkouts(false);renderCompletedWorkout(workout);}}));
       $('#formulaNote').textContent = '';
     }
 
@@ -126,28 +126,29 @@
       updateExerciseBackLabel();
       if (push) history.pushState({exercise:id}, '', `#${encodeURIComponent(id)}`);
     }
-    /** Names the destination on the Back button's accessible label. */
+    /** Names the destination on the top-bar Back button's accessible label. */
     function updateExerciseBackLabel() {
-      const back = $('#backButton'); if (!back) return;
-      const names = {'completed-workout':'workout', workout:'training', stats:'stats', dashboard:'home', program:'program', library:'library'};
+      const topBack = $('#topBarBack'); if (!topBack) return;
+      const names = {'completed-workout':'workout', workout:'workout', stats:'stats', dashboard:'home', program:'program', library:'library'};
       const dest = names[state.exerciseDetailReturn?.view] || 'library';
-      const label = `Back to ${dest}`;
-      back.setAttribute('aria-label', label);
-      const topBack = $('#topBarBack'); if (topBack) topBack.setAttribute('aria-label', label);
+      topBack.setAttribute('aria-label', `Back to ${dest}`);
     }
 
     /** Returns from the exercise detail to the recorded origin (library, stats, dashboard,
-     *  the workout tab, or the completed workout it was drilled into). */
+     *  the workout tab, or the completed workout it was drilled into). Back pops one
+     *  navigation level: it navigates without pushing a new history entry, so tapping
+     *  Back then the browser back button never ping-pongs. */
     function backFromExerciseDetail() {
       const ret = state.exerciseDetailReturn;
       if (ret && ret.view === 'completed-workout' && ret.workoutId) {
         const workout = workoutState.completed.find(w => w.id === ret.workoutId);
         if (workout) { showWorkouts(false); renderCompletedWorkout(workout); return; }
+        showWorkouts(false); return;
       }
-      if (ret && ret.view === 'stats') { showStats(); return; }
-      if (ret && ret.view === 'dashboard') { showDashboard(); return; }
-      if (ret && ret.view === 'program') { showProgram(); return; }
-      if (ret && ret.view === 'workout') { showWorkouts(); return; }
-      showLibrary();
+      if (ret && ret.view === 'stats') { showStats(false); return; }
+      if (ret && ret.view === 'dashboard') { showDashboard(false); return; }
+      if (ret && ret.view === 'program') { showProgram(false); return; }
+      if (ret && ret.view === 'workout') { showWorkouts(false); return; }
+      showLibrary(false);
     }
     

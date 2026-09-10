@@ -202,6 +202,7 @@
     $('#detailFavToggle')?.addEventListener('click', () => toggleFavorite(state.selected));
     $('#topBarBack').addEventListener('click', () => {
       if (state.activeView === 'detail') backFromExerciseDetail();
+      else if (state.activeView === 'settings') backFromSettings();
       else history.back();
     });
     $('#progressionThreshold').addEventListener('input',e=>{progressionSetup.threshold=Number(e.target.value)||8;schedulePersist();});
@@ -290,7 +291,6 @@
     });
     $('#clearMuscles').addEventListener('click', () => { state.muscles.clear(); renderMuscleSelection(); renderLibrary(); });
     $('#equipmentFilter').addEventListener('change', e => { state.equipment = e.target.value; renderLibrary(); });
-    $('#backButton').addEventListener('click', () => backFromExerciseDetail());
     $('#libraryNav').addEventListener('click', () => goTab(showLibrary, 'library'));
     window.addEventListener('popstate', e => {
       const hash = decodeURIComponent(location.hash.slice(1)); const id = e.state?.exercise || hash;
