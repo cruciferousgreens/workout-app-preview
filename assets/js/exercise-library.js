@@ -6,7 +6,10 @@
       const equipment = [...new Set(exercises.map(x => x.equipment).filter(Boolean))].sort();
       $('#muscleOptions').innerHTML = muscles.map(x => `<button class="muscle-option" type="button" data-muscle="${x}" aria-pressed="false">${titleCase(x)}</button>`).join('');
       $('#equipmentFilter').innerHTML = '<option value="">All equipment</option>' + equipment.map(x => `<option value="${x}">${titleCase(x)}</option>`).join('');
-      document.querySelectorAll('.muscle-option').forEach(button => button.addEventListener('click', () => {
+      /* Scope to [data-muscle]: the ★ Favorites toggle shares the muscle-option
+         class but has no data-muscle — the generic handler would add `undefined`
+         to the muscle set and empty the library (QA 2026-09-10). */
+      document.querySelectorAll('.muscle-option[data-muscle]').forEach(button => button.addEventListener('click', () => {
         const muscle = button.dataset.muscle;
         if (state.muscles.has(muscle)) state.muscles.delete(muscle); else state.muscles.add(muscle);
         renderMuscleSelection();

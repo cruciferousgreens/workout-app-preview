@@ -220,7 +220,11 @@
     button { color: inherit; }
     a { color: inherit; }
     /* ===== 3. App shell, status scrim & page container ===== */
-    .app { min-height: 100vh; padding-bottom: env(safe-area-inset-bottom); }
+    /* .app is a size container: on desktop the column is 393px, so all
+       width breakpoints below key off the column (container queries), not the
+       viewport — the desktop app behaves exactly like the iPhone viewport
+       (Justin 2026-09-10: desktop is just the phone, centered, for testing). */
+    .app { min-height: 100vh; padding-bottom: env(safe-area-inset-bottom); container-type: inline-size; }
     /* Opaque backdrop behind the iOS status bar / Dynamic Island so scrolled content
        slides underneath it instead of colliding with the clock. Zero-height elsewhere. */
     .status-scrim { position: fixed; top: 0; left: 0; right: 0; height: env(safe-area-inset-top); background: var(--bg); z-index: 40; pointer-events: none; }
@@ -330,7 +334,7 @@
     #topBarBack.back-pill svg { width: 16px; height: 16px; }
     /* The slot is a fixed 84px in both states, so the title sits at the exact
        same x-position on every page — no jump when the pill appears (Justin 2026-09-10). */
-    #topBarBack.back-pill[hidden] { display: inline-flex; visibility: hidden; }
+    #topBarBack.back-pill[hidden] { display: inline-flex !important; visibility: hidden; }
     .detail-header { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 24px; align-items: start; margin-bottom: 26px; }
     .detail-title { font: 800 clamp(30px, 6vw, 44px)/1.02 var(--font-sans); letter-spacing: -.03em; margin-bottom: 16px; }
     .detail-tags { display: flex; flex-wrap: wrap; gap: 7px; }
@@ -508,7 +512,7 @@
     .top-bar { position: fixed; top: env(safe-area-inset-top); left: 0; right: 0; z-index: 30; display: grid; grid-template-columns: auto minmax(0, 1fr) 44px; align-items: center; height: 54px; padding: 0 4px; border-bottom: 1px solid var(--line); background: var(--nav-bg); -webkit-backdrop-filter: blur(20px) saturate(1.6); backdrop-filter: blur(20px) saturate(1.6); }
     #topBarBack { grid-column: 1; }
     /* Reserve the back-pill slot even when hidden so the title never jumps. */
-    #topBarBack[hidden] { display: grid; visibility: hidden; }
+    #topBarBack[hidden] { display: grid !important; visibility: hidden; }
     .top-bar-title { grid-column: 2; margin: 0; font-size: 17px; font-weight: 750; text-align: left; padding-left: 12px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
     #topBarSettings { grid-column: 3; }
     /* Active state when the Settings page is open: same treatment as an active tab. */
@@ -541,13 +545,13 @@
     }
     .sr-only { position: absolute; width: 1px; height: 1px; padding: 0; overflow: hidden; clip: rect(0,0,0,0); white-space: nowrap; border: 0; }
 
-    @media (max-width: 820px) {
+    @container (max-width: 820px) {
       .exercise-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
       .detail-layout { grid-template-columns: 1fr; }
       .detail-aside { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 18px; }
       .detail-aside .section { margin-bottom: 0; }
     }
-    @media (max-width: 580px) {
+    @container (max-width: 580px) {
       .shell { padding: 20px 16px 112px; }
       .topline { align-items: start; }
       .top-actions { flex-direction: column-reverse; align-items: flex-end; gap: 8px; }
@@ -665,12 +669,12 @@
     .small-button { min-height: 38px; padding: 0 11px; border: 1px solid var(--line); border-radius: var(--radius-sm); background: var(--surface); cursor: pointer; font-size: 12px; font-weight: 750; }
     .status-note { min-height: 18px; margin: 8px 0 0; color: var(--accent); font-size: 12px; }
     .bottom-nav { grid-template-columns: repeat(5, 1fr); }
-    @media (max-width: 700px) {
+    @container (max-width: 700px) {
       .dashboard-grid { grid-template-columns: 1fr; }
       .dashboard-card.wide { grid-column: auto; }
       .stats-grid { grid-template-columns: 1fr; }
     }
-    @media (max-width: 580px) {
+    @container (max-width: 580px) {
       .shell { padding-left: 12px; padding-right: 12px; }
       .week-strip { gap: 4px; }
       .day-chip { border-radius: 16px; }
@@ -746,7 +750,7 @@
     .archived-programs { margin-top: 18px; }
     .archive-row { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 13px 0; border-top: 1px solid var(--line); }
     .archive-row span { color: var(--muted); font-size: 11px; }
-    @media (max-width: 580px) {
+    @container (max-width: 580px) {
       .exercise-visual.visible { grid-template-columns: 1fr; }
       .exercise-visual img { height: 190px; }
       .exercise-visual-copy { padding: 14px 16px; }
@@ -783,7 +787,7 @@
     .compact-heatmap .heatmap-body svg { height: 150px; }
     .compact-heatmap .heatmap-list { gap: 5px; }
     .compact-heatmap .heatmap-row { font-size: 10px; }
-    @media (max-width: 700px) {
+    @container (max-width: 700px) {
       .week-strip { grid-template-columns: repeat(4,minmax(0,1fr)); gap: 7px; }
       .heatmap-shell { grid-template-columns: 1fr; }
       .heatmap-figure { max-width: 340px; margin: 0 auto; }
@@ -793,7 +797,7 @@
       .compact-heatmap .heatmap-body:nth-child(2) { display: none; }
       .compact-heatmap .heatmap-figure { grid-template-columns: 1fr; }
     }
-    @media (max-width: 420px) {
+    @container (max-width: 420px) {
       .compact-heatmap .heatmap-shell { grid-template-columns: 120px minmax(0,1fr); gap: 10px; }
       .compact-heatmap .heatmap-row { grid-template-columns: 8px minmax(0,1fr); }
       .compact-heatmap .heatmap-row strong { display: none; }
@@ -874,11 +878,11 @@
     /* Surfaces the notched fields sit on: match the cutout behind each label. */
     .program-setup, .dashboard-card, .custom-dialog { --notch-bg: var(--surface); }
     .progression-setup { --notch-bg: var(--surface-raised); }
-    @media (max-width: 700px) {
+    @container (max-width: 700px) {
       .exercise-rule-controls { grid-template-columns: 1fr 1fr 1fr; }
       .load-progression { grid-column: 1 / -1; }
     }
-    @media (max-width: 430px) {
+    @container (max-width: 430px) {
       .exercise-rule-controls { grid-template-columns: 1fr 1fr; }
       .exercise-rule-controls .rule-field:first-child { grid-column: 1 / -1; }
       .load-progression { grid-column: 1 / -1; }
@@ -940,12 +944,12 @@
     .program-progression-summary { margin: 18px 0; padding: 14px; border: 1px solid var(--line); border-radius: var(--radius-md); background: var(--surface-raised); }
     .program-progression-summary h3 { margin: 0 0 8px; font-size: 14px; }
     .program-progression-meta { display: flex; flex-wrap: wrap; gap: 6px; }
-    @media (max-width: 700px) {
+    @container (max-width: 700px) {
       .comparison-grid { grid-template-columns: 1fr; }
       .progression-fields { grid-template-columns: 1fr 1fr; }
       .progression-choice, .switch-row { grid-column: 1 / -1; }
     }
-    @media (max-width: 420px) {
+    @container (max-width: 420px) {
       .progression-fields { grid-template-columns: 1fr; }
       .progression-choice, .switch-row { grid-column: auto; }
       .choice-pills { grid-template-columns: 1fr; }
@@ -1004,7 +1008,7 @@
     .body-map-credit a { text-underline-offset: 2px; }
     .compact-heatmap .anatomy-map { min-height: 120px; }
     .compact-heatmap .anatomy-map svg { max-height: 160px; }
-    @media (max-width: 700px) {
+    @container (max-width: 700px) {
       .week-strip { grid-template-columns: repeat(7,minmax(0,1fr)); gap: 4px; }
       .day-chip { min-height: 68px; padding: 8px 2px; border-radius: 13px; }
       .day-chip span { font-size: 9px; }
@@ -1038,7 +1042,7 @@
     .trend-change { padding: 4px 7px; border-radius: 999px; background: var(--surface-2); color: var(--muted); font-size: 10px; font-weight: 800; }
     .trend-change.up { background: var(--accent-soft); color: var(--accent); }
     .trend-change.down { background: var(--rose-soft); color: var(--warning); }
-    @media (max-width: 700px) { .muscle-analysis-grid { grid-template-columns: 1fr; } }
+    @container (max-width: 700px) { .muscle-analysis-grid { grid-template-columns: 1fr; } }
     .tracking-segment { display: inline-flex; padding: 3px; gap: 3px; border: 1px solid var(--line); border-radius: var(--radius-sm); background: var(--surface); }
     .tracking-segment button { min-height: 30px; padding: 0 12px; border: 0; border-radius: 10px; background: transparent; color: var(--muted); cursor: pointer; font-size: 11px; font-weight: 750; }
     .tracking-segment button[aria-pressed="true"] { background: var(--accent-soft); color: var(--accent); }
@@ -1070,11 +1074,11 @@
     .archive-workout { width: 100%; min-height: 44px; padding: 8px 10px; border: 1px solid var(--line); border-radius: var(--radius-sm); background: var(--surface); display: flex; align-items: center; justify-content: space-between; gap: 10px; text-align: left; cursor: pointer; }
     .archive-workout strong { font-size: 12px; }
     .archive-workout span { color: var(--muted); font-size: 10px; }
-    @media (max-width: 580px) {
+    @container (max-width: 580px) {
       .program-template-card { grid-template-columns: 1fr; }
       .program-template-card .primary-button { width: 100%; }
     }
-    @media (max-width: 520px) {
+    @container (max-width: 520px) {
       .completed-set-head { display: none; }
       .completed-set-row { grid-template-columns: 34px repeat(2,minmax(0,1fr)); gap: 6px; }
       .completed-set-row .completed-rpe { grid-column: 2; }
@@ -1135,7 +1139,7 @@
     .program-muscle-bar i::after { content:''; display:block; width:var(--fill); height:100%; background:var(--accent); border-radius:inherit; }
     .inline-feedback { color: var(--accent); font-size: 10px; font-weight: 750; }
     .search-suggestion-note { padding: 8px 2px; color: var(--muted); font-size: 11px; }
-    @media (max-width: 640px) {
+    @container (max-width: 640px) {
       .workout-start-options, .program-muscle-bars { grid-template-columns: 1fr; }
       .week-range-list { grid-template-columns: 1fr; }
       .range-fields { grid-template-columns: 1fr 1fr; }
@@ -1320,7 +1324,7 @@
     .mini-stat, .workout-detail-metric { border-radius: var(--radius-md); background: var(--surface-2); }
     .period-menu { border-color: var(--line); border-radius: var(--radius-sm); background: var(--surface-raised); box-shadow: var(--shadow); }
     .period-option:hover, .period-option[aria-checked="true"] { background: var(--rose-soft); color: var(--ink-strong); }
-    @media (max-width: 640px) {
+    @container (max-width: 640px) {
       .dashboard-card, .stats-panel, .workout-exercise, .completed-card,
       .program-template-card, .analysis-panel { padding: 16px; }
       .set-swipe + .set-swipe { margin-top: 9px; }
@@ -1381,7 +1385,7 @@
     .small-button.armed { border-color: var(--rose); background: var(--rose-soft); color: var(--ink-strong); }
     .attribution-list { margin: 0; padding-left: 18px; display: grid; gap: 8px; color: var(--muted); font-size: 13px; line-height: 1.5; }
     .attribution-list a { color: var(--accent); }
-    @media (max-width: 520px) { .settings-grid { grid-template-columns: 1fr; } }
+    @container (max-width: 520px) { .settings-grid { grid-template-columns: 1fr; } }
     /* Settings polish — airy stacked headers, generous rhythm */
     #settingsView .dashboard-card { margin-bottom: 18px; padding: 22px; }
     #settingsView .dashboard-card:last-of-type { margin-bottom: 8px; }
@@ -1458,10 +1462,15 @@
        "repeat this workout" reachable without the big button he removed. */
     .detail-repeat-button { border: 0; background: none; padding: 10px 4px; color: var(--ink); font-size: 13px; font-weight: 700; cursor: pointer; }
     .detail-secondary-actions { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 14px; }
-    .completed-detail-back { margin-bottom: 12px; }
+    .completed-detail-top { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 12px; }
+    .completed-detail-back { margin-bottom: 0; }
+    /* "Start new workout" pill next to Back on the completed-workout screen
+       (Justin 2026-09-10): accent pill matching primary-button colors. */
+    .start-new-workout-pill { min-height: 40px; padding: 0 18px; border: 0; border-radius: 999px; background: var(--accent); color: var(--surface-raised); font-size: 14px; font-weight: 750; cursor: pointer; }
+    .start-new-workout-pill:hover { background: var(--accent-hover); }
     .program-cover-head { position: relative; padding-right: 150px; }
     .program-cover-edit { position: absolute; right: 20px; top: 20px; min-height: 40px; padding: 0 14px; border: 1px solid var(--gold-soft); border-radius: 999px; background: var(--surface-raised); color: var(--ink-strong); cursor: pointer; font-weight: 800; }
-    @media (max-width: 520px) {
+    @container (max-width: 520px) {
       .shell { padding: var(--top-bar-clearance) 14px calc(205px + env(safe-area-inset-bottom)); }
       .workout-start-options { grid-template-columns: 1fr; }
       .workout-toolbar { align-items: flex-start; }
