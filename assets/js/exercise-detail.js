@@ -70,7 +70,9 @@
       state.selected = id;
       if (returnTo !== undefined) {
         state.exerciseDetailReturn = returnTo;
-      } else if (state.activeView !== 'detail') {
+      } else if (state.activeView !== 'detail' && state.activeView !== 'settings') {
+        // History navigation can land on a detail straight from Settings; keep the
+        // previous return so the breadcrumb/back don't point at Settings itself.
         state.exerciseDetailReturn = {view: state.activeView};
       }
       $('#detailTitle').textContent = ex.name;
