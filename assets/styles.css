@@ -1079,8 +1079,8 @@
     .template-disclosure-list { margin-top: 10px; }
     .built-in-label { display: inline-block; margin-left: 6px; padding: 1px 7px; border-radius: 999px; background: var(--accent-soft); color: var(--accent-ink); font-size: 9px; font-weight: 800; letter-spacing: .04em; text-transform: uppercase; vertical-align: middle; }
     .sample-label { display: inline-block; margin-left: 6px; padding: 1px 7px; border-radius: 999px; background: var(--gold-soft); color: var(--gold); font-size: 9px; font-weight: 800; letter-spacing: .04em; text-transform: uppercase; vertical-align: middle; }
-    .advanced-options summary::-webkit-details-marker, .program-rules summary::-webkit-details-marker { display: none; }
-    .advanced-options summary::after, .program-rules summary::after { content: '+'; color: var(--accent); font-size: 18px; font-weight: 500; }
+    .advanced-options summary::-webkit-details-marker { display: none; }
+    .advanced-options summary::after { content: '+'; color: var(--accent); font-size: 18px; font-weight: 500; }
     .advanced-options[open] > summary::after, .program-rules[open] > summary::after { content: '−'; }
     .advanced-options { margin-top: 10px; border-top: 1px solid var(--line); }
     .advanced-options summary { display: flex; align-items: center; justify-content: space-between; min-height: 40px; color: var(--muted); cursor: pointer; font-size: 11px; font-weight: 800; }
@@ -1101,7 +1101,7 @@
     .rep-preset[aria-pressed="true"] { border-color: var(--accent); background: var(--accent-soft); color: var(--accent); }
     .range-fields { display: grid; grid-template-columns: repeat(3,minmax(0,1fr)); gap: 8px; }
     .program-rules { margin: 20px 0; padding: 0 16px; border: 1px solid var(--line); border-radius: var(--radius-md); background: var(--surface-raised); }
-    .program-rules > summary { display: flex; align-items: center; justify-content: space-between; min-height: 54px; cursor: pointer; font-size: 15px; font-weight: 800; }
+    .program-rules > .program-rules-title { margin: 0; padding: 18px 0 6px; font-size: 15px; font-weight: 800; }
     .program-rules .progression-setup { margin: 0; padding: 0 0 18px; border: 0; background: transparent; }
     .undulating-panel { margin-top: 12px; padding-top: 12px; border-top: 1px solid var(--line); }
     .week-range-list { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: 8px; margin-top: 10px; }
@@ -1121,6 +1121,9 @@
       .workout-start-options, .program-muscle-bars { grid-template-columns: 1fr; }
       .week-range-list { grid-template-columns: 1fr; }
       .range-fields { grid-template-columns: 1fr 1fr; }
+      /* Time step (the time-based analogue of the rep/weight progression settings)
+         spans the full row on phones so its pills lay out in one line like Settings. */
+      .range-fields .field:last-child { grid-column: 1 / -1; }
     }
 
     /* ===== refined theme overrides ===== */
@@ -1178,7 +1181,7 @@
       color: var(--ink-strong);
     }
     .secondary-button:hover, .small-button:hover, .filter-button:hover,
-    .calendar-page:hover, .back:hover, .setup-program-row:hover, .copy-first-set:hover, .add-set:hover {
+    .back:hover, .setup-program-row:hover, .copy-first-set:hover, .add-set:hover {
       border-color: var(--rose);
       background: var(--rose-soft);
     }
@@ -1281,7 +1284,7 @@
       background: var(--nav-bg);
     }
     .nav-item { border-radius: 18px; color: var(--muted); }
-    .nav-item.active { background: var(--accent-soft); color: var(--accent-ink); font-weight: 800; }
+    .nav-item.active { background: var(--accent-soft); color: var(--accent-ink); font-weight: 700; }
     .day-chip { border-color: var(--line); border-radius: var(--radius-md); background: var(--surface-raised); }
     .day-chip.today { border-color: var(--accent); background: transparent; }
     .day-chip.selected { border-color: var(--accent); background: var(--accent); color: var(--on-accent); box-shadow: none; }

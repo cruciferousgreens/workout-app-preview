@@ -140,9 +140,9 @@
           </div>
           <div class="switch-row wide"><span class="switch-copy"><strong>Vary rep ranges by week</strong><span>Optional undulating periodization. Each program week can inherit its own range.</span></span><button class="switch" id="undulatingToggle" type="button" role="switch" aria-pressed="false" aria-label="Vary rep ranges by week off"></button></div>
           <div class="undulating-panel wide" id="undulatingPanel" hidden><span class="filter-label">WEEKLY REP RANGE</span><div class="week-range-list" id="weekRangeList"></div></div>
-          <details class="program-rules wide">
-            <summary id="progressionSetupTitle">Progression rules</summary>
-            <div class="progression-setup" aria-labelledby="progressionSetupTitle">
+          <section class="program-rules wide" aria-labelledby="progressionSetupTitle">
+            <h3 class="program-rules-title" id="progressionSetupTitle">Progression rules</h3>
+            <div class="progression-setup">
               <p>Defaults for this program. Exercise-level overrides remain editable inside each workout.</p>
               <div class="progression-fields">
                 <div class="field"><label for="progressionThreshold">TOP-SET RPE TRIGGER</label><input id="progressionThreshold" type="number" inputmode="decimal" min="1" max="10" step="0.5" value="8"></div>
@@ -153,7 +153,7 @@
                 <button class="small-button" id="manageProgramOverrides" type="button">Manage exercise overrides in workouts</button>
               </div>
             </div>
-          </details>
+          </section>
           <p class="form-error" id="programError" role="alert"></p>
           <button class="primary-button" id="createProgram" type="button">Create active program</button>
           <p class="session-note">Program edits are saved automatically on this device.</p>
