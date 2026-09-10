@@ -846,7 +846,7 @@
     .load-progression select, .load-progression input { width: 100%; min-width: 0; height: 38px; margin: 0; padding: 0 8px; border: 1px solid var(--line); border-radius: 7px; background: var(--surface); font-size: 12px; }
     .reps-only-toggle { min-height: 38px; padding: 0 10px; border: 1px solid var(--line); border-radius: 7px; background: var(--surface); color: var(--muted); cursor: pointer; font-size: 10px; font-weight: 800; white-space: nowrap; }
     .reps-only-toggle[aria-pressed="true"] { border-color: var(--accent); background: var(--accent-soft); color: var(--accent); }
-    .exercise-rule-controls [data-program-amrap] { grid-column: 1 / -1; }
+    .exercise-rule-controls .rule-amrap-hint { grid-column: 1 / -1; }
     .load-progression.is-disabled select, .load-progression.is-disabled input { opacity: .45; pointer-events: none; }
     /* Notched field labels (2026-09-10, Justin: keep the notch, no visible background).
        The label sits on the field's top border; its background exactly matches the

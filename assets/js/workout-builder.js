@@ -31,9 +31,9 @@
           <div class="exercise-rule-head"><label class="rule-field set-count-field"><span>Sets</span><input type="number" inputmode="numeric" min="1" max="20" step="1" value="${setCount}" data-program-rule="setCount" aria-label="Number of sets for ${escapeHtml(ex?.name||'exercise')}"></label></div>
           <div class="exercise-rule-controls">
             <label class="rule-field"><span>Track</span><select data-program-rule="mode"><option value="reps" ${time?'':'selected'}>Reps</option><option value="time" ${time?'selected':''}>Seconds</option></select></label>
-            <label class="rule-field"><span>${time?'Min sec':'Min reps'}</span><input type="number" min="1" value="${time?profile.timeMin:profile.min}" data-program-rule="${time?'timeMin':'min'}"></label>
+            <label class="rule-field"><span>${time?'Min sec':'Min reps'}</span><input type="${time?'number':'text'}" inputmode="numeric" ${time?'min="1" ':''}value="${time?profile.timeMin:(profile.amrap?profile.min+'+':profile.min)}" data-program-rule="${time?'timeMin':'min'}" ${time?'':'title="Add + after the number for AMRAP, e.g. 12+" aria-label="Minimum reps. Add + for AMRAP."'}></label>
             <label class="rule-field"><span>${time?'Max sec':'Max reps'}</span><input type="number" min="1" value="${time?profile.timeMax:profile.max}" data-program-rule="${time?'timeMax':'max'}" ${(!time&&profile.amrap)?'disabled':''}></label>
-            ${time?'':`<button class="reps-only-toggle" type="button" data-program-amrap aria-pressed="${!!profile.amrap}" aria-label="AMRAP rep target for ${escapeHtml(ex?.name||'exercise')}">AMRAP</button>`}
+            ${time?'':'<span class="field-help rule-amrap-hint">Add <b>+</b> for AMRAP, e.g. <b>12+</b>.</span>'}
             ${time?`<div class="rule-field"><span>Step</span><div class="step-pills" data-step-pills role="group" aria-label="Time step in seconds"></div></div>`:''}
             <div class="load-progression ${profile.repsOnly?'is-disabled':''}"><span class="load-control-title">Load progression</span><div class="load-progression-row"><select data-program-rule="incrementType" aria-label="Load increment type"><option value="lb" ${incrementType==='lb'?'selected':''}>Pounds</option><option value="percent" ${incrementType==='percent'?'selected':''}>Percent</option></select><span class="lp-value"><input type="number" min="0.5" step="0.5" value="${profile.incrementValue??progressionSetup.incrementValue}" data-program-rule="incrementValue" aria-label="Load increment value"><em class="unit">${incrementType==='percent'?'%':'lb'}</em></span><button class="reps-only-toggle" type="button" data-program-reps-only aria-pressed="${!!profile.repsOnly}">Increase reps only</button></div></div>
           </div>
@@ -61,6 +61,15 @@
             profile.incrementType=control.value;
             const unitEl=row.querySelector('.lp-value .unit');
             if(unitEl) unitEl.textContent = control.value==='percent' ? '%' : 'lb';
+          }else if(field==='min'){
+            // Reps mode only (time mode uses timeMin). A trailing + means AMRAP, e.g. "12+".
+            const raw=String(control.value).trim();
+            const plus=raw.match(/^(\d+)\s*\+$/);
+            if(plus){profile.min=Math.max(1,parseInt(plus[1],10));profile.amrap=true;profile.openTop=false;}
+            else{profile.min=Math.max(1,parseInt(raw,10)||1);profile.amrap=false;profile.openTop=false;}
+            control.value=profile.amrap?profile.min+'+':String(profile.min);
+            const maxInput=row.querySelector('[data-program-rule="max"]');
+            if(maxInput)maxInput.disabled=profile.amrap;
           }else{
             profile[field]=Number(control.value);
           }
@@ -90,15 +99,6 @@
           const defaults=(programMode?workoutState.activeProgram?.progression:progressionSetup)||progressionSetup,range=defaults.defaultRange||progressionSetup.defaultRange;
           const profile=item.progression||{mode:item.tracking||ex?.tracking||'reps',min:range.min,max:range.max,timeMin:30,timeMax:60,timeStep:defaults.timeStep||5,incrementType:defaults.incrementType,incrementValue:defaults.incrementValue,repsOnly:false};
           profile.repsOnly=!profile.repsOnly; item.progression=profile; if(!programMode){renderWorkoutExercises();renderWorkoutProgression();markDraftSaved();} renderExercisePicker();
-        });
-        row.querySelector('[data-program-amrap]')?.addEventListener('click',()=>{
-          const item=getItem(); if(!item)return;
-          const ex=exercises.find(entry=>entry.id===item.exerciseId);
-          const defaults=(programMode?workoutState.activeProgram?.progression:progressionSetup)||progressionSetup,range=defaults.defaultRange||progressionSetup.defaultRange;
-          const profile=item.progression||{mode:item.tracking||ex?.tracking||'reps',min:range.min,max:range.max,openTop:!!range.openTop,amrap:!!range.amrap,timeMin:30,timeMax:60,timeStep:defaults.timeStep||5,incrementType:defaults.incrementType,incrementValue:defaults.incrementValue,repsOnly:false};
-          profile.amrap=!profile.amrap; item.progression=profile;
-          if(!programMode){prepareDraftProgression(workoutState.draft,{...progressionSetup,stallDetection:false});renderWorkoutExercises();renderWorkoutProgression();markDraftSaved();}
-          renderExercisePicker();
         });
         row.querySelector('[data-program-exercise-tags]')?.addEventListener('click',()=>openExerciseTagDialog(programMode?{mode:'program',exerciseId:row.dataset.programRuleId}:{mode:'draft',exerciseUid:row.dataset.ruleUid}));
       });
