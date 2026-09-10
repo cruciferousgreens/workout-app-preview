@@ -216,20 +216,14 @@
       $('#startSelectedDateWorkout')?.addEventListener('click',()=>{const date=state.selectedDashboardDate;showWorkouts();startBlankWorkout();workoutState.draft.date=date;renderWorkoutScreen();});
     }
     /* Muscle blindspots: library muscles with zero weighted volume in the
-       period, behind a subtle toggle (Justin 2026-09-10). Shared by the Stats
-       muscle map and the Home At-a-glance card. */
+       period, always visible as dashed pills (Justin 2026-09-10 — no toggle).
+       Shared by the Stats muscle map and the Home At-a-glance card. */
     function renderBlindspots(volumes,wrapSelector){
       const wrap=$(wrapSelector||'#blindspotWrap');if(!wrap)return;
       const allMuscles=[...new Set(exercises.flatMap(ex=>[...(ex.primary||[]),...(ex.secondary||[])].map(m=>String(m).toLowerCase())))].sort();
       const missing=allMuscles.filter(m=>!volumes[m]);
       if(!missing.length){wrap.innerHTML='';return;}
-      const open=!!state.showBlindspots;
-      wrap.innerHTML=`<button class="blindspot-toggle" type="button" aria-expanded="${open}">${open?'Hide':'Show'} blindspots (${missing.length})</button><div class="tag-row blindspot-list"${open?'':' hidden'}>${missing.map(m=>`<span class="tag blindspot-tag">${escapeHtml(titleCase(m))}</span>`).join('')}</div>`;
-      wrap.querySelector('.blindspot-toggle').addEventListener('click',()=>{
-        state.showBlindspots=!state.showBlindspots;schedulePersist();renderBlindspots(volumes,wrapSelector);
-        /* Keep focus on the rebuilt toggle so iOS Safari doesn't scroll to top. */
-        wrap.querySelector('.blindspot-toggle')?.focus({preventScroll:true});
-      });
+      wrap.innerHTML=`<div class="tag-row blindspot-list">${missing.map(m=>`<span class="tag blindspot-tag">${escapeHtml(titleCase(m))}</span>`).join('')}</div>`;
     }
     function renderStats() {
       const labels={today:'Today',week:'Week',month:'Month',year:'Year',all:'All time'};

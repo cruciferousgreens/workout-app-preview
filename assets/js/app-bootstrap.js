@@ -253,8 +253,13 @@
        reps-tracked exercise in the draft. Explicit choice, so profiles become
        custom (the engine follows the chosen zone instead of last session's). */
     document.querySelectorAll('[data-workout-focus]').forEach(button=>button.addEventListener('click',()=>{
-      const preset=REP_PRESETS[button.dataset.workoutFocus]; if(!preset||!workoutState.draft)return;
-      workoutState.draft.focusPreset=button.dataset.workoutFocus;
+      if(!workoutState.draft)return;
+      const key=button.dataset.workoutFocus;
+      /* "No focus" clears the workout-level selection (Justin 2026-09-10);
+         per-exercise ranges already applied stay as the exercises' own settings. */
+      if(!key){workoutState.draft.focusPreset=null;syncWorkoutFocusPills();markDraftSaved();return;}
+      const preset=REP_PRESETS[key]; if(!preset)return;
+      workoutState.draft.focusPreset=key;
       workoutState.draft.exercises.forEach(item=>{
         const ex=exercises.find(row=>row.id===item.exerciseId);
         if(exerciseTracking(item,ex)==='time')return;

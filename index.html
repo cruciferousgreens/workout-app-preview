@@ -36,8 +36,8 @@
           <div><strong id="calendarWeekLabel"></strong><span>Swipe or use arrows to browse</span></div>
           <button class="calendar-page" id="nextWeek" type="button" aria-label="Next week">›</button>
         </div>
-        <p class="calendar-summary" id="calendarSummary">This week.</p>
         <div class="week-strip" id="weekStrip" aria-label="One-week training calendar."></div>
+        <p class="calendar-summary" id="calendarSummary">This week.</p>
         <div class="dashboard-grid">
           <section class="dashboard-card" aria-labelledby="dashProgramTitle"><h2 id="dashProgramTitle">Active program</h2><div id="dashboardProgram"></div></section>
           <section class="dashboard-card" aria-labelledby="dashStatsTitle">
@@ -106,11 +106,11 @@
           <div class="progression-banner" id="workoutProgression" hidden></div>
           <div class="workout-meta">
             <div class="field"><label for="workoutName">WORKOUT NAME</label><input id="workoutName" type="text" value="" placeholder="Workout" autocomplete="off" aria-label="Workout name" /></div>
-            <details class="workout-focus" id="workoutFocus">
-              <summary>Workout focus</summary>
-              <div class="rep-preset-row"><button class="rep-preset" type="button" data-workout-focus="strength">Strength · 1–5</button><button class="rep-preset" type="button" data-workout-focus="hypertrophy">Hypertrophy · 6–12</button><button class="rep-preset" type="button" data-workout-focus="endurance">Endurance · 12–20</button><button class="rep-preset" type="button" data-workout-focus="open">15+</button><button class="rep-preset" type="button" data-workout-focus="amrap">AMRAP</button></div>
+            <div class="workout-focus-open" id="workoutFocus">
+              <span class="workout-focus-label" id="workoutFocusLabel">Workout focus</span>
+              <div class="rep-preset-row" role="group" aria-labelledby="workoutFocusLabel"><button class="rep-preset" type="button" data-workout-focus="strength">Strength · 1–5</button><button class="rep-preset" type="button" data-workout-focus="hypertrophy">Hypertrophy · 6–12</button><button class="rep-preset" type="button" data-workout-focus="endurance">Endurance · 12–20</button><button class="rep-preset" type="button" data-workout-focus="open">15+</button><button class="rep-preset" type="button" data-workout-focus="amrap">AMRAP</button><button class="rep-preset rep-preset-none" type="button" data-workout-focus="">No focus</button></div>
               <p class="field-help">Applies the rep range to every reps-tracked exercise in this workout.</p>
-            </details>
+            </div>
             <div class="field date-field"><label id="workoutDateLabel" for="workoutDate">DATE</label><span class="date-display" id="workoutDateDisplay" aria-hidden="true">Thu, Sep 10, 2026</span><input id="workoutDate" type="date" class="date-input-overlay" aria-label="Workout date" /></div>
           </div>
           <div class="workout-toolbar">
@@ -247,6 +247,10 @@
             <li>Extra color themes use the <a href="https://github.com/catppuccin/catppuccin" target="_blank" rel="noreferrer">Catppuccin</a> palette and the <a href="https://rosepinetheme.com" target="_blank" rel="noreferrer">Rosé Pine</a> palette (Dawn).</li>
             <li>The original color scheme was inspired by <a href="https://rosepinetheme.com" target="_blank" rel="noreferrer">Rosé Pine</a>.</li>
           </ul>
+        </section>
+        <section class="dashboard-card">
+          <div class="section-head settings-head"><h2>About</h2></div>
+          <p class="section-note" id="appVersionLine">Cruciferous Greens Workout · v0.49</p>
         </section>
       </section>
 
