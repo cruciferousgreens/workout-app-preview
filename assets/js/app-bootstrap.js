@@ -292,7 +292,9 @@
     $('#closeDiscardDraft').addEventListener('click', () => $('#discardDraftDialog').close());
     $('#keepDraftButton').addEventListener('click', () => $('#discardDraftDialog').close());
     $('#confirmDiscardDraft').addEventListener('click', () => { $('#discardDraftDialog').close(); doDiscardDraft(); });
-    $('#finishWorkout').addEventListener('click', finishWorkout);
+    /* The click event must not leak into finishWorkout(skipInvalid) (Justin
+       2026-09-10: the event object is truthy and was skipping the check). */
+    $('#finishWorkout').addEventListener('click', () => finishWorkout());
 
     $('#searchInput').addEventListener('input', e => {
       state.query = e.target.value;

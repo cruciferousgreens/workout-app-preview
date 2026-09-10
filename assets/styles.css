@@ -1383,7 +1383,7 @@
     .completed-set-cell::before { content: attr(data-label); display: none; color: var(--muted); font-size: 9px; font-weight: 850; letter-spacing: .08em; }
     .completed-set-tags { grid-column: 2 / -1; }
     /* ===== 15. Heat-level fills (shared by the Sasha body map regions and swatches) ===== */
-    .heat-0 { fill: var(--heat-0); } .heat-1 { fill: var(--heat-1); } .heat-2 { fill: var(--heat-2); } .heat-3 { fill: var(--heat-3); } .heat-4 { fill: var(--heat-4); } .heat-5 { fill: var(--heat-5); }
+    .heat-0 { fill: var(--heat-0); background: var(--heat-0); } .heat-1 { fill: var(--heat-1); background: var(--heat-1); } .heat-2 { fill: var(--heat-2); background: var(--heat-2); } .heat-3 { fill: var(--heat-3); background: var(--heat-3); } .heat-4 { fill: var(--heat-4); background: var(--heat-4); } .heat-5 { fill: var(--heat-5); background: var(--heat-5); }
     .heatmap-gradient { background: linear-gradient(90deg,var(--heat-0),var(--heat-2),var(--heat-5)); }
     /* ===== 16. Settings ===== */
     .settings-grid { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: 10px; margin-bottom: 8px; }
