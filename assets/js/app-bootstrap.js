@@ -2,18 +2,19 @@
 /* ===== module: app-bootstrap.js ===== */
     /** Connects static controls to feature modules and performs initial rendering. */
     let deleteArmed=false;
-    /** Theme state (Justin 2026-09-10): themeName is 'cruciferous', the Rosé Pine
-        light flavor ('rosepine', displayed as "Rosé"), or a dark Catppuccin flavor
-        ('macchiato' displayed as "Asterid", 'mocha' displayed as "Mocha").
-        darkMode flips light/dark; for non-Cruciferous themes the toggle flips
-        between the remembered dark flavor (ctpDark) and the remembered light
-        theme (lightTheme), so it never lands somewhere unexpected. Tapping the
-        already-active theme pill toggles back to Cruciferous light. Persisted as
-        workout-theme (dark/light) + workout-theme-name + workout-theme-light. */
+    /** Theme state (Justin 2026-09-10): two families. Cruciferous (default light)
+        with Asterid as its dark; Matcha with Rosé as its light. themeName is
+        'cruciferous', 'rosepine' (displayed "Rosé"), 'macchiato' (displayed
+        "Asterid"), or 'mocha' (displayed "Matcha"). darkMode flips light/dark
+        within the family: Cruciferous dark renders the Asterid palette, and the
+        toggle flips Rosé<->Matcha (remembered via ctpDark/lightTheme), so it
+        never lands somewhere unexpected. Tapping an already-active non-default
+        pill toggles back to Cruciferous light. Persisted as workout-theme
+        (dark/light) + workout-theme-name + workout-theme-light. */
     let themeName='cruciferous', darkMode=false, ctpDark='mocha', lightTheme='cruciferous';
     const ROSEPINE='rosepine', DARK_FLAVORS=['macchiato','mocha'], LIGHT_THEMES=['cruciferous','rosepine'];
     function applyTheme(){
-      const eff=themeName==='cruciferous'?(darkMode?'dark':'light'):themeName;
+      const eff=themeName==='cruciferous'?(darkMode?'macchiato':'light'):themeName;
       document.documentElement.dataset.theme=eff;
       const toggle=$('#darkModeToggle');
       if(toggle){toggle.setAttribute('aria-pressed',String(darkMode));toggle.setAttribute('aria-label',`Dark mode ${darkMode?'on':'off'}`);}
