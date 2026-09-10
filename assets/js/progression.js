@@ -35,8 +35,16 @@
       const inStoredZone=log=>{
         const p=log.progression; if(!p)return false;
         if((p.mode||'reps')!==targetMode)return false;
-        if(targetMode==='time')return Number(p.timeMin)===timeMin&&Number(p.timeMax)===timeMax;
-        return Number(p.min)===min&&Number(p.max)===max&&!!p.amrap===!!profile?.amrap&&!!p.openTop===!!profile?.openTop;
+        if(targetMode==='time'){if(!(Number(p.timeMin)===timeMin&&Number(p.timeMax)===timeMax))return false;}
+        else if(!(Number(p.min)===min&&Number(p.max)===max&&!!p.amrap===!!profile?.amrap&&!!p.openTop===!!profile?.openTop))return false;
+        // A matching stored target range is not enough on its own: the actual
+        // logged top set must have landed inside that zone. Blank-logged
+        // sessions get the default range stamped on them, so the profile alone
+        // can't tell zones apart — a 5–8 target logged as 255×4 belongs to the
+        // 4s zone, not the 5–8 zone.
+        const top=topSetForSession(log); if(!top)return false;
+        if(targetMode==='time')return top.mode==='time'&&top.seconds>=timeMin&&top.seconds<=timeMax;
+        return top.mode==='reps'&&top.reps>=min&&(profile?.openTop||profile?.amrap||top.reps<=max);
       };
       const inLoggedZone=log=>{
         const top=topSetForSession(log); if(!top)return false;

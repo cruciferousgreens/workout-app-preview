@@ -5,7 +5,9 @@
     const tokenize = (s) => (s || '').toLowerCase().replace(/[^a-z0-9]+/g,' ').trim().split(/\s+/).filter(Boolean);
     /* Query synonyms as alternative phrases: an exact-key query scores each phrase
        separately and takes the best, so "ohp" ranks "Barbell Shoulder Press"
-       (via "shoulder press") above names that merely stack more synonym words. */
+       (via "shoulder press") above names that merely stack more synonym words.
+       Ties break toward the name closest to the bare phrase (fewest extra
+       words), so the canonical lift outranks "Alternating Cable …". */
     const searchSynonyms = {
       'knee extension':['leg extension'], 'knee extensions':['leg extension'], 'quad extension':['leg extension'],
       'smith bench':['smith machine bench press'], 'smith press':['smith machine bench press'],
@@ -31,7 +33,9 @@
     }
     function rankedExerciseMatches(query,limit=80){
       if(!query)return exercises.slice(0,limit);
-      return exercises.map(ex=>({ex,score:exerciseSearchScore(ex,query)})).filter(row=>row.score>0).sort((a,b)=>b.score-a.score||a.ex.name.localeCompare(b.ex.name)).slice(0,limit).map(row=>row.ex);
+      const raw=(query||'').toLowerCase().trim(), phrases=searchSynonyms[raw]||[raw];
+      const extraWords=name=>{const n=(name||'').toLowerCase(),wn=tokenize(n).length;let best=Infinity;phrases.forEach(p=>{if(n.includes(p))best=Math.min(best,wn-tokenize(p).length);});return best;};
+      return exercises.map(ex=>({ex,score:exerciseSearchScore(ex,query),extra:extraWords(ex.name)})).filter(row=>row.score>0).sort((a,b)=>b.score-a.score||a.extra-b.extra||a.ex.name.localeCompare(b.ex.name)).slice(0,limit).map(row=>row.ex);
     }
     const titleCase = (s) => s ? s.replace(/\b\w/g, c => c.toUpperCase()) : '—';
     let uidCounter = 0;
