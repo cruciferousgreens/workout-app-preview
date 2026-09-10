@@ -113,6 +113,7 @@
       $('#programView').classList.remove('active');
       $('#detailView').classList.add('active');
       setActiveNav('library');
+      updateTopBar('detail', ex.name);
       if (fromDetail) state.scroll['detail'] = 0;
       restoreScroll('detail');
       updateExerciseBackLabel();
@@ -123,7 +124,9 @@
       const back = $('#backButton'); if (!back) return;
       const names = {'completed-workout':'workout', workout:'training', stats:'stats', dashboard:'home', program:'program', library:'library'};
       const dest = names[state.exerciseDetailReturn?.view] || 'library';
-      back.setAttribute('aria-label', `Back to ${dest}`);
+      const label = `Back to ${dest}`;
+      back.setAttribute('aria-label', label);
+      const topBack = $('#topBarBack'); if (topBack) topBack.setAttribute('aria-label', label);
     }
 
     /** Returns from the exercise detail to the recorded origin (library, stats, dashboard,

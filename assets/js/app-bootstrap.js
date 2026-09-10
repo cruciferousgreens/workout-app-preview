@@ -120,7 +120,11 @@
     });
     $('#programNav').addEventListener('click', () => showProgram());
     $('#statsNav').addEventListener('click', () => showStats());
-    $('#settingsNav').addEventListener('click', () => showSettings());
+    $('#topBarSettings').addEventListener('click', () => showSettings());
+    $('#topBarBack').addEventListener('click', () => {
+      if (state.activeView === 'detail') backFromExerciseDetail();
+      else history.back();
+    });
     $('#progressionThreshold').addEventListener('input',e=>{progressionSetup.threshold=Number(e.target.value)||8;schedulePersist();});
     $('#progressionIncrementType').addEventListener('change',e=>{progressionSetup.incrementType=e.target.value;schedulePersist();});
     $('#progressionIncrementValue').addEventListener('input',e=>{progressionSetup.incrementValue=Number(e.target.value)||5;schedulePersist();});
