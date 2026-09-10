@@ -451,7 +451,7 @@
     .complete-set { width: 42px; height: 42px; border: 1px solid var(--line); border-radius: 50%; background: var(--surface-raised); color: var(--muted); cursor: pointer; display: grid; place-items: center; font-size: 18px; font-weight: 900; }
     .complete-set[aria-pressed="true"] { border-color: var(--accent); background: var(--accent); color: var(--surface-raised); }
     .log-set.is-complete .log-input { background: var(--pine-soft); border-color: var(--foam); }
-    .set-swipe { border-radius: var(--radius-sm); }
+    .set-swipe { border-radius: 0; } /* square: divider lines run full-width, never clipped by rounded corners (Justin 2026-09-10) */
     .set-swipe .swipe-delete-action { width: 76px; }
     .set-swipe.is-open .swipe-content { transform: translateX(-76px); }
     .add-set { margin: 12px 0 0 42px; padding: 7px 0; border: 0; background: transparent; color: var(--accent); cursor: pointer; font-size: 13px; font-weight: 750; }
@@ -528,7 +528,7 @@
     .crumb-sep { flex: none; margin: 0 7px; color: var(--muted); opacity: .55; }
     .crumb-here { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
     .top-bar-btn { display: grid; place-items: center; width: 44px; height: 44px; border: 0; border-radius: 12px; background: transparent; color: var(--ink); cursor: pointer; }
-    .top-bar-btn svg { width: 22px; height: 22px; }
+    .top-bar-btn svg { width: 22px; height: 22px; stroke-width: 2.5; /* match tab icon weight (Justin 2026-09-10) */ }
     .top-bar-btn[hidden] { display: none; }
     /* The top bar owns back/title on the exercise detail; hide the in-screen duplicate. */
     .has-top-bar .detail .detail-title { display: none; }
@@ -685,7 +685,7 @@
       .dashboard-card { padding: 16px; }
       .log-set { grid-template-columns: 28px repeat(3,minmax(0,1fr)) 73px; }
       .log-set .set-actions { grid-column: 5; }
-      .exercise-tools { flex-wrap: wrap; justify-content: flex-end; }
+      .exercise-tools { flex-wrap: wrap; justify-content: flex-start; }
       .bottom-nav { padding: 4px 6px calc(4px + env(safe-area-inset-bottom)); }
       .nav-item { min-height: 48px; font-size: 10px; }
       .nav-item svg { width: 22px; height: 22px; }
@@ -730,6 +730,7 @@
     #dashboardStats .stats-panel span { font-size: 11px; }
     .muscle-summary { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 12px; }
     .calendar-summary { min-height: 19px; margin: -12px 2px 18px; color: var(--muted); font-size: 12px; }
+    .link-button { padding: 0; border: 0; background: none; color: var(--accent); cursor: pointer; font: inherit; font-weight: 700; text-decoration: underline; text-underline-offset: 2px; }
     /* ===== 13. Charts ===== */
     .chart-card { margin-top: 12px; }
     .chart-wrap { width: 100%; min-height: 180px; overflow: hidden; }
@@ -852,7 +853,8 @@
     .step-pills { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; padding: 8px 2px 2px; }
     .step-pills [data-step] { min-height: 36px; padding: 6px 14px; border: 1px solid var(--line); border-radius: 999px; background: var(--surface); color: var(--ink); font-size: 12px; font-weight: 700; cursor: pointer; }
     .step-pills [data-step][aria-pressed="true"] { border-color: var(--accent); background: var(--accent-soft); color: var(--accent); }
-    .step-pills .step-custom { width: 88px; flex: 0 0 auto; height: 36px; }
+    /* Custom time-step edits inline in its own pill (Justin 2026-09-10). */
+    .step-pills .step-custom { width: 88px; flex: 0 0 auto; height: 36px; border: 1px solid var(--accent); border-radius: 999px; background: var(--accent-soft); color: var(--accent); text-align: center; font-size: 12px; font-weight: 700; outline: none; }
     /* Weight-unit pills share the step-pill look, including the selected state. */
     .step-pills [data-units] { min-height: 36px; padding: 6px 14px; border: 1px solid var(--line); border-radius: 999px; background: var(--surface); color: var(--ink); font-size: 12px; font-weight: 700; cursor: pointer; }
     .step-pills [data-units][aria-pressed="true"] { border-color: var(--accent); background: var(--accent-soft); color: var(--accent); }
@@ -863,7 +865,7 @@
     .theme-pills [data-theme-name] i { width: 14px; height: 14px; border-radius: 50%; border: 1px solid rgba(0,0,0,.15); }
     .theme-pills [data-theme-name][aria-pressed="true"] { border-color: var(--accent); background: var(--accent-soft); color: var(--accent); }
     /* Theme families (Justin 2026-09-10): two columns — Cruciferous/Asterid and
-       Matcha/Rosé — with a subtle hairline separator between the families. */
+       Rosé/Matcha — with a subtle hairline separator between the families. */
     .theme-pills.theme-families { display: flex; align-items: stretch; }
     .theme-family { flex: 1 1 0; display: flex; flex-direction: column; gap: 8px; }
     .theme-family:first-child { padding-right: 12px; }
@@ -1021,7 +1023,7 @@
       .program-row-actions { grid-column: 2; justify-content: flex-start; }
     }
     .add-set { display: inline-flex; align-items: center; justify-content: center; min-height: 38px; margin: 12px 0 0 42px; padding: 0 13px; border: 1px solid var(--foam); border-radius: var(--radius-sm); background: var(--pine-soft); color: var(--accent); }
-    .set-count-badge { display: inline-flex; align-items: center; min-height: 22px; margin-top: 7px; padding: 2px 7px; border-radius: 999px; background: var(--surface-2); color: var(--muted); font-size: 10px; font-weight: 750; }
+    /* (set-count-badge retired 2026-09-10: the accordion summary already carries the set count) */
     .suggestion-basis { margin-top: 10px; padding-top: 9px; border-top: 1px solid var(--line); color: var(--muted); font-size: 11px; line-height: 1.5; }
     .muscle-analysis-grid { display: grid; grid-template-columns: minmax(0,1.15fr) minmax(250px,.85fr); gap: 12px; margin-top: 12px; }
     .analysis-panel { padding: 18px; border: 1px solid var(--line); border-radius: var(--radius-md); background: var(--surface); }
@@ -1114,9 +1116,15 @@
     .workout-focus[open] > summary::after { content: '›'; transform: rotate(90deg); }
     .workout-focus .field-help { margin: 0 0 8px; }
     .advanced-options-body { display: grid; gap: 10px; padding: 2px 0 8px; }
+    /* Similar exercises collapse on the exercise detail (Justin 2026-09-10). */
+    .similar-collapse summary { display: flex; align-items: center; justify-content: space-between; gap: 10px; list-style: none; cursor: pointer; }
+    .similar-collapse summary::-webkit-details-marker { display: none; }
+    .similar-collapse summary::after { content: '+'; color: var(--accent); font-size: 18px; font-weight: 500; }
+    .similar-collapse[open] > summary::after { content: '−'; }
+    .similar-collapse .section-head { margin-bottom: 0; }
     .set-utility-row { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 10px; }
-    .copy-first-set { min-height: 30px; padding: 0 8px; border: 0; border-radius: var(--radius-sm); background: transparent; color: var(--muted); cursor: pointer; font-size: 11px; font-weight: 700; }
-    .copy-first-set:disabled { opacity: .45; cursor: default; }
+    .copy-first-set { display: inline-flex; align-items: center; justify-content: center; min-height: 38px; padding: 0 13px; border: 1px solid var(--line); border-radius: var(--radius-sm); background: var(--surface); color: var(--ink); cursor: pointer; font-size: 12px; font-weight: 700; }
+    .copy-first-set:disabled { background: transparent; color: var(--muted); opacity: .55; cursor: default; }
     /* Accent circular add-exercises button on the workout page (Justin 2026-09-10). */
     #addWorkoutExercise { border-color: var(--accent); background: var(--accent-soft); color: var(--accent); }
     .rep-preset-row { display: flex; flex-wrap: wrap; gap: 7px; margin: 9px 0 12px; }
@@ -1357,7 +1365,8 @@
     .last-session-line { margin: 10px 0 8px; padding: 9px 11px; border-radius: var(--radius-sm); background: var(--surface-2); color: var(--muted); font-size: 12px; }
     .last-session-line strong { color: var(--ink-strong); }
     /* ===== 14. Toasts ===== */
-    .app-toast { position: fixed; z-index: 80; left: 50%; bottom: calc(112px + env(safe-area-inset-bottom)); width: min(420px, calc(100% - 28px)); padding: 13px 16px; transform: translateX(-50%); border: 1px solid var(--line-strong); border-radius: var(--radius-md); background: var(--ink-strong); color: var(--bg); box-shadow: var(--shadow); font-size: 13px; font-weight: 750; }
+    .app-toast { position: fixed; z-index: 80; left: 50%; bottom: calc(112px + env(safe-area-inset-bottom)); width: min(420px, calc(100% - 28px)); padding: 13px 16px; transform: translate(-50%, 10px); border: 1px solid var(--line-strong); border-radius: var(--radius-md); background: var(--ink-strong); color: var(--bg); box-shadow: var(--shadow); font-size: 13px; font-weight: 750; opacity: 0; transition: opacity .28s ease, transform .28s ease; pointer-events: none; }
+    .app-toast.show { transform: translate(-50%, 0); opacity: 1; }
     .app-toast.pr-toast { border-color: var(--gold); background: var(--gold-soft); color: var(--ink-strong); }
     .compact-dialog { width: min(460px, calc(100% - 28px)); }
     /* Stacked dialog actions (Justin 2026-09-10): three buttons don't fit

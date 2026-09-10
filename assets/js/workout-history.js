@@ -1,11 +1,39 @@
 
 /* ===== module: workout-history.js ===== */
     /** Finalizes editable workout records and renders detailed set-by-set history. */
-    function finishWorkout() {
+    /** Sets missing required values (reps/seconds, weight for weighted
+        exercises, or exercises with no sets at all). Powers the "Unfilled
+        sets" dialog (Justin 2026-09-10). */
+    function invalidSetsIn(draft){
+      const rows=[];
+      (draft?.exercises||[]).forEach(item=>{
+        const ex=exercises.find(row=>row.id===item.exerciseId);
+        const weightOptional=ex?.equipment==='body only', tracking=exerciseTracking(item,ex);
+        if(!item.sets.length){rows.push({item,set:null});return;}
+        item.sets.forEach(set=>{
+          const bad=(!weightOptional&&set.w==='')||(tracking==='time'?set.seconds:set.r)===''||Number(set.w||0)<0||Number(tracking==='time'?set.seconds:set.r)<1||(set.rpe!==''&&(Number(set.rpe)<1||Number(set.rpe)>10));
+          if(bad)rows.push({item,set});
+        });
+      });
+      return rows;
+    }
+    function isInvalidSet(item,set){
+      const ex=exercises.find(row=>row.id===item.exerciseId);
+      const weightOptional=ex?.equipment==='body only', tracking=exerciseTracking(item,ex);
+      return (!weightOptional&&set.w==='')||(tracking==='time'?set.seconds:set.r)===''||Number(set.w||0)<0||Number(tracking==='time'?set.seconds:set.r)<1||(set.rpe!==''&&(Number(set.rpe)<1||Number(set.rpe)>10));
+    }
+    function finishWorkout(skipInvalid=false) {
       const draft = workoutState.draft;
       if (!draft || !draft.exercises.length) { showToast('Add at least one exercise before finishing.'); return; }
-      const invalid = draft.exercises.some(item => { const ex=exercises.find(row=>row.id===item.exerciseId); const weightOptional=ex?.equipment==='body only',tracking=exerciseTracking(item,ex); return !item.sets.length || item.sets.some(set => ((!weightOptional && set.w === '') || (tracking==='time'?set.seconds:set.r) === '' || Number(set.w||0) < 0 || Number(tracking==='time'?set.seconds:set.r) < 1 || (set.rpe !== '' && (Number(set.rpe) < 1 || Number(set.rpe) > 10)))); });
-      if (invalid) { showToast('Finish blocked: complete reps or seconds for every set, plus weight for weighted exercises. RPE is optional.','',6500); return; }
+      if (!skipInvalid) {
+        const bad = invalidSetsIn(draft);
+        if (bad.length) {
+          $('#invalidSetsCopy').textContent=`${bad.length} set${bad.length===1?' is':'s are'} missing reps, seconds, or weight.`;
+          $('#invalidSetsDelete').textContent=`Delete ${bad.length===1?'the unfilled set':'unfilled sets'}`;
+          $('#invalidSetsDialog').showModal();
+          return;
+        }
+      }
       const unmarked=draft.exercises.flatMap(item=>item.sets.map((set,index)=>({set,index,item}))).filter(row=>!row.set.complete);
       if (unmarked.length) {
         $('#unfinishedSetsCopy').textContent=`${unmarked.length} set${unmarked.length===1?' isn’t':'s aren’t'} marked complete.`;

@@ -22,7 +22,7 @@
       const templateBox=$('#pickerTemplateOptions');
       templateBox.hidden=false;
       const templateButtons=programMode&&workoutState.templates.length?`<strong>START FROM A TEMPLATE</strong><div class="picker-template-buttons">${workoutState.templates.map(template=>`<button class="picker-template-button" type="button" data-use-program-template="${escapeHtml(template.id)}">${escapeHtml(template.name)}</button>`).join('')}</div>`:'';
-      const ruleRangeSummary=(profile,time,setCount)=>`${setCount} set${setCount===1?'':'s'} · `+(time?`${profile.timeMin}–${profile.timeMax} sec`:(profile.amrap?(profile.min>1?`AMRAP from ${profile.min} reps`:'AMRAP'):profile.openTop?`${profile.min}+ reps`:`${profile.min??''}–${profile.max??''} reps`));
+      const ruleRangeSummary=(profile,time,setCount)=>`${setCount} set${setCount===1?'':'s'} · `+(time?`${profile.timeMin}–${profile.timeMax} sec`:(profile.amrap?(profile.min>1?`AMRAP from ${profile.min} reps`:'AMRAP'):(profile.openTop||profile.max==null)?`${profile.min}+ reps`:`${profile.min??''}–${profile.max??''} reps`));
       const ruleRows=collection.length?`<div class="exercise-rules-list">${collection.map(item=>{
         const ex=exercises.find(row=>row.id===item.exerciseId);
         const defaults=(programMode?workoutState.activeProgram?.progression:progressionSetup)||progressionSetup;

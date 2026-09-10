@@ -89,11 +89,14 @@
     function syncTimeStepPills(root,value){
       if(!root)return;
       const n=Math.max(1,Number(value)||5), isPreset=TIME_STEP_PRESETS.includes(n);
+      const customBtn=root.querySelector('[data-step="custom"]'), custom=root.querySelector('[data-step-custom]');
       root.querySelectorAll('[data-step]').forEach(btn=>{
         const key=btn.dataset.step;
         btn.setAttribute('aria-pressed',String(key==='custom'?!isPreset:Number(key)===n));
       });
-      const custom=root.querySelector('[data-step-custom]');
+      /* Custom edits inline in its own pill (Justin 2026-09-10): the input
+         takes the Custom button's place instead of appearing below. */
+      if(customBtn)customBtn.hidden=!isPreset;
       if(custom){custom.hidden=isPreset;if(!isPreset&&document.activeElement!==custom)custom.value=n;}
     }
     function wireTimeStepPills(root,get,set){
@@ -106,14 +109,17 @@
         if(btn.dataset.step==='custom'){
           const custom=root.querySelector('[data-step-custom]');
           root.querySelectorAll('[data-step]').forEach(b=>b.setAttribute('aria-pressed',String(b===btn)));
-          if(custom){custom.hidden=false;custom.value=get();custom.focus();custom.select();}
+          if(custom){btn.hidden=true;custom.hidden=false;custom.value=get();custom.focus();custom.select();}
           return;
         }
         set(Number(btn.dataset.step));
         syncTimeStepPills(root,get());
       });
       const custom=root.querySelector('[data-step-custom]');
-      custom.addEventListener('change',()=>{const n=Math.max(1,Number(custom.value)||5);set(n);syncTimeStepPills(root,get());});
+      const commitCustom=()=>{const n=Math.max(1,Number(custom.value)||5);set(n);syncTimeStepPills(root,get());};
+      custom.addEventListener('change',commitCustom);
+      custom.addEventListener('blur',()=>{if(!custom.hidden)commitCustom();});
+      custom.addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault();custom.blur();}});
     }
     function rememberScroll() { state.scroll[state.activeView] = window.scrollY; }
     function restoreScroll(view) { requestAnimationFrame(() => window.scrollTo({top:state.scroll[view] || 0, behavior:'auto'})); }

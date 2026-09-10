@@ -52,11 +52,17 @@
       return '';
     }
 
-    let toastTimer;
+    let toastTimer, toastFadeTimer;
+    /* Toasts pop up and fade away (Justin 2026-09-10) — never a static banner. */
     function showToast(message,kind='',durationMs=3600) {
       const toast=$('#appToast'); if(!toast)return;
       toast.textContent=message; toast.className=`app-toast ${kind}`.trim(); toast.hidden=false;
-      clearTimeout(toastTimer); toastTimer=setTimeout(()=>{toast.hidden=true;},durationMs);
+      clearTimeout(toastTimer); clearTimeout(toastFadeTimer);
+      requestAnimationFrame(()=>requestAnimationFrame(()=>toast.classList.add('show')));
+      toastTimer=setTimeout(()=>{
+        toast.classList.remove('show');
+        toastFadeTimer=setTimeout(()=>{ if(!toast.classList.contains('show'))toast.hidden=true; },300);
+      },durationMs);
     }
 
     let saveStatusTimer;
@@ -195,9 +201,9 @@
             <summary class="exercise-accordion-head"><span class="exercise-accordion-title"><strong>${escapeHtml(ex.name)}</strong><small>${escapeHtml(cardSummary)}</small></span><span class="exercise-accordion-actions"><button class="exercise-info-button" type="button" data-exercise-info="${escapeHtml(item.exerciseId)}" aria-label="About ${escapeHtml(ex.name)}">i</button><span class="exercise-accordion-chevron" aria-hidden="true">›</span></span></summary>
             <div class="exercise-accordion-body">
             ${grouped ? `<div class="superset-band">Superset ${draft.exercises.filter((row, index) => row.supersetId && draft.exercises.findIndex(first => first.supersetId === row.supersetId) === index).findIndex(row => row.supersetId === item.supersetId) + 1}</div>` : ''}
-            <div class="workout-exercise-head"><div class="exercise-title-copy"><p>${escapeHtml((ex.primary||[]).map(titleCase).join(', ') || 'Unspecified muscle')} · ${escapeHtml(titleCase(ex.equipment || 'No equipment'))}</p><div class="exercise-meta-row"><span class="set-count-badge">${item.sets.length} set${item.sets.length===1?'':'s'}</span></div></div><button class="drag-handle" type="button" data-drag-uid="${escapeHtml(item.uid)}" aria-label="Drag to reorder ${escapeHtml(ex.name)}">⋮⋮</button></div>
+            <div class="workout-exercise-head"><div class="exercise-title-copy"><p>${escapeHtml((ex.primary||[]).map(titleCase).join(', ') || 'Unspecified muscle')} · ${escapeHtml(titleCase(ex.equipment || 'No equipment'))}</p></div><button class="drag-handle" type="button" data-drag-uid="${escapeHtml(item.uid)}" aria-label="Drag to reorder ${escapeHtml(ex.name)}">⋮⋮</button></div>
             <details class="advanced-options" ${item.optionsOpen?'open':''}><summary>Exercise options</summary><div class="advanced-options-body"><div class="exercise-tools"><div class="tracking-segment" role="group" aria-label="Track reps or seconds"><button type="button" data-tracking-mode="reps" data-tracking-uid="${escapeHtml(item.uid)}" aria-pressed="${tracking==='time'?'false':'true'}">Reps</button><button type="button" data-tracking-mode="seconds" data-tracking-uid="${escapeHtml(item.uid)}" aria-pressed="${tracking==='time'?'true':'false'}">Seconds</button></div>${draft.exercises.length > 1 ? `<button class="superset-button ${grouped ? 'active' : ''}" type="button" data-superset-uid="${escapeHtml(item.uid)}">${grouped ? 'Edit superset' : 'Create superset'}</button>` : ''}</div><div class="exercise-tag-row">${(item.exerciseTags||[]).map(tag=>`<span class="exercise-tag-chip ${workoutState.exerciseTagPresets.includes(tag)?'preset':''}">${escapeHtml(tag)}</span>`).join('')}<button class="exercise-tag-button" type="button" data-draft-exercise-tags="${escapeHtml(item.uid)}">${item.exerciseTags?.length?'Edit exercise tags':'+ Exercise tags'}</button></div><button class="remove-workout-exercise text-danger-button" type="button" data-uid="${escapeHtml(item.uid)}" aria-label="Remove ${escapeHtml(ex.name)} from this workout">Remove exercise</button></div></details>
-            ${lastSummary?`<p class="last-session-line"><strong>${escapeHtml(lastSummary)}</strong></p>`:'<p class="last-session-line">No history for this exercise yet.</p>'}
+            ${lastSummary?`<p class="last-session-line"><strong>${escapeHtml(lastSummary)}</strong></p>`:''}
             <div class="log-labels"><span>SET</span><span>${isBodyweight ? `ADDED ${weightUnit().toUpperCase()}` : `WEIGHT (${weightUnit().toUpperCase()})`}</span><span>${tracking === 'time' ? 'SECONDS' : 'REPS'}</span><span>RPE</span><span>ACTIONS</span></div>
             <div>${item.sets.map((set,index) => `<div class="set-swipe" data-set-wrapper="${escapeHtml(set.uid)}">
               <div class="log-set ${set.complete ? 'is-complete' : ''}" data-set-uid="${escapeHtml(set.uid)}">
