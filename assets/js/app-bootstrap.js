@@ -125,6 +125,12 @@
     $('#closeCustomDialog').addEventListener('click', closeCustomDialog);
     $('#cancelCustomExercise').addEventListener('click', closeCustomDialog);
 
+    /* "By weighted volume" <-> "By number of sets" toggle on the stats page (Justin 2026-09-10). */
+    $('#topExercisesMode').addEventListener('click',()=>{
+      state.topExercisesMode=state.topExercisesMode==='sets'?'volume':'sets';
+      schedulePersist();renderStats();
+    });
+
     $('#darkModeToggle').addEventListener('click',()=>{
       darkMode=!darkMode;
       /* The toggle walks to the matching theme pill (Justin 2026-09-10):

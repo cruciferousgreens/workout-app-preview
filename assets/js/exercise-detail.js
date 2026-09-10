@@ -83,7 +83,9 @@
         detailFav.setAttribute('aria-pressed', String(fav));
         detailFav.setAttribute('aria-label', fav ? 'Remove from favorites' : 'Add to favorites');
       }
-      $('#detailTags').innerHTML = [...ex.primary.map(x => `<span class="tag primary">${escapeHtml(x)}</span>`), ...ex.secondary.map(x => `<span class="tag">${escapeHtml(x)}</span>`), `<span class="tag">${escapeHtml(ex.equipment || 'no equipment')}</span>`, ...(ex.custom ? ['<span class="tag custom">Custom</span>'] : [])].join('');
+      /* Muscle names live with the "Muscles worked" heat map below (Justin
+         2026-09-10); the top keeps only equipment/custom context. */
+      $('#detailTags').innerHTML = [`<span class="tag">${escapeHtml(ex.equipment || 'no equipment')}</span>`, ...(ex.custom ? ['<span class="tag custom">Custom</span>'] : [])].join('');
       const realStats = statsFor(id);
       const st = realStats;
       const isBodyweight = ex.equipment === 'body only';

@@ -69,9 +69,12 @@
       workouts.forEach(workout=>workout.exercises.forEach(item=>{if((item.tracking||'reps')==='time')return;item.sets.forEach(set=>{if((set.tags||[]).some(tag=>tag.toLowerCase()==='warmup'))return;const reps=Number(set.r);if(!reps)return;if(reps<=5)focus.Strength+=1;else if(reps<=12)focus.Hypertrophy+=1;else focus.Endurance+=1;});}));
       const focusTotal=Object.values(focus).reduce((sum,value)=>sum+value,0);
       $('#trainingFocus').innerHTML=focusTotal?Object.entries(focus).map(([name,value])=>{const share=Math.round(value/focusTotal*100);return `<div class="focus-key"><strong>${name}</strong><span class="analysis-track"><i class="analysis-fill" style="width:${share}%"></i></span><span class="analysis-value">${share}%</span></div>`;}).join(''):'<p class="section-note">Complete rep-based working sets to see your training focus.</p>';
-      const exerciseVolumes={};workouts.forEach(workout=>workout.exercises.forEach(item=>{exerciseVolumes[item.exerciseId]=(exerciseVolumes[item.exerciseId]||0)+item.sets.reduce((sum,set)=>sum+setVolume(set),0);}));
-      const top=Object.entries(exerciseVolumes).filter(([,value])=>value>0).sort((a,b)=>b[1]-a[1]).slice(0,6);
-      $('#topExercises').innerHTML=top.length?`<div class="action-list">${top.map(([id,value])=>`<button class="action-row" type="button" data-stat-exercise="${escapeHtml(id)}"><span><strong>${escapeHtml(exercises.find(ex=>ex.id===id)?.name||'Exercise')}</strong><span>Open history and trend</span></span><span class="action-row-value">${formatVolume(value)}</span></button>`).join('')}</div>`:'<p class="section-note">No weighted exercise volume in this period.</p>';
+      /* Top exercises: "By weighted volume" toggles to "By number of sets" (Justin 2026-09-10). */
+      const exerciseStats={};workouts.forEach(workout=>workout.exercises.forEach(item=>{const entry=exerciseStats[item.exerciseId]||(exerciseStats[item.exerciseId]={volume:0,sets:0});entry.volume+=item.sets.reduce((sum,set)=>sum+setVolume(set),0);entry.sets+=item.sets.length;}));
+      const bySets=state.topExercisesMode==='sets';
+      const top=Object.entries(exerciseStats).filter(([,entry])=>bySets?entry.sets>0:entry.volume>0).sort((a,b)=>bySets?b[1].sets-a[1].sets:b[1].volume-a[1].volume).slice(0,6);
+      const modeButton=$('#topExercisesMode');if(modeButton)modeButton.textContent=bySets?'By number of sets':'By weighted volume';
+      $('#topExercises').innerHTML=top.length?`<div class="action-list">${top.map(([id,entry])=>`<button class="action-row" type="button" data-stat-exercise="${escapeHtml(id)}"><span><strong>${escapeHtml(exercises.find(ex=>ex.id===id)?.name||'Exercise')}</strong><span>Open history and trend</span></span><span class="action-row-value">${bySets?`${entry.sets} set${entry.sets===1?'':'s'}`:formatVolume(entry.volume)}</span></button>`).join('')}</div>`:`<p class="section-note">${bySets?'No completed sets in this period yet.':'No weighted exercise volume in this period.'}</p>`;
       const prs=recentPRRows(workouts);
       $('#recentPRs').innerHTML=prs.length?`<div class="action-list">${prs.map(pr=>`<button class="action-row" type="button" data-stat-exercise="${escapeHtml(pr.exerciseId)}"><span><strong>${escapeHtml(exercises.find(ex=>ex.id===pr.exerciseId)?.name||'Exercise')}</strong><span>${escapeHtml(pr.kind)}${pr.sample?' <span class="sample-label">Sample</span>':''} · ${escapeHtml(formatLogDate(pr.date))}</span></span><span class="action-row-value">${escapeHtml(pr.value)}</span></button>`).join('')}</div>`:'<p class="section-note">No new PRs in this period yet. Keep logging completed sets—your next one will show here.</p>';
       document.querySelectorAll('[data-stat-exercise]').forEach(button=>button.addEventListener('click',()=>openExercise(button.dataset.statExercise)));
@@ -159,13 +162,17 @@
       if(!rows.length)return '<div class="chart-empty">No weighted training volume in this period.</div>';
       const max=Math.max(...rows.map(([,v])=>v)),shown=compact?rows.slice(0,4):rows;
       const encoded=encodeURIComponent(JSON.stringify(volumes));
-      const map=`<div class="anatomy-map" data-volumes="${encoded}"><div class="chart-empty">Loading anatomical map\u2026</div></div>${compact?'':'<p class="body-map-credit">Anatomy: <a href="https://github.com/Olkre/Sasha-s-Body-Map" target="_blank" rel="noreferrer">Sasha\u2019s Body Map \u2197</a></p>'}`;
+      const map=`<div class="anatomy-map" data-volumes="${encoded}"><div class="chart-empty">Loading anatomical map\u2026</div></div>`;
       return `<div class="heatmap-shell">${map}<div><div class="heatmap-list">${shown.map(([muscle,value])=>`<div class="heatmap-row"><i class="heatmap-swatch heat-${heatLevel(value,max)}"></i><span>${escapeHtml(titleCase(muscle))}</span><strong>${formatVolume(value)}</strong></div>`).join('')}</div>${compact?'':`<div class="heatmap-legend"><span>Less</span><i class="heatmap-gradient"></i><span>More volume</span></div>`}</div></div>`;
     }
-    /* Per-exercise body map for the exercise detail page (Justin 2026-09-10). */
+    /* Per-exercise body map for the exercise detail page (Justin 2026-09-10).
+       The legend carries the actual muscle names with their colors, so the
+       "muscles worked" live with the map instead of the top of the page. */
     function exerciseBodyMapMarkup(ex){
       const primary=(ex.primary||[]).join(','),secondary=(ex.secondary||[]).join(',');
-      return `<div class="anatomy-map exercise-map" data-primary="${escapeHtml(primary)}" data-secondary="${escapeHtml(secondary)}"><div class="chart-empty">Loading anatomical map\u2026</div></div><div class="exercise-map-legend"><span><i class="heatmap-swatch heat-5"></i>Primary</span><span><i class="heatmap-swatch heat-2"></i>Secondary</span></div>`;
+      const pNames=(ex.primary||[]).map(titleCase).join(', '),sNames=(ex.secondary||[]).map(titleCase).join(', ');
+      const legend=[pNames?`<span><i class="heatmap-swatch heat-5"></i>Primary \u00b7 ${escapeHtml(pNames)}</span>`:'',sNames?`<span><i class="heatmap-swatch heat-2"></i>Secondary \u00b7 ${escapeHtml(sNames)}</span>`:''].join('');
+      return `<div class="anatomy-map exercise-map" data-primary="${escapeHtml(primary)}" data-secondary="${escapeHtml(secondary)}"><div class="chart-empty">Loading anatomical map\u2026</div></div><div class="exercise-map-legend">${legend}</div>`;
     }
 
     function renderDashboard() {
@@ -201,6 +208,17 @@
       document.querySelectorAll('[data-workout-id]').forEach(b=>b.addEventListener('click',()=>{state.workoutDetailReturn='dashboard';showWorkouts();renderCompletedWorkout(workoutState.completed.find(w=>w.id===b.dataset.workoutId));}));
       $('#startSelectedDateWorkout')?.addEventListener('click',()=>{const date=state.selectedDashboardDate;showWorkouts();startBlankWorkout();workoutState.draft.date=date;renderWorkoutScreen();});
     }
+    /* Muscle blindspots: library muscles with zero weighted volume in the
+       period, behind a subtle toggle (Justin 2026-09-10). */
+    function renderBlindspots(volumes){
+      const wrap=$('#blindspotWrap');if(!wrap)return;
+      const allMuscles=[...new Set(exercises.flatMap(ex=>[...(ex.primary||[]),...(ex.secondary||[])].map(m=>String(m).toLowerCase())))].sort();
+      const missing=allMuscles.filter(m=>!volumes[m]);
+      if(!missing.length){wrap.innerHTML='';return;}
+      const open=!!state.showBlindspots;
+      wrap.innerHTML=`<button class="blindspot-toggle" id="blindspotToggle" type="button" aria-expanded="${open}">${open?'Hide':'Show'} blindspots (${missing.length})</button><div class="tag-row blindspot-list"${open?'':' hidden'}>${missing.map(m=>`<span class="tag blindspot-tag">${escapeHtml(titleCase(m))}</span>`).join('')}</div>`;
+      $('#blindspotToggle').addEventListener('click',()=>{state.showBlindspots=!state.showBlindspots;schedulePersist();renderBlindspots(volumes);});
+    }
     function renderStats() {
       const labels={today:'Today',week:'Week',month:'Month',year:'Year',all:'All time'};
       $('#statsPeriodTabs').innerHTML=Object.entries(labels).map(([key,label])=>`<button class="period-tab" type="button" data-stats-period="${key}" aria-pressed="${state.statsPeriod===key}">${label}</button>`).join('');
@@ -208,9 +226,9 @@
       const workouts=workoutsForPeriod(state.statsPeriod), sets=workouts.flatMap(w=>w.exercises.flatMap(e=>e.sets)), volume=sets.reduce((n,set)=>n+setVolume(set),0);
       $('#statsGrid').innerHTML=`<div class="stats-panel"><strong>${workouts.length}</strong><span>Completed workouts</span></div><div class="stats-panel"><strong>${sets.length}</strong><span>Completed sets</span></div><div class="stats-panel"><strong>${Math.round(displayVolume(volume)).toLocaleString()}</strong><span>Total ${weightUnit()} volume</span></div>`;
       const muscles=muscleCounts(workouts), volumes=muscleVolumes(workouts);
-      $('#muscleHeatmapNote').textContent=`${labels[state.statsPeriod]} · weighted volume by primary and secondary muscle`;
       $('#muscleHeatmap').innerHTML=muscleHeatmapMarkup(volumes,false);hydrateBodyMaps();
       $('#muscleStats').innerHTML=Object.keys(muscles).length?`<div class="tag-row">${Object.entries(muscles).sort((a,b)=>b[1]-a[1]).map(([m,n])=>`<span class="tag primary">${escapeHtml(m)} · ${n} sets</span>`).join('')}</div>`:'<p class="section-note">Complete a workout to start building muscle-level stats.</p>';
+      renderBlindspots(volumes);
       renderMuscleAnalysis(workouts,state.statsPeriod);
       const allWorkouts=workoutState.completed,monday=new Date();monday.setHours(12,0,0,0);monday.setDate(monday.getDate()-((monday.getDay()+6)%7));const weeks=Array.from({length:10},(_,i)=>{const d=new Date(monday);d.setDate(monday.getDate()-(7*(9-i)));const next=new Date(d);next.setDate(d.getDate()+7);const startIso=isoForDate(d),endIso=isoForDate(next);const value=allWorkouts.filter(w=>w.date>=startIso&&w.date<endIso).flatMap(w=>w.exercises.flatMap(e=>e.sets)).reduce((n,set)=>n+setVolume(set),0);return{label:new Intl.DateTimeFormat('en-US',{month:'short',day:'numeric'}).format(d),shortLabel:new Intl.DateTimeFormat('en-US',{month:'numeric',day:'numeric'}).format(d),value};});
       $('#volumeChart').innerHTML=allWorkouts.length?lineChart(weeks,value=>`${Math.round(displayVolume(value)).toLocaleString()} ${weightUnit()}`):'<div class="chart-empty">Complete a workout to start the weekly volume chart.</div>';

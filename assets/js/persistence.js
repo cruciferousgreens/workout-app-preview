@@ -17,7 +17,9 @@ function collectPersistable(){
     favorites:[...state.favorites],
     progressionSetup:progressionSetup,
     dashboardPeriod:state.dashboardPeriod,
-    statsPeriod:state.statsPeriod
+    statsPeriod:state.statsPeriod,
+    topExercisesMode:state.topExercisesMode,
+    showBlindspots:state.showBlindspots
   };
 }
 function persistNow(){
@@ -73,6 +75,8 @@ function restorePersisted(){
   }
   if(typeof data.dashboardPeriod==='string')state.dashboardPeriod=data.dashboardPeriod;
   if(typeof data.statsPeriod==='string')state.statsPeriod=data.statsPeriod;
+  if(data.topExercisesMode==='volume'||data.topExercisesMode==='sets')state.topExercisesMode=data.topExercisesMode;
+  if(typeof data.showBlindspots==='boolean')state.showBlindspots=data.showBlindspots;
   mergeCustomExercises();
 }
 function exportWorkoutData(){

@@ -350,6 +350,8 @@
     .section-head { display: flex; align-items: baseline; justify-content: space-between; gap: 16px; margin-bottom: 12px; }
     .section h2 { margin: 0; font-size: 18px; letter-spacing: -.02em; }
     .section-note { margin: 0; color: var(--muted); font-size: 12px; }
+    button.section-note.mode-toggle { background: none; border: 0; padding: 0; font: inherit; color: var(--accent); font-weight: 700; cursor: pointer; }
+    button.section-note.mode-toggle:active { opacity: .6; }
     /* Exercise detail: stack section heads so notes never crowd the title on narrow screens. */
     .detail .section-head { flex-direction: column; align-items: flex-start; gap: 3px; }
     .detail .chart-empty { min-height: 0; padding: 30px 18px; }
@@ -778,11 +780,14 @@
        side by side in one 760x614 viewBox; heat-N classes paint the regions. */
     .anatomy-map svg { display: block; width: 100%; height: auto; }
     .anatomy-map [data-muscle] { stroke: var(--surface); stroke-width: 1; transition: fill .16s ease; }
-    .body-map-credit { margin: 6px 0 0; color: var(--muted); font-size: 10px; }
-    .body-map-credit a { color: var(--muted); }
+    /* (body-map-credit retired 2026-09-10: attribution lives in Settings) */
     /* Per-exercise map on the exercise detail page (Justin 2026-09-10). */
     .exercise-musclemap { margin-top: 18px; }
-    .exercise-map-legend { display: flex; gap: 14px; margin-top: 8px; color: var(--muted); font-size: 11px; font-weight: 700; }
+    .exercise-map-legend { display: flex; flex-wrap: wrap; gap: 6px 14px; margin-top: 8px; color: var(--muted); font-size: 11px; font-weight: 700; }
+    .blindspot-toggle { display: inline-block; margin-top: 10px; background: none; border: 0; padding: 2px 0; color: var(--muted); font-size: 11px; font-weight: 600; cursor: pointer; }
+    .blindspot-toggle:active { opacity: .6; }
+    .blindspot-list { margin-top: 8px; }
+    .tag.blindspot-tag { background: transparent; border: 1px dashed var(--line); color: var(--muted); font-weight: 600; }
     .exercise-map-legend span { display: inline-flex; align-items: center; gap: 6px; }
     .heatmap-list { display: grid; gap: 7px; }
     .heatmap-row { display: grid; grid-template-columns: 10px minmax(0,1fr) auto; gap: 8px; align-items: center; font-size: 12px; }
@@ -1008,8 +1013,6 @@
     .anatomy-map svg { display: block; width: 100%; height: auto; max-height: 360px; }
     .anatomy-map [data-muscle] { stroke: var(--shadow-color); stroke-width: .55; transition: fill .16s ease; }
     .anatomy-labels { display: grid; grid-template-columns: 1fr 1fr; margin-top: 2px; color: var(--muted); font-size: 10px; font-weight: 750; text-align: center; text-transform: uppercase; }
-    .body-map-credit { margin: 8px 0 0; color: var(--muted); font-size: 9px; text-align: center; }
-    .body-map-credit a { text-underline-offset: 2px; }
     .compact-heatmap .anatomy-map { min-height: 120px; }
     .compact-heatmap .anatomy-map svg { max-height: 160px; }
     @container (max-width: 700px) {
