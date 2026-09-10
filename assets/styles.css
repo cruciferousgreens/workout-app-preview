@@ -1464,3 +1464,12 @@
       .program-cover-edit { top: 20px; left: 20px; right: auto; }
     }
   
+    /* ===== Desktop mode (laptop testing, Justin 2026-09-10) =====
+       Purely additive: this block only applies at viewport widths >= 900px, so
+       the phone layout is untouched. Centers the app in a phone-width column and
+       constrains the fixed top bar / bottom nav to that column, making the full
+       app testable with a mouse on a laptop. */
+    @media (min-width: 900px) {
+      .app { width: 100%; max-width: 480px; margin: 0 auto; border-left: 1px solid var(--line); border-right: 1px solid var(--line); }
+      .top-bar, .bottom-nav { left: 50%; right: auto; width: min(480px, 100%); transform: translateX(-50%); }
+    }
