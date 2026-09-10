@@ -460,6 +460,13 @@
     .workout-footer { display: flex; align-items: center; justify-content: space-between; gap: 16px; margin-top: 20px; padding-top: 18px; border-top: 1px solid var(--line); }
     .workout-error { margin: 0; color: var(--danger); font-size: 12px; }
     .picker-search { width: 100%; height: 44px; margin-bottom: 12px; padding: 0 12px; border: 1px solid var(--line); border-radius: var(--radius-sm); outline: none; }
+    /* Picker gets the library's search + filter interface (Justin 2026-09-10):
+       circular icon-only filter button like the Exercises tab. */
+    .picker-controls { display: grid; grid-template-columns: minmax(0,1fr) auto; gap: 8px; margin-bottom: 12px; align-items: center; }
+    .picker-controls .picker-search { margin-bottom: 0; padding-left: 38px; }
+    .picker-filter-button { min-width: 0; width: 44px; height: 44px; padding: 0; border-radius: 50%; }
+    .picker-filter-button span { display: none; }
+    .picker-filter-panel { margin-bottom: 12px; }
     .picker-list { display: grid; gap: 7px; max-height: 48vh; overflow-y: auto; overscroll-behavior: contain; scroll-padding-bottom: calc(82px + env(safe-area-inset-bottom)); }
     #exercisePickerList { padding-bottom: calc(76px + env(safe-area-inset-bottom)); }
     .picker-section-label { margin: 8px 2px 2px; color: var(--muted); font-size: 11px; font-weight: 800; display: flex; align-items: center; gap: 5px; letter-spacing: .08em; }
@@ -785,6 +792,7 @@
     .exercise-musclemap { margin-top: 18px; }
     .exercise-map-legend { display: flex; flex-wrap: wrap; gap: 6px 14px; margin-top: 8px; color: var(--muted); font-size: 11px; font-weight: 700; }
     .blindspot-toggle { display: inline-block; margin-top: 10px; background: none; border: 0; padding: 2px 0; color: var(--muted); font-size: 11px; font-weight: 600; cursor: pointer; }
+    .dash-blindspots:empty { display: none; }
     .blindspot-toggle:active { opacity: .6; }
     .blindspot-list { margin-top: 8px; }
     .tag.blindspot-tag { background: transparent; border: 1px dashed var(--line); color: var(--muted); font-weight: 600; }

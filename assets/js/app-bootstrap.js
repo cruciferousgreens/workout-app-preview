@@ -242,6 +242,7 @@
       $('#exercisePickerTitle').textContent='Add exercise';
       $('#exercisePickerTitle').nextElementSibling.textContent='Choose one or more movements for this workout.';
       $('#exercisePickerSearch').value = '';
+      preparePickerFilters();
       renderExercisePicker();
       $('#exercisePickerDialog').showModal();
       requestAnimationFrame(() => $('#exercisePickerSearch').focus());
@@ -263,6 +264,22 @@
       renderWorkoutExercises(); renderWorkoutProgression(); syncWorkoutFocusPills(); markDraftSaved();
     }));
     $('#exercisePickerSearch').addEventListener('input', renderPickerList);
+    /* Picker filter panel: the Exercises tab's selector interface inside the
+       add-exercise dialog (Justin 2026-09-10). */
+    $('#pickerFilterToggle').addEventListener('click',()=>{
+      const panel=$('#pickerFilterPanel'),open=panel.classList.toggle('open');
+      $('#pickerFilterToggle').setAttribute('aria-expanded',String(open));
+    });
+    $('#pickerMuscleOptions').addEventListener('click',event=>{
+      const b=event.target.closest('[data-picker-muscle]');if(!b)return;
+      const m=b.dataset.pickerMuscle;
+      if(pickerFilters.muscles.has(m))pickerFilters.muscles.delete(m);else pickerFilters.muscles.add(m);
+      renderPickerFilterState();renderPickerList();
+    });
+    $('#pickerFavoritesToggle').addEventListener('click',()=>{pickerFilters.onlyFavorites=!pickerFilters.onlyFavorites;renderPickerFilterState();renderPickerList();});
+    $('#pickerCustomToggle').addEventListener('click',()=>{pickerFilters.onlyCustom=!pickerFilters.onlyCustom;renderPickerFilterState();renderPickerList();});
+    $('#pickerEquipmentFilter').addEventListener('change',event=>{pickerFilters.equipment=event.target.value;renderPickerList();});
+    $('#pickerClearMuscles').addEventListener('click',()=>{pickerFilters.muscles.clear();renderPickerFilterState();renderPickerList();});
     $('#workoutName').addEventListener('input', event => { if (workoutState.draft) { workoutState.draft.name = event.target.value; markDraftSaved(); } });
     /* The native date input sits invisibly over the pretty date display, so
        tapping it opens the OS date picker directly (showPicker on a hidden

@@ -197,11 +197,18 @@
       $('#openDashboardProgram').addEventListener('click',()=>showProgram());
       const periodLabels={today:'Today',week:'Week',month:'Month',year:'Year',all:'All time'};
       $('#dashPeriodTabs').innerHTML=Object.entries(periodLabels).map(([key,label])=>`<button class="period-tab" type="button" data-dash-period="${key}" aria-pressed="${state.dashboardPeriod===key}">${label}</button>`).join('');
-      document.querySelectorAll('[data-dash-period]').forEach(button=>button.addEventListener('click',()=>{state.dashboardPeriod=button.dataset.dashPeriod;schedulePersist();renderDashboard();}));
+      document.querySelectorAll('[data-dash-period]').forEach(button=>button.addEventListener('click',()=>{
+        if(state.dashboardPeriod===button.dataset.dashPeriod)return;
+        state.dashboardPeriod=button.dataset.dashPeriod;schedulePersist();renderDashboard();
+        /* The re-render destroys the tapped button; refocus its replacement so iOS
+           Safari doesn't drop focus to <body> and scroll to the top (Justin 2026-09-10). */
+        document.querySelector('[data-dash-period="'+state.dashboardPeriod+'"]')?.focus({preventScroll:true});
+      }));
       const periodWorkouts=workoutsForPeriod(state.dashboardPeriod), periodSets=periodWorkouts.flatMap(w=>w.exercises.flatMap(e=>e.sets)), volume=periodSets.reduce((n,set)=>n+setVolume(set),0);
       $('#dashboardStats').innerHTML=`<div class="stats-panel"><strong>${periodWorkouts.length}</strong><span>Completed workouts</span></div><div class="stats-panel"><strong>${periodSets.length}</strong><span>Completed sets</span></div><div class="stats-panel"><strong>${Math.round(displayVolume(volume)).toLocaleString()}</strong><span>Total ${weightUnit()} volume</span></div>`;
       const muscles=muscleCounts(periodWorkouts),volumes=muscleVolumes(periodWorkouts);$('#dashboardMuscles').innerHTML=Object.keys(muscles).length?Object.entries(muscles).sort((a,b)=>b[1]-a[1]).slice(0,6).map(([m,n])=>`<span class="tag primary">${escapeHtml(m)} · ${n}</span>`).join(''):'<span class="section-note">No muscles logged in this period.</span>';
       $('#dashboardHeatmap').innerHTML=muscleHeatmapMarkup(volumes,true);hydrateBodyMaps();
+      renderBlindspots(volumes,'#dashBlindspots');
       const selDate=state.selectedDashboardDate, todayIso=localIsoDate();
       const emptyDateCopy=selDate>todayIso?'<p>Nothing logged for this date.</p>':selDate===todayIso?'<p>No workout logged yet today. <button class="filter-clear" id="startSelectedDateWorkout" type="button">Start workout</button></p>':'<p>No workout logged for this date. <button class="filter-clear" id="startSelectedDateWorkout" type="button">Log a workout</button></p>';
       $('#dashboardRecent').innerHTML=selectedWorkouts.length?selectedWorkouts.map(w=>{const setCount=w.exercises.flatMap(e=>e.sets).length;const detail=state.selectedDashboardDate?`${w.exercises.length} exercise${w.exercises.length===1?'':'s'} · ${setCount} set${setCount===1?'':'s'}`:formatLogDate(w.date);return `<button class="recent-workout" type="button" data-workout-id="${escapeHtml(w.id)}"><span><strong>${escapeHtml(w.name)}${isSampleWorkout(w)?'<span class="sample-label">Sample</span>':''}</strong><small>${escapeHtml(detail)}</small></span><span aria-hidden="true">›</span></button>`;}).join(''):state.selectedDashboardDate?emptyDateCopy:'<p>No completed workouts yet. Your first session will appear here.</p>';
@@ -209,20 +216,30 @@
       $('#startSelectedDateWorkout')?.addEventListener('click',()=>{const date=state.selectedDashboardDate;showWorkouts();startBlankWorkout();workoutState.draft.date=date;renderWorkoutScreen();});
     }
     /* Muscle blindspots: library muscles with zero weighted volume in the
-       period, behind a subtle toggle (Justin 2026-09-10). */
-    function renderBlindspots(volumes){
-      const wrap=$('#blindspotWrap');if(!wrap)return;
+       period, behind a subtle toggle (Justin 2026-09-10). Shared by the Stats
+       muscle map and the Home At-a-glance card. */
+    function renderBlindspots(volumes,wrapSelector){
+      const wrap=$(wrapSelector||'#blindspotWrap');if(!wrap)return;
       const allMuscles=[...new Set(exercises.flatMap(ex=>[...(ex.primary||[]),...(ex.secondary||[])].map(m=>String(m).toLowerCase())))].sort();
       const missing=allMuscles.filter(m=>!volumes[m]);
       if(!missing.length){wrap.innerHTML='';return;}
       const open=!!state.showBlindspots;
-      wrap.innerHTML=`<button class="blindspot-toggle" id="blindspotToggle" type="button" aria-expanded="${open}">${open?'Hide':'Show'} blindspots (${missing.length})</button><div class="tag-row blindspot-list"${open?'':' hidden'}>${missing.map(m=>`<span class="tag blindspot-tag">${escapeHtml(titleCase(m))}</span>`).join('')}</div>`;
-      $('#blindspotToggle').addEventListener('click',()=>{state.showBlindspots=!state.showBlindspots;schedulePersist();renderBlindspots(volumes);});
+      wrap.innerHTML=`<button class="blindspot-toggle" type="button" aria-expanded="${open}">${open?'Hide':'Show'} blindspots (${missing.length})</button><div class="tag-row blindspot-list"${open?'':' hidden'}>${missing.map(m=>`<span class="tag blindspot-tag">${escapeHtml(titleCase(m))}</span>`).join('')}</div>`;
+      wrap.querySelector('.blindspot-toggle').addEventListener('click',()=>{
+        state.showBlindspots=!state.showBlindspots;schedulePersist();renderBlindspots(volumes,wrapSelector);
+        /* Keep focus on the rebuilt toggle so iOS Safari doesn't scroll to top. */
+        wrap.querySelector('.blindspot-toggle')?.focus({preventScroll:true});
+      });
     }
     function renderStats() {
       const labels={today:'Today',week:'Week',month:'Month',year:'Year',all:'All time'};
       $('#statsPeriodTabs').innerHTML=Object.entries(labels).map(([key,label])=>`<button class="period-tab" type="button" data-stats-period="${key}" aria-pressed="${state.statsPeriod===key}">${label}</button>`).join('');
-      document.querySelectorAll('[data-stats-period]').forEach(button=>button.addEventListener('click',()=>{state.statsPeriod=button.dataset.statsPeriod;schedulePersist();renderStats();}));
+      document.querySelectorAll('[data-stats-period]').forEach(button=>button.addEventListener('click',()=>{
+        if(state.statsPeriod===button.dataset.statsPeriod)return;
+        state.statsPeriod=button.dataset.statsPeriod;schedulePersist();renderStats();
+        /* Same focus-drop scroll-to-top guard as the dashboard tabs (Justin 2026-09-10). */
+        document.querySelector('[data-stats-period="'+state.statsPeriod+'"]')?.focus({preventScroll:true});
+      }));
       const workouts=workoutsForPeriod(state.statsPeriod), sets=workouts.flatMap(w=>w.exercises.flatMap(e=>e.sets)), volume=sets.reduce((n,set)=>n+setVolume(set),0);
       $('#statsGrid').innerHTML=`<div class="stats-panel"><strong>${workouts.length}</strong><span>Completed workouts</span></div><div class="stats-panel"><strong>${sets.length}</strong><span>Completed sets</span></div><div class="stats-panel"><strong>${Math.round(displayVolume(volume)).toLocaleString()}</strong><span>Total ${weightUnit()} volume</span></div>`;
       const muscles=muscleCounts(workouts), volumes=muscleVolumes(workouts);
