@@ -1,4 +1,5 @@
 
+/* ===== module: dashboard-stats.js ===== */
     /** Produces dashboard calendars, charts, and muscle-volume analysis from completed workouts. */
     function isoForDate(date) { return new Date(date.getTime()-date.getTimezoneOffset()*60000).toISOString().slice(0,10); }
     function workoutsForPeriod(period) {

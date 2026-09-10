@@ -1,4 +1,5 @@
 
+/* ===== module: set-tags.js ===== */
     /** Handles set annotations and exercise-level tags used by templates, live logging, and history. */
     function exerciseTagTargetItem() {
       const target=workoutState.exerciseTagTarget;

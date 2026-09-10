@@ -1,4 +1,5 @@
 
+/* ===== module: exercise-detail.js ===== */
     /** Calculates exercise PRs, history, similarity, and detail-view presentation. */
     function estimate1RM(set) {
       // Use the logged load as-is; dumbbell entries are the combined total, not a per-hand value.

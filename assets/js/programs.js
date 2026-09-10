@@ -1,4 +1,5 @@
 
+/* ===== module: programs.js ===== */
     /** Manages reusable workouts, active programs, built-in templates, and archived program history. */
     const REP_PRESETS={strength:{label:'Strength',min:1,max:5},hypertrophy:{label:'Hypertrophy',min:6,max:12},endurance:{label:'Endurance',min:12,max:20},open:{label:'15+',min:15,max:20,openTop:true},amrap:{label:'AMRAP',min:1,max:1,amrap:true}};
     function applyRepPreset(key,target=progressionSetup){const preset=REP_PRESETS[key]||REP_PRESETS.hypertrophy;target.defaultRange={preset:key,min:preset.min,max:preset.max,openTop:!!preset.openTop,amrap:!!preset.amrap};if(target===progressionSetup){$('#programRepMin').value=preset.min;$('#programRepMax').value=preset.max;document.querySelectorAll('[data-rep-preset]').forEach(button=>button.setAttribute('aria-pressed',String(button.dataset.repPreset===key)));}}

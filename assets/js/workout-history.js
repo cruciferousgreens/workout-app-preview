@@ -1,4 +1,5 @@
 
+/* ===== module: workout-history.js ===== */
     /** Finalizes editable workout records and renders detailed set-by-set history. */
     function finishWorkout() {
       const draft = workoutState.draft;

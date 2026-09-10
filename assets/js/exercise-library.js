@@ -1,4 +1,5 @@
 
+/* ===== module: exercise-library.js ===== */
     /** Renders searchable exercise cards and the multi-muscle AND filter. */
     function populateFilters() {
       const muscles = [...new Set(exercises.flatMap(x => [...x.primary, ...x.secondary]))].sort();

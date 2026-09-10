@@ -1,4 +1,5 @@
 
+/* ===== module: utilities.js ===== */
     /** Shared DOM, formatting, ID, and date helpers used by the feature modules below. */
     const $ = (s) => document.querySelector(s);
     const normalize = (s) => (s || '').toLowerCase().replace(/[^a-z0-9]/g, '');

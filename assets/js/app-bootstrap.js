@@ -1,4 +1,5 @@
 
+/* ===== module: app-bootstrap.js ===== */
     /** Connects static controls to feature modules and performs initial rendering. */
     let deleteArmed=false;
     /** Light unit suffix inside the increment value field; follows the type (Justin 2026-09-10). */

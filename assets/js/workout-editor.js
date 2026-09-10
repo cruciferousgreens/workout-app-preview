@@ -1,4 +1,5 @@
 
+/* ===== module: workout-editor.js ===== */
     /** Manages the live workout draft, set completion, exercise notes, and mobile interactions. */
     function newSet() { return {uid:uid('set'), w:'', r:'', seconds:'', rpe:'', tags:[], complete:false}; }
     function exerciseTracking(item, ex) { return item?.tracking || item?.progression?.mode || ex?.tracking || (ex?.force === 'static' ? 'time' : 'reps'); }

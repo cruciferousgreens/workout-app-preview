@@ -1,4 +1,5 @@
 
+/* ===== module: progression.js ===== */
     /** Computes RPE-gated rep, time, and load suggestions from real completed history. */
     function topSetForSession(session) {
       if (!session?.sets?.length) return null;
