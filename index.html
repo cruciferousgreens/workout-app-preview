@@ -36,8 +36,8 @@
           <div><strong id="calendarWeekLabel"></strong><span>Swipe or use arrows to browse</span></div>
           <button class="calendar-page" id="nextWeek" type="button" aria-label="Next week">›</button>
         </div>
-        <div class="week-strip" id="weekStrip" aria-label="One-week training calendar."></div>
         <p class="calendar-summary" id="calendarSummary">This week.</p>
+        <div class="week-strip" id="weekStrip" aria-label="One-week training calendar."></div>
         <div class="dashboard-grid">
           <section class="dashboard-card" aria-labelledby="dashProgramTitle"><h2 id="dashProgramTitle">Active program</h2><div id="dashboardProgram"></div></section>
           <section class="dashboard-card" aria-labelledby="dashStatsTitle">
@@ -68,6 +68,7 @@
             <div class="filter-label-row"><span class="filter-label" id="showFilterLabel">SHOW</span></div>
             <div class="muscle-options" role="group" aria-labelledby="showFilterLabel">
               <button class="muscle-option" id="favoritesToggle" type="button" aria-pressed="false">★ Favorites</button>
+              <button class="muscle-option" id="customToggle" type="button" aria-pressed="false">Custom</button>
             </div>
           </div>
           <div class="filter-group">
@@ -105,13 +106,13 @@
           <div class="progression-banner" id="workoutProgression" hidden></div>
           <div class="workout-meta">
             <div class="field"><label for="workoutName">WORKOUT NAME</label><input id="workoutName" type="text" value="" placeholder="Workout" autocomplete="off" aria-label="Workout name" /></div>
+            <details class="workout-focus" id="workoutFocus">
+              <summary>Workout focus</summary>
+              <div class="rep-preset-row"><button class="rep-preset" type="button" data-workout-focus="strength">Strength · 1–5</button><button class="rep-preset" type="button" data-workout-focus="hypertrophy">Hypertrophy · 6–12</button><button class="rep-preset" type="button" data-workout-focus="endurance">Endurance · 12–20</button><button class="rep-preset" type="button" data-workout-focus="open">15+</button><button class="rep-preset" type="button" data-workout-focus="amrap">AMRAP</button></div>
+              <p class="field-help">Applies the rep range to every reps-tracked exercise in this workout.</p>
+            </details>
             <div class="field date-field"><label id="workoutDateLabel" for="workoutDate">DATE</label><span class="date-display" id="workoutDateDisplay" aria-hidden="true">Thu, Sep 10, 2026</span><input id="workoutDate" type="date" class="date-input-overlay" aria-label="Workout date" /></div>
           </div>
-          <details class="workout-focus" id="workoutFocus">
-            <summary>Workout focus</summary>
-            <div class="rep-preset-row"><button class="rep-preset" type="button" data-workout-focus="strength">Strength · 1–5</button><button class="rep-preset" type="button" data-workout-focus="hypertrophy">Hypertrophy · 6–12</button><button class="rep-preset" type="button" data-workout-focus="endurance">Endurance · 12–20</button><button class="rep-preset" type="button" data-workout-focus="open">15+</button><button class="rep-preset" type="button" data-workout-focus="amrap">AMRAP</button></div>
-            <p class="field-help">Applies the rep range to every reps-tracked exercise in this workout.</p>
-          </details>
           <div class="workout-toolbar">
             <h2>Exercises</h2>
             <button class="exercise-info-button plain-glyph" id="addWorkoutExercise" type="button" aria-label="Add exercises">+</button>
@@ -218,7 +219,7 @@
               </div>
             </div>
             <div class="settings-subsection">
-              <span class="settings-subhead">Time step · timed exercises</span>
+              <span class="settings-subhead">Time step</span>
               <div class="step-pills" id="settingsTimeStepPills" role="group" aria-label="Time step in seconds"></div>
             </div>
           </div>

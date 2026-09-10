@@ -20,12 +20,20 @@
         renderMuscleSelection();
         renderLibrary();
       });
+      /* Custom-exercise filter sits beside ★ Favorites (Justin 2026-09-10). */
+      $('#customToggle')?.addEventListener('click', () => {
+        state.onlyCustom = !state.onlyCustom;
+        renderMuscleSelection();
+        renderLibrary();
+      });
     }
 
     function renderMuscleSelection() {
       document.querySelectorAll('.muscle-option').forEach(button => button.setAttribute('aria-pressed', state.muscles.has(button.dataset.muscle)));
       const favToggle = $('#favoritesToggle');
       if (favToggle) favToggle.setAttribute('aria-pressed', String(state.onlyFavorites));
+      const customToggle = $('#customToggle');
+      if (customToggle) customToggle.setAttribute('aria-pressed', String(state.onlyCustom));
       $('#clearMuscles').hidden = state.muscles.size === 0;
     }
 
@@ -35,7 +43,8 @@
         const allMuscles = [...x.primary, ...x.secondary];
         const muscleMatch = !state.muscles.size || [...state.muscles].every(muscle => allMuscles.includes(muscle));
         const favMatch = !state.onlyFavorites || state.favorites.has(x.id);
-        return muscleMatch && favMatch && (!state.equipment || x.equipment === state.equipment);
+        const customMatch = !state.onlyCustom || x.custom;
+        return muscleMatch && favMatch && customMatch && (!state.equipment || x.equipment === state.equipment);
       });
     }
 
