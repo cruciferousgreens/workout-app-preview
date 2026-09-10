@@ -41,7 +41,8 @@
         <div class="dashboard-grid">
           <section class="dashboard-card" aria-labelledby="dashProgramTitle"><h2 id="dashProgramTitle">Active program</h2><div id="dashboardProgram"></div></section>
           <section class="dashboard-card" aria-labelledby="dashStatsTitle">
-            <div class="dashboard-card-head"><h2 id="dashStatsTitle">At a glance</h2><div class="period-wrap"><button class="period-trigger" id="periodTrigger" type="button" aria-expanded="false" aria-haspopup="menu"><span id="periodLabel">This week</span> ⌄</button><div class="period-menu" id="periodMenu" role="menu" hidden></div></div></div>
+            <div class="dashboard-card-head"><h2 id="dashStatsTitle">At a glance</h2></div>
+            <div class="period-tabs dash-period-tabs" id="dashPeriodTabs" role="group" aria-label="At a glance period"></div>
             <div class="mini-stats" id="dashboardStats"></div><div class="muscle-summary" id="dashboardMuscles"></div><div class="compact-heatmap" id="dashboardHeatmap"></div>
           </section>
           <section class="dashboard-card wide" aria-labelledby="dashRecentTitle"><h2 id="dashRecentTitle">Recent workouts</h2><div class="recent-workouts" id="dashboardRecent"></div></section>
@@ -49,12 +50,6 @@
       </section>
 
       <section id="libraryView" class="library hidden" aria-label="Exercises">
-        <div class="topline actions-only">
-          <div class="top-actions">
-            <button class="add-exercise" id="addExerciseButton" type="button">+ Custom exercise</button>
-          </div>
-        </div>
-
         <div class="controls">
           <div class="search-wrap">
             <svg class="search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="11" cy="11" r="7"></circle><path d="m20 20-3.5-3.5"></path></svg>
@@ -70,7 +65,7 @@
 
         <div class="filter-panel" id="filterPanel">
           <div class="filter-group">
-            <div class="filter-label-row"><span class="filter-label" id="muscleFilterLabel">MUSCLES · MATCH ALL</span><button class="filter-clear" id="clearMuscles" type="button" hidden>Clear</button></div>
+            <div class="filter-label-row"><span class="filter-label" id="muscleFilterLabel">MUSCLES</span><button class="filter-clear" id="clearMuscles" type="button" hidden>Clear</button></div>
             <div class="muscle-options" id="muscleOptions" role="group" aria-labelledby="muscleFilterLabel"></div>
           </div>
           <div class="filter-group"><label for="equipmentFilter">EQUIPMENT</label><select id="equipmentFilter"><option value="">All equipment</option></select></div>
@@ -78,6 +73,7 @@
 
         <div class="summary-row"><p class="result-count" id="resultCount"></p></div>
         <div id="exerciseResults"></div>
+        <div class="library-foot"><button class="add-exercise" id="addExerciseButton" type="button">+ Custom exercise</button></div>
       </section>
 
       <section id="workoutView" class="workout-view" aria-label="Workout">

@@ -29,12 +29,21 @@
       // Basing the suggestion on the latest log regardless of zone produced invented
       // loads (e.g. a Friday 4s e1RM interpolated into a Monday 8s target); the
       // program's own zone history is the honest basis. Falls back to the latest log.
-      const zoneLog=logs.find(log=>{
+      // Zone is matched first by the stored progression profile, then by the actual
+      // logged top-set reps/seconds, because older logs (e.g. blank-logged sessions)
+      // may carry no stored profile at all.
+      const inStoredZone=log=>{
         const p=log.progression; if(!p)return false;
         if((p.mode||'reps')!==targetMode)return false;
         if(targetMode==='time')return Number(p.timeMin)===timeMin&&Number(p.timeMax)===timeMax;
         return Number(p.min)===min&&Number(p.max)===max&&!!p.amrap===!!profile?.amrap&&!!p.openTop===!!profile?.openTop;
-      });
+      };
+      const inLoggedZone=log=>{
+        const top=topSetForSession(log); if(!top)return false;
+        if(targetMode==='time')return top.mode==='time'&&top.seconds>=timeMin&&top.seconds<=timeMax;
+        return top.mode==='reps'&&top.reps>=min&&(profile?.openTop||profile?.amrap||top.reps<=max);
+      };
+      const zoneLog=logs.find(inStoredZone)||logs.find(inLoggedZone);
       const latestLog=zoneLog||logs[0],latest=topSetForSession(latestLog); if(!latest)return null;
       const mode=profile?.mode || latest.mode || 'reps';
       const incrementType=profile?.incrementType || programConfig.incrementType || 'lb';

@@ -3,21 +3,31 @@
     const $ = (s) => document.querySelector(s);
     const normalize = (s) => (s || '').toLowerCase().replace(/[^a-z0-9]/g, '');
     const tokenize = (s) => (s || '').toLowerCase().replace(/[^a-z0-9]+/g,' ').trim().split(/\s+/).filter(Boolean);
+    /* Query synonyms as alternative phrases: an exact-key query scores each phrase
+       separately and takes the best, so "ohp" ranks "Barbell Shoulder Press"
+       (via "shoulder press") above names that merely stack more synonym words. */
     const searchSynonyms = {
-      'knee extension':'leg extension', 'knee extensions':'leg extension', 'quad extension':'leg extension',
-      'smith bench':'smith machine bench press', 'smith press':'smith machine bench press',
-      'ohp':'overhead press military press shoulder press', 'overhead press':'shoulder press overhead press military press', 'rdl':'romanian deadlift', 'lat pull down':'lat pulldown',
-      'pull up':'pullup chinup', 'rear delt':'reverse fly posterior deltoid', 'calf raise':'calf raises'
+      'knee extension':['leg extension'], 'knee extensions':['leg extension'], 'quad extension':['leg extension'],
+      'smith bench':['smith machine bench press'], 'smith press':['smith machine bench press'],
+      'ohp':['overhead press','military press','shoulder press'], 'overhead press':['overhead press','military press','shoulder press'],
+      'rdl':['romanian deadlift'], 'lat pull down':['lat pulldown'],
+      'pull up':['pullup','chinup'], 'rear delt':['reverse fly','posterior deltoid'], 'calf raise':['calf raise']
     };
     function levenshtein(a,b){const m=a.length,n=b.length,row=Array.from({length:n+1},(_,i)=>i);for(let i=1;i<=m;i+=1){let prev=row[0];row[0]=i;for(let j=1;j<=n;j+=1){const old=row[j];row[j]=Math.min(row[j]+1,row[j-1]+1,prev+(a[i-1]===b[j-1]?0:1));prev=old;}}return row[n];}
-    function exerciseSearchScore(ex,query){
-      const raw=(query||'').toLowerCase().trim(); if(!raw)return 1;
-      const alias=Object.entries(searchSynonyms).map(([key,value])=>({key,value,distance:levenshtein(raw,key)})).sort((a,b)=>a.distance-b.distance)[0];
-      const expanded=searchSynonyms[raw]||(alias&&alias.distance<=Math.max(1,Math.floor(raw.length*.18))?alias.value:raw), qTokens=tokenize(expanded), name=ex.name.toLowerCase(), haystack=[ex.name,ex.id,...ex.primary,...ex.secondary,ex.equipment].join(' ').toLowerCase();
-      if(name===expanded)return 100;if(name.includes(expanded)||haystack.includes(expanded))return 80;
+    function phraseScore(ex,phrase){
+      const qTokens=tokenize(phrase), name=ex.name.toLowerCase(), haystack=[ex.name,ex.id,...ex.primary,...ex.secondary,ex.equipment].join(' ').toLowerCase();
+      if(name===phrase)return 100;if(name.includes(phrase)||haystack.includes(phrase))return 80;
       const words=tokenize(haystack); let score=0;
       qTokens.forEach(token=>{if(words.includes(token))score+=15;else if(words.some(word=>word.includes(token)||token.includes(word)))score+=9;else{const best=Math.min(...words.map(word=>levenshtein(token,word)));if(best<=Math.max(1,Math.floor(token.length*.34)))score+=5;}});
       return score;
+    }
+    function exerciseSearchScore(ex,query){
+      const raw=(query||'').toLowerCase().trim(); if(!raw)return 1;
+      const keys=Object.keys(searchSynonyms);
+      if(searchSynonyms[raw])return Math.max(...searchSynonyms[raw].map(phrase=>phraseScore(ex,phrase)));
+      const alias=keys.map(key=>({key,distance:levenshtein(raw,key)})).sort((a,b)=>a.distance-b.distance)[0];
+      if(alias&&alias.distance<=Math.max(1,Math.floor(raw.length*.18)))return Math.max(...searchSynonyms[alias.key].map(phrase=>phraseScore(ex,phrase)));
+      return phraseScore(ex,raw);
     }
     function rankedExerciseMatches(query,limit=80){
       if(!query)return exercises.slice(0,limit);

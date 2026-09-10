@@ -129,6 +129,8 @@
     .muscle-option[aria-pressed="true"] { border-color: var(--accent); background: var(--accent-soft); color: var(--accent-ink); font-weight: 700; }
     select { width: 100%; min-height: 42px; margin-top: 8px; padding: 0 12px; border: 1px solid var(--line); border-radius: var(--radius-sm); background: var(--surface); color: var(--ink); font: inherit; }
     .summary-row { display: flex; align-items: center; justify-content: space-between; gap: 16px; margin: 18px 2px 12px; }
+    .library-foot { margin: 20px 0 8px; }
+    .library-foot .add-exercise { width: 100%; min-height: 48px; border-radius: var(--radius-md); font-size: 15px; }
     .library-section + .library-section { margin-top: 28px; }
     .library-heading { margin: 0 2px 10px; font-size: 15px; letter-spacing: -.01em; }
     .result-count { margin: 0; font-size: 13px; color: var(--muted); }
@@ -325,8 +327,8 @@
     .completed-exercises { margin: 22px 0; padding: 0; list-style: none; border-top: 1px solid var(--line); }
     .completed-exercises li { display: flex; justify-content: space-between; gap: 12px; padding: 12px 0; border-bottom: 1px solid var(--line); font-size: 13px; }
     .completed-exercises span { color: var(--muted); }
-    .program-setup { max-width: 700px; padding: clamp(22px, 5vw, 42px); border: 1px solid var(--line); border-radius: var(--radius-lg); background: var(--surface); }
-    .program-setup h2, .program-cover-head h2 { margin-bottom: 8px; font: 400 clamp(28px, 5vw, 44px)/1.04 var(--font-display); letter-spacing: -.035em; }
+    .program-setup { max-width: 700px; padding: clamp(28px, 7vw, 44px) clamp(22px, 5vw, 42px) clamp(22px, 5vw, 42px); border: 1px solid var(--line); border-radius: var(--radius-lg); background: var(--surface); }
+    .program-setup h2, .program-cover-head h2 { margin-bottom: 10px; font: 400 clamp(28px, 5vw, 44px)/1.04 var(--font-display); letter-spacing: -.035em; }
     .program-setup > p { color: var(--muted); line-height: 1.5; }
     .program-form { display: grid; grid-template-columns: minmax(0,1fr) 150px; gap: 14px; margin-top: 22px; }
     .program-form .wide { grid-column: 1 / -1; }
@@ -364,8 +366,8 @@
     /* The top bar owns back/title on the exercise detail; hide the in-screen duplicates. */
     .has-top-bar #backButton { display: none; }
     .has-top-bar .detail .detail-title { display: none; }
-    .nav-item { min-height: 50px; border: 0; border-radius: 12px; background: transparent; color: var(--muted); display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 1px; cursor: pointer; font-size: 11px; font-weight: 700; line-height: 1.25; }
-    .nav-item.active { background: transparent; color: var(--accent-ink); font-weight: 800; }
+    .nav-item { min-height: 50px; border: 0; border-radius: 12px; background: transparent; color: var(--muted); display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 1px; cursor: pointer; font-size: 11px; font-weight: 800; line-height: 1.25; }
+    .nav-item.active { background: transparent; color: var(--accent-ink); font-weight: 900; }
     .nav-item.has-live-draft { position: relative; }
     .nav-item.has-live-draft:not(.active) { color: var(--accent-ink); }
     .nav-item.has-live-draft::after { content: ''; position: absolute; top: 6px; left: 50%; margin-left: 12px; width: 9px; height: 9px; border-radius: 50%; background: var(--rose); box-shadow: 0 0 0 2px var(--surface-raised); pointer-events: none; }
@@ -547,6 +549,10 @@
     .period-menu { position: absolute; top: calc(100% + 6px); right: 0; z-index: 8; width: 126px; padding: 5px; border: 1px solid var(--line); border-radius: 11px; background: var(--surface); box-shadow: var(--shadow); }
     .period-option { width: 100%; min-height: 36px; padding: 0 9px; border: 0; border-radius: 7px; background: transparent; text-align: left; cursor: pointer; font-size: 12px; }
     .period-option:hover, .period-option[aria-checked="true"] { background: var(--accent-soft); color: var(--accent); }
+    .dash-period-tabs { margin: 0 0 14px; }
+    #dashboardStats .stats-panel { padding: 14px 10px; }
+    #dashboardStats .stats-panel strong { font-size: 24px; }
+    #dashboardStats .stats-panel span { font-size: 11px; }
     .muscle-summary { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 12px; }
     .calendar-summary { min-height: 19px; margin: -12px 2px 18px; color: var(--muted); font-size: 12px; }
     .chart-card { margin-top: 12px; }
@@ -674,9 +680,14 @@
     .step-pills [data-step] { min-height: 36px; padding: 6px 14px; border: 1px solid var(--line); border-radius: 999px; background: var(--surface); color: var(--ink); font-size: 12px; font-weight: 700; cursor: pointer; }
     .step-pills [data-step][aria-pressed="true"] { border-color: var(--accent); background: var(--accent-soft); color: var(--accent); }
     .step-pills .step-custom { width: 88px; flex: 0 0 auto; height: 36px; }
-    .filter-group { position: relative; margin-top: 12px; }
+    .filter-group { position: relative; margin-top: 0; }
     .filter-group > label { position: absolute; top: -7px; left: 10px; z-index: 1; padding: 0 6px; background: var(--notch-bg, var(--bg)); }
     .filter-group > label + select { margin-top: 0; }
+    /* Equipment dropdown: custom chevron, notch-consistent field styling. */
+    .filter-group select { appearance: none; -webkit-appearance: none; min-height: 46px; padding-right: 36px; border-radius: var(--radius-md);
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 24 24' fill='none' stroke='%238e8e99' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");
+      background-repeat: no-repeat; background-position: right 13px center; }
+    .filter-panel { --notch-bg: var(--surface); }
     /* Surfaces the notched fields sit on: match the cutout behind each label. */
     .program-setup, .dashboard-card, .custom-dialog { --notch-bg: var(--surface); }
     .progression-setup { --notch-bg: var(--surface-raised); }
@@ -1088,7 +1099,7 @@
       background: var(--surface-raised);
     }
     .nav-item { border-radius: 18px; color: var(--muted); }
-    .nav-item.active { background: transparent; color: var(--accent-ink); font-weight: 700; }
+    .nav-item.active { background: transparent; color: var(--accent-ink); font-weight: 900; }
     .day-chip { border-color: var(--line); border-radius: var(--radius-md); background: var(--surface-raised); }
     .day-chip.today, .day-chip.selected { border-color: var(--rose); background: var(--rose-soft); }
     .day-chip.has-workout strong::after { background: var(--accent); }

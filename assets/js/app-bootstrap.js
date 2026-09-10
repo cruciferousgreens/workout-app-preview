@@ -116,19 +116,19 @@
     $('#closeReplaceDraft').addEventListener('click',()=>{pendingRepeatWorkout=null;$('#replaceDraftDialog').close();});
     $('#keepCurrentDraft').addEventListener('click',()=>{pendingRepeatWorkout=null;$('#replaceDraftDialog').close();});
     $('#confirmReplaceDraft').addEventListener('click',()=>{const workout=pendingRepeatWorkout;pendingRepeatWorkout=null;$('#replaceDraftDialog').close();if(workout)repeatWorkout(workout,true);});
-    $('#dashboardNav').addEventListener('click', () => showDashboard());
+    $('#dashboardNav').addEventListener('click', () => goTab(showDashboard, 'dashboard'));
     $('#workoutsNav').addEventListener('click', () => {
       // Re-tapping the active Workout tab pops a completed-workout review back to the
       // start screen; otherwise it just scrolls to top. A live draft is never disturbed.
       if (state.activeView === 'workout' && !workoutState.draft && !$('#workoutComplete').hidden) {
         $('#workoutComplete').hidden = true; renderWorkoutScreen(); window.scrollTo({top:0}); return;
       }
-      if (state.activeView === 'workout') { window.scrollTo({top:0, behavior:'smooth'}); return; }
-      showWorkouts();
+      if (state.activeView === 'workout') { state.scroll.workout = 0; window.scrollTo({top:0}); return; }
+      goTab(showWorkouts, 'workout');
     });
-    $('#programNav').addEventListener('click', () => showProgram());
-    $('#statsNav').addEventListener('click', () => showStats());
-    $('#topBarSettings').addEventListener('click', () => showSettings());
+    $('#programNav').addEventListener('click', () => goTab(showProgram, 'program'));
+    $('#statsNav').addEventListener('click', () => goTab(showStats, 'stats'));
+    $('#topBarSettings').addEventListener('click', () => goTab(showSettings, 'settings'));
     $('#topBarBack').addEventListener('click', () => {
       if (state.activeView === 'detail') backFromExerciseDetail();
       else history.back();
@@ -197,7 +197,7 @@
     $('#clearMuscles').addEventListener('click', () => { state.muscles.clear(); renderMuscleSelection(); renderLibrary(); });
     $('#equipmentFilter').addEventListener('change', e => { state.equipment = e.target.value; renderLibrary(); });
     $('#backButton').addEventListener('click', () => backFromExerciseDetail());
-    $('#libraryNav').addEventListener('click', () => showLibrary());
+    $('#libraryNav').addEventListener('click', () => goTab(showLibrary, 'library'));
     window.addEventListener('popstate', e => {
       const hash = decodeURIComponent(location.hash.slice(1)); const id = e.state?.exercise || hash;
       if (hash === 'dashboard' || e.state?.view === 'dashboard' || !hash) showDashboard(false);

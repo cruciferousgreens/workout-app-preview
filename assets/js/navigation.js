@@ -45,6 +45,10 @@
       $('#settingsView').classList.add('active'); setActiveNav('settings'); renderSettings(); restoreScroll('settings');
       if (push) history.pushState({view:'settings'}, '', '#settings');
     }
+    /** Bottom-tab taps always land at the top of the destination page. In-flow
+     *  back/forward (popstate) keeps per-view scroll restoration; only explicit
+     *  tab taps reset. Tapping the already-active tab also returns to top. */
+    function goTab(show, view) { show(); state.scroll[view] = 0; window.scrollTo({top:0, behavior:'auto'}); }
     /** Tints the Workout tab and adds a dot badge while a draft is live. Called on every
      *  render of the workout screen, after finish/discard, and once at boot (restored drafts). */
     function updateLiveWorkoutIndicator() {
