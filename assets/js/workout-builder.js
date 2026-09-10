@@ -30,8 +30,8 @@
         const profile=item.progression||{mode:item.tracking||ex?.tracking||'reps',min:range.min,max:range.max,openTop:!!range.openTop,amrap:!!range.amrap,timeMin:30,timeMax:60,timeStep:defaults.timeStep||5,incrementType:defaults.incrementType,incrementValue:defaults.incrementValue,repsOnly:false};
         const time=profile.mode==='time', setCount=Math.max(1,item.sets?.length||1), incrementType=profile.incrementType||progressionSetup.incrementType||'lb';
         const rangeSummary=ruleRangeSummary(profile,time,setCount);
-        return `<details class="exercise-rule-accordion" data-program-rule-id="${escapeHtml(item.exerciseId)}" data-rule-uid="${escapeHtml(item.uid||'')}" open>
-          <summary class="exercise-rule-accordion-head"><span class="exercise-rule-accordion-title"><strong>${escapeHtml(ex?.name||'Exercise')}</strong><small>${escapeHtml(rangeSummary)}</small></span><span class="exercise-accordion-chevron" aria-hidden="true">›</span></summary>
+        return `<details class="exercise-rule-accordion" data-program-rule-id="${escapeHtml(item.exerciseId)}" data-rule-uid="${escapeHtml(item.uid||'')}">
+          <summary class="exercise-rule-accordion-head"><span class="exercise-rule-accordion-title"><strong>${escapeHtml(ex?.name||'Exercise')}</strong><small>${escapeHtml(rangeSummary)}</small></span><span class="rule-head-actions"><button class="rule-remove" type="button" data-remove-rule aria-label="Remove ${escapeHtml(ex?.name||'exercise')} from this workout">×</button><span class="exercise-accordion-chevron" aria-hidden="true">›</span></span></summary>
           <div class="exercise-rule-accordion-body"><div class="exercise-rule-row">
           <div class="exercise-rule-head"><label class="rule-field set-count-field"><span>Sets</span><input type="number" inputmode="numeric" min="1" max="20" step="1" value="${setCount}" data-program-rule="setCount" aria-label="Number of sets for ${escapeHtml(ex?.name||'exercise')}"></label></div>
           <div class="exercise-rule-controls">
@@ -50,6 +50,15 @@
       document.querySelectorAll('[data-use-program-template]').forEach(button=>button.addEventListener('click',()=>{const template=workoutState.templates.find(row=>row.id===button.dataset.useProgramTemplate);if(!template||!programWorkout)return;programWorkout.template={name:programWorkout.name,exercises:cloneTemplateExercises(template.exercises)};renderPickerRules();}));
       document.querySelectorAll('[data-program-rule-id]').forEach(row=>{
         const getItem=()=>programMode?programWorkout?.template?.exercises.find(entry=>entry.exerciseId===row.dataset.programRuleId):(workoutState.draft?.exercises.find(entry=>entry.uid===row.dataset.ruleUid)||workoutState.draft?.exercises.find(entry=>entry.exerciseId===row.dataset.programRuleId));
+        /* × on a chosen exercise removes it outright, so an accidental tap in
+           the list below doesn't require hunting the row down again. */
+        row.querySelector('[data-remove-rule]')?.addEventListener('click',event=>{
+          event.preventDefault();event.stopPropagation();
+          const item=getItem();if(!item)return;
+          if(programMode){if(programWorkout?.template)programWorkout.template.exercises=programWorkout.template.exercises.filter(entry=>entry.exerciseId!==item.exerciseId);}
+          else{workoutState.draft.exercises=workoutState.draft.exercises.filter(entry=>entry.uid!==item.uid);prepareDraftProgression(workoutState.draft,freeformProgressionConfig());renderWorkoutExercises();renderWorkoutProgression();markDraftSaved();}
+          renderPickerRules();renderPickerList();
+        });
         row.querySelectorAll('[data-program-rule]').forEach(control=>control.addEventListener('change',()=>{
           const item=getItem(); if(!item)return;
           const ex=exercises.find(entry=>entry.id===item.exerciseId);

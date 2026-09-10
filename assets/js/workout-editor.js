@@ -120,6 +120,7 @@
       renderWorkoutDateDisplay();
       renderWorkoutExercises();
       renderWorkoutProgression();
+      syncWorkoutFocusPills();
     }
 
     function attachSwipeDelete(scope = document) {

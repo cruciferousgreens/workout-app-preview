@@ -99,11 +99,11 @@
           <div class="progression-banner" id="workoutProgression" hidden></div>
           <div class="workout-meta">
             <div class="field"><label for="workoutName">WORKOUT NAME</label><input id="workoutName" type="text" value="Workout" autocomplete="off" aria-label="Workout name" /></div>
-            <div class="field date-field"><label id="workoutDateLabel">DATE</label><button class="date-display" id="workoutDateDisplay" type="button" aria-labelledby="workoutDateLabel">Thu, Sep 10, 2026</button><input id="workoutDate" type="date" class="date-input-hidden" aria-label="Workout date" tabindex="-1" /></div>
+            <div class="field date-field"><label id="workoutDateLabel" for="workoutDate">DATE</label><span class="date-display" id="workoutDateDisplay" aria-hidden="true">Thu, Sep 10, 2026</span><input id="workoutDate" type="date" class="date-input-overlay" aria-label="Workout date" /></div>
           </div>
           <div class="workout-toolbar">
             <h2>Exercises</h2>
-            <div class="workout-toolbar-actions"><button class="secondary-button" id="addWorkoutExercise" type="button">+ Add exercises</button></div>
+            <button class="exercise-info-button plain-glyph" id="addWorkoutExercise" type="button" aria-label="Add exercises">+</button>
           </div>
           <details class="workout-focus" id="workoutFocus">
             <summary>Workout focus</summary>
@@ -192,19 +192,25 @@
           </div>
         </section>
         <section class="dashboard-card">
-          <div class="section-head settings-head"><h2>Progression defaults</h2><p class="section-note">Used for new exercises and programs.</p></div>
+          <div class="section-head settings-head"><div class="settings-title-row"><h2>Progression defaults</h2><button class="exercise-info-button" id="progressionInfoButton" type="button" aria-label="About progression defaults">i</button></div><p class="section-note">Used for new exercises and programs.</p></div>
           <div class="settings-grid">
             <label class="rule-field"><span>RPE trigger threshold</span><input id="settingsRpeThreshold" type="number" min="1" max="10" step="1" value="8"></label>
             <div class="settings-pair">
               <label class="rule-field"><span>Increment type</span><select id="settingsIncrementType"><option value="lb">Pounds (lb)</option><option value="percent">Percent (%)</option></select></label>
               <label class="rule-field"><span>Increment value</span><input id="settingsIncrementValue" type="number" min="0" step="0.5" value="5"><em class="unit" id="settingsIncrementUnit">lb</em></label>
             </div>
-            <div class="rule-field"><span>Default focus</span><div class="rep-preset-row" id="settingsRepPresets"><button class="rep-preset" type="button" data-rep-preset="strength" aria-pressed="false">Strength · 1–5</button><button class="rep-preset" type="button" data-rep-preset="hypertrophy" aria-pressed="true">Hypertrophy · 6–12</button><button class="rep-preset" type="button" data-rep-preset="endurance" aria-pressed="false">Endurance · 12–20</button><button class="rep-preset" type="button" data-rep-preset="open" aria-pressed="false">15+</button><button class="rep-preset" type="button" data-rep-preset="amrap" aria-pressed="false">AMRAP</button></div></div>
-            <div class="settings-pair">
-              <label class="rule-field"><span>Default rep range min</span><input id="settingsRepMin" type="number" min="1" step="1" value="6"></label>
-              <label class="rule-field"><span>Default rep range max</span><input id="settingsRepMax" type="number" min="1" step="1" value="12"></label>
+            <div class="settings-subsection">
+              <span class="settings-subhead">Time step · timed exercises</span>
+              <div class="step-pills" id="settingsTimeStepPills" role="group" aria-label="Time step in seconds"></div>
             </div>
-            <div class="rule-field"><span>Time step (timed exercises)</span><div class="step-pills" id="settingsTimeStepPills" role="group" aria-label="Time step in seconds"></div></div>
+            <div class="rule-field"><span>Default focus</span><div class="rep-preset-row" id="settingsRepPresets"><button class="rep-preset" type="button" data-rep-preset="strength" aria-pressed="false">Strength · 1–5</button><button class="rep-preset" type="button" data-rep-preset="hypertrophy" aria-pressed="true">Hypertrophy · 6–12</button><button class="rep-preset" type="button" data-rep-preset="endurance" aria-pressed="false">Endurance · 12–20</button><button class="rep-preset" type="button" data-rep-preset="open" aria-pressed="false">15+</button><button class="rep-preset" type="button" data-rep-preset="amrap" aria-pressed="false">AMRAP</button></div></div>
+            <div class="settings-subsection">
+              <span class="settings-subhead">Default rep range</span>
+              <div class="settings-pair">
+                <label class="rule-field"><span>Min</span><input id="settingsRepMin" type="number" min="1" step="1" value="6"></label>
+                <label class="rule-field"><span>Max</span><input id="settingsRepMax" type="number" min="1" step="1" value="12"></label>
+              </div>
+            </div>
           </div>
           <div class="switch-row wide"><span class="switch-copy"><strong>Stall detection</strong><span>Suggest a separate deload week after repeated flat sessions with rising RPE. Never changes the program automatically.</span></span><button class="switch" id="settingsStallToggle" type="button" role="switch" aria-pressed="true" aria-label="Stall detector on"></button></div>
         </section>
@@ -340,6 +346,24 @@
           <button class="form-action primary" type="submit">Add exercise</button>
         </div>
       </form>
+    </dialog>
+
+    <dialog class="custom-dialog" id="progressionInfoDialog" aria-labelledby="progressionInfoTitle">
+      <div class="custom-form">
+        <div class="custom-form-head">
+          <div><h2 id="progressionInfoTitle">Progression defaults</h2><p>How the app suggests your next session.</p></div>
+          <button class="dialog-close" id="closeProgressionInfo" type="button" aria-label="Close">×</button>
+        </div>
+        <div class="info-list">
+          <p><strong>RPE trigger threshold</strong><span>When your top set comes in at or under this RPE, the app suggests progressing next session.</span></p>
+          <p><strong>Increment type &amp; value</strong><span>How much load to add on a progression: a fixed amount (lb or kg) or a percent of the current weight.</span></p>
+          <p><strong>Time step</strong><span>For timed exercises, how many extra seconds to hold before adding weight.</span></p>
+          <p><strong>Default focus</strong><span>The rep-range preset applied to new programs and exercises.</span></p>
+          <p><strong>Default rep range</strong><span>Min and max reps for double progression: add reps inside the range first, then add weight and return to the bottom of the range.</span></p>
+          <p><strong>Stall detection</strong><span>Suggests scheduling a deload week after repeated flat sessions with rising RPE. It never changes your program automatically.</span></p>
+        </div>
+        <div class="form-actions"><button class="form-action primary" id="doneProgressionInfo" type="button">Got it</button></div>
+      </div>
     </dialog>
 
     <dialog class="custom-dialog" id="exercisePickerDialog" aria-labelledby="exercisePickerTitle">

@@ -413,7 +413,10 @@
     .date-display { width: 100%; min-height: 44px; padding: 0 12px; display: flex; align-items: center; justify-content: space-between; gap: 8px; border: 1px solid var(--line); border-radius: var(--radius-sm); background: var(--surface); color: var(--ink); cursor: pointer; font: inherit; font-weight: 600; text-align: left; }
     .date-display:hover { border-color: var(--line-strong); }
     .date-display::after { content: '▾'; color: var(--muted); font-size: 12px; }
-    .date-input-hidden { position: absolute; bottom: 0; left: 0; width: 1px; height: 1px; opacity: 0; pointer-events: none; }
+    /* The native date input covers the pretty display invisibly, so tapping the
+       field opens the OS date picker directly (reliable on iOS, unlike
+       showPicker on a 1px hidden input). */
+    .date-input-overlay { position: absolute; inset: 0; width: 100%; height: 100%; margin: 0; padding: 0; border: 0; opacity: 0; cursor: pointer; }
     .swipe-hint { color: var(--muted); font-size: 11px; white-space: nowrap; }
     .log-labels, .log-set { display: grid; grid-template-columns: 42px minmax(82px, .75fr) minmax(74px, .65fr) minmax(74px, .65fr) 42px; gap: 8px; align-items: start; }
     .log-labels { margin-bottom: 6px; color: var(--muted); font-size: 10px; font-weight: 750; }
@@ -829,6 +832,9 @@
     .step-pills [data-step] { min-height: 36px; padding: 6px 14px; border: 1px solid var(--line); border-radius: 999px; background: var(--surface); color: var(--ink); font-size: 12px; font-weight: 700; cursor: pointer; }
     .step-pills [data-step][aria-pressed="true"] { border-color: var(--accent); background: var(--accent-soft); color: var(--accent); }
     .step-pills .step-custom { width: 88px; flex: 0 0 auto; height: 36px; }
+    /* Weight-unit pills share the step-pill look, including the selected state. */
+    .step-pills [data-units] { min-height: 36px; padding: 6px 14px; border: 1px solid var(--line); border-radius: 999px; background: var(--surface); color: var(--ink); font-size: 12px; font-weight: 700; cursor: pointer; }
+    .step-pills [data-units][aria-pressed="true"] { border-color: var(--accent); background: var(--accent-soft); color: var(--accent); }
     /* Theme picker (Settings > Appearance, under the Dark mode toggle). */
     .theme-picker { margin-top: 14px; }
     .theme-pills { display: flex; flex-wrap: wrap; gap: 8px; padding: 8px 2px 2px; }
@@ -1191,8 +1197,10 @@
       background: var(--pine-soft);
       color: var(--accent-ink);
     }
+    /* Note: .switch is deliberately excluded here — its off-state track uses
+       --switch-track (visible on light themes), set in the base .switch rule. */
     .form-pill, .muscle-option, .reps-only-toggle,
-    .exercise-tag-button, .superset-button, .period-trigger, .switch {
+    .exercise-tag-button, .superset-button, .period-trigger {
       border-color: var(--line-strong);
       background: var(--surface-raised);
       color: var(--muted);
@@ -1334,6 +1342,29 @@
     .settings-head { display: block; margin-bottom: 20px; }
     .settings-head h2 { margin: 0 0 6px; font-size: 19px; letter-spacing: -.02em; }
     .settings-head .section-note { font-size: 13px; line-height: 1.55; max-width: 46ch; }
+    /* Title row: heading with an inline info button (progression explainer). */
+    .settings-title-row { display: flex; align-items: center; gap: 10px; margin-bottom: 6px; }
+    .settings-title-row h2 { margin: 0; }
+    .settings-title-row .exercise-info-button { width: 28px; height: 28px; font-size: 13px; }
+    /* Grouped subsections inside the progression card (rep range, time step). */
+    .settings-subsection { grid-column: 1 / -1; display: grid; gap: 10px; }
+    .settings-subhead { color: var(--muted); font-size: 10px; font-weight: 800; letter-spacing: .11em; text-transform: uppercase; font-variant-caps: all-small-caps; }
+    /* Progression explainer popup body. */
+    .info-list { display: grid; gap: 12px; margin: 6px 0 10px; }
+    .info-list p { margin: 0; display: grid; gap: 3px; font-size: 13px; line-height: 1.55; }
+    .info-list strong { color: var(--ink-strong); }
+    .info-list span { color: var(--muted); }
+    /* Library headings with an inline text action ("+ New exercise"). */
+    .library-heading-row { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; margin: 0 2px 10px; }
+    .library-heading-row .library-heading { margin: 0; }
+    .text-link { border: 0; background: none; padding: 4px 2px; color: var(--accent); font-size: 13px; font-weight: 700; cursor: pointer; white-space: nowrap; }
+    .text-link:active { transform: scale(.96); }
+    /* Non-italic glyph variant of the circular info button (used for "+"). */
+    .exercise-info-button.plain-glyph { font-style: normal; font-size: 20px; font-weight: 500; }
+    /* × remove button inside a picker rule accordion head. */
+    .rule-head-actions { display: inline-flex; align-items: center; gap: 10px; flex: none; }
+    .rule-remove { width: 30px; height: 30px; border-radius: 50%; border: 1px solid var(--line); background: var(--surface); color: var(--muted); font-size: 17px; line-height: 1; cursor: pointer; padding: 0 0 2px; }
+    .rule-remove:active { transform: scale(.92); }
     .settings-grid { gap: 16px; margin-bottom: 6px; grid-auto-flow: dense; }
     /* Paired fields (increment type+value, rep min+max) always sit side by side. */
     .settings-pair { grid-column: 1 / -1; display: grid; grid-template-columns: repeat(2, minmax(0,1fr)); gap: 16px; }

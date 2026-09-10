@@ -5,11 +5,12 @@
     /** Theme state (Justin 2026-09-10): themeName is 'cruciferous', the Rosé Pine
         light flavor ('rosepine'), or a dark Catppuccin flavor ('macchiato',
         'mocha' — displayed as "Matcha"). darkMode flips light/dark; for
-        non-Cruciferous themes, light is always Rosé Pine and dark is the
-        remembered dark flavor (ctpDark). Persisted as workout-theme
-        (dark/light) + workout-theme-name. */
-    let themeName='cruciferous', darkMode=false, ctpDark='mocha';
-    const ROSEPINE='rosepine', DARK_FLAVORS=['macchiato','mocha'];
+        non-Cruciferous themes the toggle flips between the remembered dark
+        flavor (ctpDark) and the remembered light theme (lightTheme), so it
+        never lands somewhere unexpected. Persisted as workout-theme
+        (dark/light) + workout-theme-name + workout-theme-light. */
+    let themeName='cruciferous', darkMode=false, ctpDark='mocha', lightTheme='cruciferous';
+    const ROSEPINE='rosepine', DARK_FLAVORS=['macchiato','mocha'], LIGHT_THEMES=['cruciferous','rosepine'];
     function applyTheme(){
       const eff=themeName==='cruciferous'?(darkMode?'dark':'light'):themeName;
       document.documentElement.dataset.theme=eff;
@@ -17,13 +18,19 @@
       if(toggle){toggle.setAttribute('aria-pressed',String(darkMode));toggle.setAttribute('aria-label',`Dark mode ${darkMode?'on':'off'}`);}
       document.querySelectorAll('#themePills [data-theme-name]').forEach(button=>button.setAttribute('aria-pressed',String(button.dataset.themeName===themeName)));
       const color=getComputedStyle(document.documentElement).getPropertyValue('--theme-color').trim();document.querySelector('meta[name="theme-color"]').setAttribute('content',color);document.querySelector('meta[name="apple-mobile-web-app-status-bar-style"]').setAttribute('content',darkMode?'black-translucent':'default');
-      try{localStorage.setItem('workout-theme',darkMode?'dark':'light');localStorage.setItem('workout-theme-name',themeName);}catch(_){}
+      try{localStorage.setItem('workout-theme',darkMode?'dark':'light');localStorage.setItem('workout-theme-name',themeName);localStorage.setItem('workout-theme-light',lightTheme);}catch(_){}
     }
     function setThemeName(name){
       themeName=name;
-      if(name===ROSEPINE){darkMode=false;}
-      else if(name!=='cruciferous'){darkMode=true;ctpDark=name;}
+      if(name===ROSEPINE){darkMode=false;lightTheme=ROSEPINE;}
+      else if(name==='cruciferous'){lightTheme='cruciferous';}
+      else{ /* dark Catppuccin flavor */ darkMode=true;ctpDark=name;}
       applyTheme();
+    }
+    /** Highlights the active workout-focus pill from the draft's explicit choice (Justin 2026-09-10). */
+    function syncWorkoutFocusPills(){
+      const key=workoutState.draft?.focusPreset||null;
+      document.querySelectorAll('[data-workout-focus]').forEach(button=>button.setAttribute('aria-pressed',String(button.dataset.workoutFocus===key)));
     }
     /** Light unit suffix inside the increment value field; follows the type (Justin 2026-09-10). */
     function syncSettingsIncrementUnit(){
@@ -114,7 +121,7 @@
     $('#closeCustomDialog').addEventListener('click', closeCustomDialog);
     $('#cancelCustomExercise').addEventListener('click', closeCustomDialog);
 
-    $('#darkModeToggle').addEventListener('click',()=>{darkMode=!darkMode;if(themeName!=='cruciferous')themeName=darkMode?ctpDark:ROSEPINE;applyTheme();});
+    $('#darkModeToggle').addEventListener('click',()=>{darkMode=!darkMode;if(themeName!=='cruciferous')themeName=darkMode?ctpDark:lightTheme;applyTheme();});
     document.querySelectorAll('#themePills [data-theme-name]').forEach(button=>button.addEventListener('click',()=>setThemeName(button.dataset.themeName)));
     document.querySelectorAll('#settingsUnitPills [data-units]').forEach(button=>button.addEventListener('click',()=>{
       progressionSetup.units=button.dataset.units; syncUnitPills(); syncSettingsIncrementUnit(); schedulePersist();
@@ -129,6 +136,9 @@
     wireTimeStepPills($('#settingsTimeStepPills'),()=>progressionSetup.timeStep,v=>{progressionSetup.timeStep=v;syncAllTimeStepPills();schedulePersist();});
     wireTimeStepPills($('#programTimeStepPills'),()=>progressionSetup.timeStep,v=>{progressionSetup.timeStep=v;syncAllTimeStepPills();schedulePersist();});
     $('#settingsStallToggle').addEventListener('click',()=>{progressionSetup.stallDetection=!progressionSetup.stallDetection;const toggle=$('#settingsStallToggle');toggle.setAttribute('aria-pressed',String(progressionSetup.stallDetection));toggle.setAttribute('aria-label',`Stall detector ${progressionSetup.stallDetection?'on':'off'}`);schedulePersist();});
+    $('#progressionInfoButton').addEventListener('click',()=>$('#progressionInfoDialog').showModal());
+    $('#closeProgressionInfo').addEventListener('click',()=>$('#progressionInfoDialog').close());
+    $('#doneProgressionInfo').addEventListener('click',()=>$('#progressionInfoDialog').close());
     $('#exportDataButton').addEventListener('click',()=>{downloadWorkoutBackup();showToast('Backup downloaded.');});
     $('#addSampleDataButton').addEventListener('click',()=>{addSampleData();});
     $('#clearSampleDataButton').addEventListener('click',()=>{clearSampleData();});
@@ -146,6 +156,7 @@
       if(themeName==='latte')themeName='rosepine';else if(themeName==='frappe')themeName='macchiato';
       if(!['cruciferous','rosepine','macchiato','mocha'].includes(themeName))themeName='cruciferous';
       if(DARK_FLAVORS.includes(themeName))ctpDark=themeName;
+      try{const savedLight=localStorage.getItem('workout-theme-light');if(LIGHT_THEMES.includes(savedLight))lightTheme=savedLight;}catch(_){}
     }catch(_){}
     applyTheme();
     $('#closeReplaceDraft').addEventListener('click',()=>{pendingRepeatWorkout=null;$('#replaceDraftDialog').close();});
@@ -198,18 +209,24 @@
        custom (the engine follows the chosen zone instead of last session's). */
     document.querySelectorAll('[data-workout-focus]').forEach(button=>button.addEventListener('click',()=>{
       const preset=REP_PRESETS[button.dataset.workoutFocus]; if(!preset||!workoutState.draft)return;
+      workoutState.draft.focusPreset=button.dataset.workoutFocus;
       workoutState.draft.exercises.forEach(item=>{
         const ex=exercises.find(row=>row.id===item.exerciseId);
         if(exerciseTracking(item,ex)==='time')return;
         item.progression={...(item.progression||{}),preset:button.dataset.workoutFocus,min:preset.min,max:preset.max,openTop:!!preset.openTop,amrap:!!preset.amrap,custom:true};
       });
       prepareDraftProgression(workoutState.draft,freeformProgressionConfig());
-      renderWorkoutExercises(); renderWorkoutProgression(); markDraftSaved();
+      renderWorkoutExercises(); renderWorkoutProgression(); syncWorkoutFocusPills(); markDraftSaved();
     }));
     $('#exercisePickerSearch').addEventListener('input', renderPickerList);
     $('#workoutName').addEventListener('input', event => { if (workoutState.draft) { workoutState.draft.name = event.target.value; markDraftSaved(); } });
-    $('#workoutDateDisplay').addEventListener('click', () => { const input=$('#workoutDate'); if(input.showPicker)input.showPicker(); else input.focus(); });
-    $('#workoutDate').addEventListener('input', event => { if (workoutState.draft) { workoutState.draft.date = event.target.value; markDraftSaved(); } renderWorkoutDateDisplay(); });
+    /* The native date input sits invisibly over the pretty date display, so
+       tapping it opens the OS date picker directly (showPicker on a hidden
+       input was unreliable on iOS). Both input and change are wired because
+       some browsers only fire change for picker selections. */
+    const workoutDateChanged=event=>{if(workoutState.draft&&event.target.value){workoutState.draft.date=event.target.value;markDraftSaved();}renderWorkoutDateDisplay();};
+    $('#workoutDate').addEventListener('input',workoutDateChanged);
+    $('#workoutDate').addEventListener('change',workoutDateChanged);
     $('#closeSetTags').addEventListener('click', () => $('#setTagsDialog').close());
     $('#doneSetTags').addEventListener('click', () => $('#setTagsDialog').close());
     $('#closeExerciseTags').addEventListener('click', () => $('#exerciseTagsDialog').close());
