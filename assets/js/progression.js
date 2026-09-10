@@ -24,7 +24,13 @@
       const logs=getExerciseLogs(exerciseId).sort((a,b)=>b.isoDate.localeCompare(a.isoDate));
       if(!logs.length)return null;
       const targetMode=profile?.mode || 'reps';
-      const threshold=Number(programConfig.threshold ?? 8), min=Number(profile?.min ?? 5), max=Number(profile?.max ?? 8);
+      const threshold=Number(programConfig.threshold ?? 8);
+      // AMRAP has no upper rep bound: a blank max means "as many as possible" from an
+      // optional floor (blank min defaults to 1). Normalize both sides the same way so
+      // a blank max matches a blank max (not 0, not the 8 fallback) in zone comparisons.
+      const normMin=p=>p?.amrap?(Number(p?.min)||1):Number(p?.min ?? 5);
+      const normMax=p=>p?.amrap?null:Number(p?.max ?? 8);
+      const min=normMin(profile), max=normMax(profile);
       const timeMin=Number(profile?.timeMin ?? 30), timeMax=Number(profile?.timeMax ?? 60), timeStep=Number(profile?.timeStep ?? 5);
       // Suggest from the most recent log in the SAME rep/time zone as the target.
       // Basing the suggestion on the latest log regardless of zone produced invented
@@ -37,7 +43,9 @@
         const p=log.progression; if(!p)return false;
         if((p.mode||'reps')!==targetMode)return false;
         if(targetMode==='time'){if(!(Number(p.timeMin)===timeMin&&Number(p.timeMax)===timeMax))return false;}
-        else if(!(Number(p.min)===min&&Number(p.max)===max&&!!p.amrap===!!profile?.amrap&&!!p.openTop===!!profile?.openTop))return false;
+        // For AMRAP the max is open, so stored logs match on the amrap flag and the
+        // floor (blank min normalizes to 1 on both sides) rather than on a max.
+        else if(!((profile?.amrap?normMin(p)===min:Number(p.min)===min)&&(profile?.amrap||normMax(p)===max)&&!!p.amrap===!!profile?.amrap&&!!p.openTop===!!profile?.openTop))return false;
         // A matching stored target range is not enough on its own: the actual
         // logged top set must have landed inside that zone. Blank-logged
         // sessions get the default range stamped on them, so the profile alone
@@ -59,8 +67,8 @@
       const incrementValue=Number(profile?.incrementValue ?? programConfig.incrementValue ?? 5);
       const repsOnly=!!profile?.repsOnly;
       const previousProfile=latestLog.progression;
-      const previousMin=Number(previousProfile?.min),previousMax=Number(previousProfile?.max);
-      const hasStoredRange=Number.isFinite(previousMin)&&Number.isFinite(previousMax),outsideNewRange=latest.reps<min||(!profile?.openTop&&!profile?.amrap&&latest.reps>max);
+      const previousMin=normMin(previousProfile),previousMax=normMax(previousProfile);
+      const hasStoredRange=Number.isFinite(Number(previousProfile?.min))&&(!!previousProfile?.amrap||Number.isFinite(Number(previousProfile?.max))),outsideNewRange=latest.reps<min||(!profile?.openTop&&!profile?.amrap&&latest.reps>max);
       const repRangeChanged=mode==='reps'&&previousProfile?.mode!=='time'&&((hasStoredRange&&(previousMin!==min||previousMax!==max))||(!hasStoredRange&&outsideNewRange));
       let nextWeight=latest.weight,nextReps=latest.reps,nextSeconds=latest.seconds,kind='hold',reason='Top-set RPE is above the progression trigger.',estimated1RM=0;
       if(repRangeChanged&&latest.weight>0){
@@ -74,7 +82,7 @@
           if(latest.seconds<timeMax){nextSeconds=Math.min(timeMax,Math.max(timeMin,latest.seconds+timeStep));kind='time';reason=`Top set was at or below RPE ${threshold}; add ${timeStep} seconds inside the ${timeMin}–${timeMax}s range.`;}
           else if(repsOnly){kind='hold';reason=`Time ceiling reached. Load progression is off, so hold ${timeMax} seconds.`;}
           else{nextWeight=roundedIncrement(latest.weight,incrementType,incrementValue);nextSeconds=timeMin;kind='load';reason=`Time ceiling reached at RPE ${latest.rpe}; add ${incrementType==='percent'?`${incrementValue}%`:`${incrementValue} lb`} and reset to ${timeMin} seconds.`;}
-        } else if(profile?.amrap){nextReps=Math.max(min,latest.reps);kind='hold';reason=`AMRAP target: keep the load and stop when the set reaches the program effort target.`;}
+        } else if(profile?.amrap){nextReps=Math.max(min,latest.reps);kind='hold';reason=`AMRAP target: keep the load and take the set to the effort target (top-set RPE ${threshold} or below).`;}
         else if(profile?.openTop){nextReps=Math.max(min,latest.reps+1);kind='reps';reason=`Open-ended range: add one rep while the top set stays at or below RPE ${threshold}.`;}
         else if(latest.reps<max){nextReps=Math.max(min,latest.reps+1);kind='reps';reason=`Top set was at or below RPE ${threshold}; add one rep inside the ${min}–${max} range.`;}
         else if(repsOnly){kind='hold';reason=`Rep ceiling reached. Load progression is off, so hold ${latest.weight||0} lb.`;}
