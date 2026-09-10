@@ -101,27 +101,57 @@
       if(!value||!max)return 0;
       return Math.max(1,Math.min(5,Math.ceil(Math.sqrt(value/max)*5)));
     }
-    function bodyMapSvg(view) {
-      const front=view==='front';
-      return `<figure class="body-figure"><svg viewBox="0 0 120 260" role="img" aria-label="${front?'Front':'Back'} muscle volume silhouette">
-        <circle class="body-silhouette" cx="60" cy="22" r="14"></circle><path class="body-silhouette" d="M43 40 Q60 34 77 40 L91 70 82 125 76 155 84 243 66 243 60 172 54 243 36 243 44 155 38 125 29 70Z"></path>
-        ${front?`<ellipse class="body-region" data-muscle="shoulders" cx="37" cy="57" rx="11" ry="9"></ellipse><ellipse class="body-region" data-muscle="shoulders" cx="83" cy="57" rx="11" ry="9"></ellipse><path class="body-region" data-muscle="chest" d="M45 54 Q60 47 59 75 Q46 77 42 66Z"></path><path class="body-region" data-muscle="chest" d="M75 54 Q60 47 61 75 Q74 77 78 66Z"></path><rect class="body-region" data-muscle="biceps" x="29" y="70" width="9" height="30" rx="4"></rect><rect class="body-region" data-muscle="biceps" x="82" y="70" width="9" height="30" rx="4"></rect><rect class="body-region" data-muscle="forearms" x="25" y="101" width="8" height="28" rx="4"></rect><rect class="body-region" data-muscle="forearms" x="87" y="101" width="8" height="28" rx="4"></rect><rect class="body-region" data-muscle="abdominals" x="49" y="78" width="22" height="49" rx="8"></rect><path class="body-region" data-muscle="quadriceps" d="M44 139 Q57 135 57 170 L53 204 39 202Z"></path><path class="body-region" data-muscle="quadriceps" d="M76 139 Q63 135 63 170 L67 204 81 202Z"></path><path class="body-region" data-muscle="calves" d="M39 205 53 207 50 239 38 239Z"></path><path class="body-region" data-muscle="calves" d="M81 205 67 207 70 239 82 239Z"></path>`:`<path class="body-region" data-muscle="traps" d="M46 43 60 38 74 43 68 61 52 61Z"></path><path class="body-region" data-muscle="lats" d="M42 61 Q51 57 58 67 L54 108 40 116 35 78Z"></path><path class="body-region" data-muscle="lats" d="M78 61 Q69 57 62 67 L66 108 80 116 85 78Z"></path><rect class="body-region" data-muscle="triceps" x="29" y="69" width="9" height="31" rx="4"></rect><rect class="body-region" data-muscle="triceps" x="82" y="69" width="9" height="31" rx="4"></rect><rect class="body-region" data-muscle="lower back" x="47" y="99" width="26" height="30" rx="8"></rect><ellipse class="body-region" data-muscle="glutes" cx="49" cy="143" rx="12" ry="13"></ellipse><ellipse class="body-region" data-muscle="glutes" cx="71" cy="143" rx="12" ry="13"></ellipse><path class="body-region" data-muscle="hamstrings" d="M41 157 Q53 153 57 163 L53 203 39 201Z"></path><path class="body-region" data-muscle="hamstrings" d="M79 157 Q67 153 63 163 L67 203 81 201Z"></path><path class="body-region" data-muscle="calves" d="M39 205 53 207 50 239 38 239Z"></path><path class="body-region" data-muscle="calves" d="M81 205 67 207 70 239 82 239Z"></path>`}
-      </svg><figcaption>${front?'Front':'Back'}</figcaption></figure>`;
+    /* Sasha anatomical body map (restored 2026-09-10 at Justin's request; the
+       style revisit is pinned in UX-BACKLOG.md). SVG regions carry data-muscle;
+       this maps them to the exercise library's muscle names. */
+    const bodyMapMuscleAliases={
+      'upper-chest':'chest','lower-chest':'chest','front-delts':'shoulders','rear-delts':'shoulders','side-delts':'shoulders',
+      'quads':'quadriceps','hamstrings':'hamstrings','glutes':'glutes','forearms':'forearms','abs':'abdominals',
+      'lats':'lats','lower-back':'lower back','traps':'traps','triceps':'triceps','biceps':'biceps','calves':'calves','obliques':'abdominals'
+    };
+    let bodyMapTemplatePromise;
+    function loadBodyMapTemplate(){
+      if(!bodyMapTemplatePromise)bodyMapTemplatePromise=fetch('data/sasha-male-body.svg').then(response=>{if(!response.ok)throw new Error('Body map unavailable');return response.text();}).catch(()=>null);
+      return bodyMapTemplatePromise;
+    }
+    function paintBodyRegion(region,level,label){
+      region.classList.add(`heat-${level}`);
+      const title=document.createElementNS('http://www.w3.org/2000/svg','title');
+      title.textContent=label;region.prepend(title);
     }
     function hydrateBodyMaps(){
-      document.querySelectorAll('.anatomy-map[data-volumes]').forEach(host=>{
-        if(host.dataset.hydrated)return;
-        const volumes=JSON.parse(decodeURIComponent(host.dataset.volumes));
-        const regions=[...host.querySelectorAll('[data-muscle]')];
-        const regionValue=region=>Number(volumes[region.dataset.muscle]||0);
-        const max=Math.max(1,...regions.map(regionValue));
-        regions.forEach(region=>{
-          const muscle=region.dataset.muscle;
-          const value=regionValue(region);
-          region.classList.add(`heat-${heatLevel(value,max)}`);
-          const title=document.createElementNS('http://www.w3.org/2000/svg','title');title.textContent=`${titleCase(muscle)} · ${formatVolume(value)}`;region.prepend(title);
+      /* Volume heat maps (dashboard + stats): data-volumes holds {muscle: volume}. */
+      const volumeHosts=[...document.querySelectorAll('.anatomy-map[data-volumes]:not([data-hydrated])')];
+      /* Per-exercise maps (exercise detail): data-primary/data-secondary hold
+         comma-separated library muscle names; primary = full heat, secondary = soft. */
+      const exerciseHosts=[...document.querySelectorAll('.anatomy-map[data-primary]:not([data-hydrated])')];
+      const hosts=volumeHosts.concat(exerciseHosts);
+      if(!hosts.length)return;
+      loadBodyMapTemplate().then(template=>{
+        hosts.forEach(host=>{
+          if(!template){host.innerHTML='<div class="chart-empty">Body map unavailable.</div>';return;}
+          host.innerHTML=template;
+          const regions=[...host.querySelectorAll('[data-muscle]')];
+          if(host.dataset.primary!==undefined){
+            const primary=new Set(host.dataset.primary.split(',').filter(Boolean));
+            const secondary=new Set(host.dataset.secondary.split(',').filter(Boolean));
+            regions.forEach(region=>{
+              const muscle=bodyMapMuscleAliases[region.dataset.muscle];
+              const kind=muscle&&primary.has(muscle)?'primary':muscle&&secondary.has(muscle)?'secondary':null;
+              paintBodyRegion(region,kind==='primary'?5:kind==='secondary'?2:0,`${titleCase(muscle||region.dataset.muscle)}${kind?` · ${kind}`:' · not targeted'}`);
+            });
+          }else{
+            const volumes=JSON.parse(decodeURIComponent(host.dataset.volumes));
+            const regionValue=region=>Number(volumes[bodyMapMuscleAliases[region.dataset.muscle]]||0);
+            const max=Math.max(1,...regions.map(regionValue));
+            regions.forEach(region=>{
+              const muscle=bodyMapMuscleAliases[region.dataset.muscle];
+              const value=regionValue(region);
+              paintBodyRegion(region,heatLevel(value,max),`${titleCase(muscle||region.dataset.muscle)} · ${formatVolume(value)}`);
+            });
+          }
+          host.dataset.hydrated='true';
         });
-        host.dataset.hydrated='true';
       });
     }
     function muscleHeatmapMarkup(volumes,compact=false) {
@@ -129,9 +159,15 @@
       if(!rows.length)return '<div class="chart-empty">No weighted training volume in this period.</div>';
       const max=Math.max(...rows.map(([,v])=>v)),shown=compact?rows.slice(0,4):rows;
       const encoded=encodeURIComponent(JSON.stringify(volumes));
-      const body=`<div class="body-map-grid">${bodyMapSvg('front')}${bodyMapSvg('back')}</div>`;
-      return `<div class="heatmap-shell"><div class="anatomy-map" data-volumes="${encoded}">${body}</div><div><div class="heatmap-list">${shown.map(([muscle,value])=>`<div class="heatmap-row"><i class="heatmap-swatch heat-${heatLevel(value,max)}"></i><span>${escapeHtml(titleCase(muscle))}</span><strong>${formatVolume(value)}</strong></div>`).join('')}</div>${compact?'':`<div class="heatmap-legend"><span>Less</span><i class="heatmap-gradient"></i><span>More volume</span></div>`}</div></div>`;
+      const map=`<div class="anatomy-map" data-volumes="${encoded}"><div class="chart-empty">Loading anatomical map\u2026</div></div>${compact?'':'<p class="body-map-credit">Anatomy: <a href="https://github.com/Olkre/Sasha-s-Body-Map" target="_blank" rel="noreferrer">Sasha\u2019s Body Map \u2197</a></p>'}`;
+      return `<div class="heatmap-shell">${map}<div><div class="heatmap-list">${shown.map(([muscle,value])=>`<div class="heatmap-row"><i class="heatmap-swatch heat-${heatLevel(value,max)}"></i><span>${escapeHtml(titleCase(muscle))}</span><strong>${formatVolume(value)}</strong></div>`).join('')}</div>${compact?'':`<div class="heatmap-legend"><span>Less</span><i class="heatmap-gradient"></i><span>More volume</span></div>`}</div></div>`;
     }
+    /* Per-exercise body map for the exercise detail page (Justin 2026-09-10). */
+    function exerciseBodyMapMarkup(ex){
+      const primary=(ex.primary||[]).join(','),secondary=(ex.secondary||[]).join(',');
+      return `<div class="anatomy-map exercise-map" data-primary="${escapeHtml(primary)}" data-secondary="${escapeHtml(secondary)}"><div class="chart-empty">Loading anatomical map\u2026</div></div><div class="exercise-map-legend"><span><i class="heatmap-swatch heat-5"></i>Primary</span><span><i class="heatmap-swatch heat-2"></i>Secondary</span></div>`;
+    }
+
     function renderDashboard() {
       const now=new Date();
       const strip=$('#weekStrip'),start=new Date(now);start.setHours(12,0,0,0);start.setDate(now.getDate()-((now.getDay()+6)%7)+(state.calendarWeekOffset*7));

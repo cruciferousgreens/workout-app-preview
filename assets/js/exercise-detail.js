@@ -113,6 +113,9 @@
       }
       $('#similarGrid').innerHTML = `<div class="action-list">${similarTo(ex).map(x => `<button class="action-row" type="button" data-id="${escapeHtml(x.id)}" aria-label="Open ${escapeHtml(x.name)}"><span><strong>${escapeHtml(x.name)}</strong><span>${escapeHtml(x.primary[0] || 'Unspecified muscle')} · ${escapeHtml(x.equipment || 'No equipment')}</span></span><span class="similar-chevron" aria-hidden="true">›</span></button>`).join('')}</div>`;
       document.querySelectorAll('#similarGrid [data-id]').forEach(btn => btn.addEventListener('click', () => openExercise(btn.dataset.id)));
+      /* Anatomical muscle map for this exercise (Justin 2026-09-10). */
+      $('#exerciseBodyMap').innerHTML = exerciseBodyMapMarkup(ex);
+      hydrateBodyMaps();
       state.activeView = 'detail';
       hideAllViews();
       $('#detailView').classList.add('active');
