@@ -44,6 +44,43 @@
     function escapeHtml(text) {
       const div = document.createElement('div'); div.textContent = text; return div.innerHTML;
     }
+    /* Time-step preset pills (2026-09-10, Justin picked presets over a stepper).
+       Shared by Settings, program setup, and per-exercise rule rows. */
+    const TIME_STEP_PRESETS=[5,10,15,30];
+    function timeStepPillsHTML(){
+      return TIME_STEP_PRESETS.map(n=>`<button type="button" data-step="${n}" aria-pressed="false">${n}s</button>`).join('')
+        + `<button type="button" data-step="custom" aria-pressed="false">Custom</button>`
+        + `<input type="number" inputmode="numeric" min="1" step="1" class="step-custom" data-step-custom aria-label="Custom time step in seconds" hidden>`;
+    }
+    function syncTimeStepPills(root,value){
+      if(!root)return;
+      const n=Math.max(1,Number(value)||5), isPreset=TIME_STEP_PRESETS.includes(n);
+      root.querySelectorAll('[data-step]').forEach(btn=>{
+        const key=btn.dataset.step;
+        btn.setAttribute('aria-pressed',String(key==='custom'?!isPreset:Number(key)===n));
+      });
+      const custom=root.querySelector('[data-step-custom]');
+      if(custom){custom.hidden=isPreset;if(!isPreset&&document.activeElement!==custom)custom.value=n;}
+    }
+    function wireTimeStepPills(root,get,set){
+      if(!root)return;
+      root.innerHTML=timeStepPillsHTML();
+      syncTimeStepPills(root,get());
+      root.addEventListener('click',e=>{
+        const btn=e.target.closest('[data-step]');
+        if(!btn||!root.contains(btn))return;
+        if(btn.dataset.step==='custom'){
+          const custom=root.querySelector('[data-step-custom]');
+          root.querySelectorAll('[data-step]').forEach(b=>b.setAttribute('aria-pressed',String(b===btn)));
+          if(custom){custom.hidden=false;custom.value=get();custom.focus();custom.select();}
+          return;
+        }
+        set(Number(btn.dataset.step));
+        syncTimeStepPills(root,get());
+      });
+      const custom=root.querySelector('[data-step-custom]');
+      custom.addEventListener('change',()=>{const n=Math.max(1,Number(custom.value)||5);set(n);syncTimeStepPills(root,get());});
+    }
     function rememberScroll() { state.scroll[state.activeView] = window.scrollY; }
     function restoreScroll(view) { requestAnimationFrame(() => window.scrollTo({top:state.scroll[view] || 0, behavior:'auto'})); }
     function setActiveNav(view) {

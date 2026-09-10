@@ -668,6 +668,11 @@
     /* Inline unit suffix, e.g. "sec" on the time-step field, "lb"/"%" on increment. */
     .rule-field .unit { position: absolute; right: 12px; top: 0; bottom: 0; display: inline-flex; align-items: center; font-style: normal; font-size: 12px; color: var(--muted); pointer-events: none; }
     .rule-field:has(.unit) input, .rule-field:has(.unit) select { padding-right: 44px; }
+    /* Time-step preset pills (2026-09-10, Justin's pick). */
+    .step-pills { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; padding: 8px 2px 2px; }
+    .step-pills [data-step] { min-height: 36px; padding: 6px 14px; border: 1px solid var(--line); border-radius: 999px; background: var(--surface); color: var(--ink); font-size: 12px; font-weight: 700; cursor: pointer; }
+    .step-pills [data-step][aria-pressed="true"] { border-color: var(--accent); background: var(--accent-soft); color: var(--accent); }
+    .step-pills .step-custom { width: 88px; flex: 0 0 auto; height: 36px; }
     .filter-group { position: relative; margin-top: 12px; }
     .filter-group > label { position: absolute; top: -7px; left: 10px; z-index: 1; padding: 0 6px; background: var(--notch-bg, var(--bg)); }
     .filter-group > label + select { margin-top: 0; }

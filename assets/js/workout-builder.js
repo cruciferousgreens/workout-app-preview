@@ -31,7 +31,7 @@
             <label class="rule-field"><span>Track</span><select data-program-rule="mode"><option value="reps" ${time?'':'selected'}>Reps</option><option value="time" ${time?'selected':''}>Seconds</option></select></label>
             <label class="rule-field"><span>${time?'Min sec':'Min reps'}</span><input type="number" min="1" value="${time?profile.timeMin:profile.min}" data-program-rule="${time?'timeMin':'min'}"></label>
             <label class="rule-field"><span>${time?'Max sec':'Max reps'}</span><input type="number" min="1" value="${time?profile.timeMax:profile.max}" data-program-rule="${time?'timeMax':'max'}"></label>
-            ${time?`<label class="rule-field"><span>Step sec</span><input type="number" min="1" value="${profile.timeStep||defaults.timeStep||5}" data-program-rule="timeStep"></label>`:''}
+            ${time?`<div class="rule-field"><span>Step</span><div class="step-pills" data-step-pills role="group" aria-label="Time step in seconds"></div></div>`:''}
             <div class="load-progression ${profile.repsOnly?'is-disabled':''}"><span class="load-control-title">Load progression</span><div class="load-progression-row"><select data-program-rule="incrementType" aria-label="Load increment type"><option value="lb" ${incrementType==='lb'?'selected':''}>Pounds</option><option value="percent" ${incrementType==='percent'?'selected':''}>Percent</option></select><span class="lp-value"><input type="number" min="0.5" step="0.5" value="${profile.incrementValue??progressionSetup.incrementValue}" data-program-rule="incrementValue" aria-label="Load increment value"><em class="unit">${incrementType==='percent'?'%':'lb'}</em></span><button class="reps-only-toggle" type="button" data-program-reps-only aria-pressed="${!!profile.repsOnly}">Increase reps only</button></div></div>
           </div>
           <div class="exercise-tags-builder"><div class="exercise-tag-row">${(item.exerciseTags||[]).map(tag=>`<span class="exercise-tag-chip ${workoutState.exerciseTagPresets.includes(tag)?'preset':''}">${escapeHtml(tag)}</span>`).join('')}<button class="exercise-tag-button" type="button" data-program-exercise-tags="${escapeHtml(item.exerciseId)}">${item.exerciseTags?.length?'Edit exercise tags':'+ Exercise tags'}</button></div></div>
@@ -65,6 +65,18 @@
           if(!programMode){prepareDraftProgression(workoutState.draft,{...progressionSetup,stallDetection:false});renderWorkoutExercises();renderWorkoutProgression();markDraftSaved();}
           if(field==='setCount'||field==='mode'||field==='incrementType')renderExercisePicker();
         }));
+        row.querySelectorAll('[data-step-pills]').forEach(pills=>{
+          const readStep=()=>{const item=getItem();return item?.progression?.timeStep||(programMode?workoutState.activeProgram?.progression?.timeStep:progressionSetup.timeStep)||5;};
+          wireTimeStepPills(pills,readStep,n=>{
+            const item=getItem(); if(!item)return;
+            const ex=exercises.find(entry=>entry.id===item.exerciseId);
+            const dflt=(programMode?workoutState.activeProgram?.progression:progressionSetup)||progressionSetup,range=dflt.defaultRange||progressionSetup.defaultRange;
+            const profile=item.progression||{mode:item.tracking||ex?.tracking||'reps',min:range.min,max:range.max,timeMin:30,timeMax:60,timeStep:dflt.timeStep||5,incrementType:dflt.incrementType,incrementValue:dflt.incrementValue,repsOnly:false};
+            profile.timeStep=n; item.progression=profile;
+            if(!programMode){prepareDraftProgression(workoutState.draft,{...progressionSetup,stallDetection:false});renderWorkoutExercises();renderWorkoutProgression();markDraftSaved();}
+            else syncTimeStepPills(pills,n);
+          });
+        });
         row.querySelector('[data-program-reps-only]')?.addEventListener('click',()=>{
           const item=getItem(); if(!item)return;
           const ex=exercises.find(entry=>entry.id===item.exerciseId);

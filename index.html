@@ -136,7 +136,7 @@
           <div class="field wide">
             <span class="filter-label">DEFAULT REP RANGE</span>
             <div class="rep-preset-row" id="programRepPresets"><button class="rep-preset" type="button" data-rep-preset="strength" aria-pressed="false">Strength · 1–5</button><button class="rep-preset" type="button" data-rep-preset="hypertrophy" aria-pressed="true">Hypertrophy · 6–12</button><button class="rep-preset" type="button" data-rep-preset="endurance" aria-pressed="false">Endurance · 12–20</button><button class="rep-preset" type="button" data-rep-preset="open" aria-pressed="false">15+</button><button class="rep-preset" type="button" data-rep-preset="amrap" aria-pressed="false">AMRAP</button></div>
-            <div class="range-fields"><div class="field"><label for="programRepMin">MIN REPS</label><input id="programRepMin" type="number" min="1" value="6"></div><div class="field"><label for="programRepMax">MAX REPS</label><input id="programRepMax" type="number" min="1" value="12"></div><div class="field"><label for="programTimeStep">TIME STEP · SEC</label><input id="programTimeStep" type="number" min="1" value="5" aria-label="Default seconds added for timed exercises"></div></div>
+            <div class="range-fields"><div class="field"><label for="programRepMin">MIN REPS</label><input id="programRepMin" type="number" min="1" value="6"></div><div class="field"><label for="programRepMax">MAX REPS</label><input id="programRepMax" type="number" min="1" value="12"></div><div class="field"><label>TIME STEP</label><div class="step-pills" id="programTimeStepPills" role="group" aria-label="Default time step in seconds"></div></div></div>
           </div>
           <div class="switch-row wide"><span class="switch-copy"><strong>Vary rep ranges by week</strong><span>Optional undulating periodization. Each program week can inherit its own range.</span></span><button class="switch" id="undulatingToggle" type="button" role="switch" aria-pressed="false" aria-label="Vary rep ranges by week off"></button></div>
           <div class="undulating-panel wide" id="undulatingPanel" hidden><span class="filter-label">WEEKLY REP RANGE</span><div class="week-range-list" id="weekRangeList"></div></div>
@@ -195,7 +195,7 @@
               <label class="rule-field"><span>Default rep range min</span><input id="settingsRepMin" type="number" min="1" step="1" value="6"></label>
               <label class="rule-field"><span>Default rep range max</span><input id="settingsRepMax" type="number" min="1" step="1" value="12"></label>
             </div>
-            <label class="rule-field"><span>Time step (timed exercises)</span><input id="settingsTimeStep" type="number" min="1" step="1" value="5"><em class="unit">sec</em></label>
+            <div class="rule-field"><span>Time step (timed exercises)</span><div class="step-pills" id="settingsTimeStepPills" role="group" aria-label="Time step in seconds"></div></div>
           </div>
           <div class="switch-row wide"><span class="switch-copy"><strong>Stall detection</strong><span>Suggest a separate deload week after repeated flat sessions with rising RPE. Never changes the program automatically.</span></span><button class="switch" id="settingsStallToggle" type="button" role="switch" aria-pressed="true" aria-label="Stall detector on"></button></div>
         </section>
