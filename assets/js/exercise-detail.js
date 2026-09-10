@@ -75,7 +75,6 @@
       }
       $('#detailTitle').textContent = ex.name;
       $('#detailTags').innerHTML = [...ex.primary.map(x => `<span class="tag primary">${escapeHtml(x)}</span>`), ...ex.secondary.map(x => `<span class="tag">${escapeHtml(x)}</span>`), `<span class="tag">${escapeHtml(ex.equipment || 'no equipment')}</span>`, ...(ex.custom ? ['<span class="tag custom">Custom</span>'] : [])].join('');
-      $('#sourceId').innerHTML = ex.custom ? 'Created in this session' : `Source record <strong>${escapeHtml(ex.id)}</strong><br><a href="${SOURCE_URL}" target="_blank" rel="noreferrer">View dataset ↗</a>`;
       const realStats = statsFor(id);
       const st = realStats;
       const isBodyweight = ex.equipment === 'body only';

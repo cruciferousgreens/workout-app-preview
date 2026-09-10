@@ -131,7 +131,7 @@
       return `<div class="heatmap-shell"><div class="anatomy-map" data-volumes="${encoded}">${body}</div><div><div class="heatmap-list">${shown.map(([muscle,value])=>`<div class="heatmap-row"><i class="heatmap-swatch heat-${heatLevel(value,max)}"></i><span>${escapeHtml(titleCase(muscle))}</span><strong>${formatVolume(value)}</strong></div>`).join('')}</div>${compact?'':`<div class="heatmap-legend"><span>Less</span><i class="heatmap-gradient"></i><span>More volume</span></div>`}</div></div>`;
     }
     function renderDashboard() {
-      const now=new Date(); $('#dashboardDate').textContent=new Intl.DateTimeFormat('en-US',{weekday:'long',month:'long',day:'numeric'}).format(now);
+      const now=new Date();
       const strip=$('#weekStrip'),start=new Date(now);start.setHours(12,0,0,0);start.setDate(now.getDate()-((now.getDay()+6)%7)+(state.calendarWeekOffset*7));
       const end=new Date(start);end.setDate(start.getDate()+6);
       const sameMonth=start.getMonth()===end.getMonth();
