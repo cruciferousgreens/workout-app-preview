@@ -57,7 +57,7 @@
     function renderWorkoutRecent() {
       const host=$('#workoutRecent'); if(!host)return;
       const recent=workoutState.completed.slice().sort((a,b)=>b.date.localeCompare(a.date)).slice(0,6);
-      host.innerHTML=recent.length?recent.map(workout=>{const summary=workoutSummary(workout);return `<button class="recent-workout" type="button" data-training-workout="${escapeHtml(workout.id)}"><span><strong>${escapeHtml(workout.name)}</strong><small>${escapeHtml(formatLogDate(workout.date))} · ${summary.sets} sets · ${formatVolume(summary.volume)}</small></span><span aria-hidden="true">›</span></button>`;}).join(''):'<p class="section-note">Your completed workouts will appear here.</p>';
+      host.innerHTML=recent.length?recent.map(workout=>{const summary=workoutSummary(workout);return `<button class="recent-workout" type="button" data-training-workout="${escapeHtml(workout.id)}"><span><strong>${escapeHtml(workout.name)}${isSampleWorkout(workout)?'<span class="sample-label">Sample</span>':''}</strong><small>${escapeHtml(formatLogDate(workout.date))} · ${summary.sets} sets · ${formatVolume(summary.volume)}</small></span><span aria-hidden="true">›</span></button>`;}).join(''):'<p class="section-note">Your completed workouts will appear here.</p>';
       document.querySelectorAll('[data-training-workout]').forEach(button=>button.addEventListener('click',()=>{state.workoutDetailReturn='workout';renderCompletedWorkout(workoutState.completed.find(workout=>workout.id===button.dataset.trainingWorkout));}));
     }
     function renderWorkoutProgramSuggestion() {
@@ -73,8 +73,17 @@
     }
     function renderWorkoutScreen() {
       const hasDraft = !!workoutState.draft;
-      $('#workoutStart').hidden = hasDraft || !$('#workoutComplete').hidden;
+      // Exactly one sub-pane is ever visible: a live draft wins over everything, a completed
+      // workout under review wins over the start screen, otherwise the start screen shows.
+      if (hasDraft) $('#workoutComplete').hidden = true;
+      const viewingComplete = !hasDraft && !$('#workoutComplete').hidden;
+      $('#workoutStart').hidden = hasDraft || viewingComplete;
       $('#workoutEditor').hidden = !hasDraft;
+      const lede = $('#workoutLede');
+      if (lede) lede.textContent = hasDraft ? 'Workout in progress — log your sets below.'
+        : viewingComplete ? 'Reviewing a completed session.'
+        : 'Start a session or revisit your recent work.';
+      updateLiveWorkoutIndicator();
       renderWorkoutProgramSuggestion();
       renderWorkoutTemplateList();
       const latestReal=workoutState.completed.slice().sort((a,b)=>b.date.localeCompare(a.date))[0];

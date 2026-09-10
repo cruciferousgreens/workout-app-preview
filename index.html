@@ -80,7 +80,7 @@
         <div class="topline training-topline">
           <div>
             <h1 id="workoutTitle">Training</h1>
-            <p class="lede">Start a session or revisit your recent work.</p>
+            <p class="lede" id="workoutLede">Start a session or revisit your recent work.</p>
           </div>
         </div>
         <div id="workoutStart" class="training-home">
@@ -209,6 +209,8 @@
           <div class="section-head settings-head"><h2>Data</h2><p class="section-note">Backups and storage on this device.</p></div>
           <div class="settings-actions">
             <button class="small-button" id="exportDataButton" type="button">Export data (JSON)</button>
+            <button class="small-button" id="addSampleDataButton" type="button">Add sample data</button>
+            <button class="small-button" id="clearSampleDataButton" type="button">Clear sample data</button>
             <button class="small-button danger" id="deleteAllDataButton" type="button">Delete all data</button>
           </div>
         </section>
@@ -226,9 +228,9 @@
       </section>
 
       <article id="detailView" class="detail" aria-live="polite">
-        <button class="back" id="backButton" type="button" aria-label="Back to exercise library">
+        <button class="back" id="backButton" type="button" aria-label="Back">
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="m15 18-6-6 6-6"></path></svg>
-          Library
+          <span class="back-text">Back</span>
         </button>
         <header class="detail-header">
           <div>
@@ -418,6 +420,7 @@
 <script src="assets/js/program-templates.js"></script>
 <script src="assets/js/state.js"></script>
 <script src="assets/js/persistence.js"></script>
+<script src="assets/js/sample-data.js"></script>
 <script src="assets/js/exercise-library.js"></script>
 <script src="assets/js/exercise-detail.js"></script>
 <script src="assets/js/navigation.js"></script>

@@ -2,6 +2,14 @@
 
 Newest first. Dates are release dates (America/New_York).
 
+## 2026-09-10 — Navigation, live-state & sample data batch
+
+- **Smoother workout navigation.** The Training tab now switches atomically between exactly one of Start / Editor / Completed-workout panes — no more overlapping content, and leaving mid-workout and coming back restores the editor exactly (scroll position and open exercise cards preserved).
+- **Better Back buttons.** Exercise detail now remembers where you opened it from and takes you back there: a drill-down from a completed workout returns to that workout, from Stats returns to Stats, and so on. The Back button names its destination.
+- **Live-workout tab marker.** While a session is in progress, the Workout tab gets a rose tint and a dot badge so you can see at a glance that a draft is live.
+- **Sample data (opt-in).** Settings → Data now has “Add sample data” and “Clear sample data”. Adding creates 8 labeled sample workouts across the last ~3 weeks (push/pull/legs with progressive overload) so charts and lists can be explored; clearing removes only the sample workouts, never your real data. Sample rows are labeled “Sample” wherever they’re listed.
+- **Samples never drive progression.** The progression engine, PRs, exercise history, and suggestion cards use real completed history only — sample data is excluded from all of it.
+
 ## 2026-09-10 — Workout UI batch
 
 - **Nixed the plate calculator.** The Plate calculator button and dialog are gone from the workout builder.
