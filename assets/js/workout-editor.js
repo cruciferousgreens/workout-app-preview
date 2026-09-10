@@ -138,6 +138,8 @@
     function renderWorkoutExercises() {
       const draft = workoutState.draft;
       if (!draft) return;
+      const meta=$('#resumeDraftMeta');
+      if(meta)meta.textContent=`${draft.name || 'Workout'} · ${draft.exercises.length} exercise${draft.exercises.length===1?'':'s'} · ${formatLogDate(draft.date)}`;
       draft.exercises.forEach(item=>{if(!item.uid)item.uid=uid('exercise');item.sets=(item.sets||[]).map(set=>({...set,uid:set.uid||uid('set'),tags:[...(set.tags||[])]}));});
       $('#workoutExercises').innerHTML = draft.exercises.length ? draft.exercises.map((item,itemIndex) => {
         const ex = exercises.find(x => x.id === item.exerciseId); if (!ex) return '';

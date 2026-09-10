@@ -1091,6 +1091,21 @@
     .small-button.armed { border-color: var(--rose); background: var(--rose-soft); color: var(--ink-strong); }
     .attribution-list { margin: 0; padding-left: 18px; display: grid; gap: 8px; color: var(--muted); font-size: 13px; line-height: 1.5; }
     @media (max-width: 520px) { .settings-grid { grid-template-columns: 1fr; } }
+    /* Settings polish — airy stacked headers, generous rhythm */
+    #settingsView .dashboard-card { margin-bottom: 18px; padding: 22px; }
+    #settingsView .dashboard-card:last-of-type { margin-bottom: 8px; }
+    .settings-head { display: block; margin-bottom: 20px; }
+    .settings-head h2 { margin: 0 0 6px; font-size: 19px; letter-spacing: -.02em; }
+    .settings-head .section-note { font-size: 13px; line-height: 1.55; max-width: 46ch; }
+    .settings-grid { gap: 16px; margin-bottom: 6px; }
+    #settingsView .rule-field { gap: 8px; }
+    #settingsView .rule-field > span { font-size: 10px; letter-spacing: .06em; }
+    #settingsView .rule-field input, #settingsView .rule-field select { min-height: 48px; height: 48px; padding: 0 14px; border-radius: 12px; font-size: 15px; }
+    #settingsView .switch-row { margin-top: 12px; padding: 18px 0 2px; border-top: 1px solid var(--line); }
+    #settingsView .switch-copy strong { font-size: 14px; }
+    #settingsView .switch-copy span { font-size: 12px; line-height: 1.5; }
+    .settings-actions { gap: 12px; }
+    #settingsView .attribution-list { gap: 10px; }
     .action-list { display: grid; gap: 8px; }
     .action-row { width: 100%; display: grid; grid-template-columns: minmax(0,1fr) auto; gap: 12px; align-items: center; min-height: 52px; padding: 10px 12px; border: 1px solid var(--line); border-radius: var(--radius-sm); background: var(--surface-raised); color: var(--ink); text-align: left; cursor: pointer; }
     .action-row span { color: var(--muted); font-size: 11px; }
@@ -1105,12 +1120,11 @@
     .calendar-toolbar strong { font-size: 14px; letter-spacing: -.01em; }
     .calendar-page { width: 44px; height: 44px; }
     .week-strip { gap: 7px; padding-bottom: 16px; }
-    .day-chip { min-height: 82px; padding: 10px 3px 8px; overflow: hidden; }
+    .day-chip { min-height: 64px; padding: 10px 2px 8px; overflow: hidden; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px; border-radius: 16px; }
+    .day-chip span, .day-chip strong { margin-top: 0; }
     .day-chip.has-workout strong::after { display: none; }
-    .day-chip em { width: max-content; max-width: 100%; min-height: 17px; margin: 5px auto 0; padding: 2px 4px; display: inline-flex; align-items: center; justify-content: center; gap: 3px; border-radius: 999px; background: var(--gold-soft); font-size: 7px; line-height: 1; white-space: nowrap; }
-    .day-chip em i { width: 4px; height: 4px; flex: 0 0 auto; border-radius: 50%; background: currentColor; }
-    .day-chip:not(.has-workout) em { background: transparent; }
-    .day-chip.has-real-workout em { background: var(--accent-soft); }
+    .day-chip em { display: block; min-height: 6px; margin: 0; }
+    .day-chip em i { display: block; width: 5px; height: 5px; border-radius: 50%; background: var(--accent); }
     .dashboard-card-head { align-items: flex-start; margin-bottom: 22px; }
     .period-trigger { min-height: 36px; padding-inline: 11px; white-space: nowrap; }
     .mini-stats { margin-top: 2px; }
