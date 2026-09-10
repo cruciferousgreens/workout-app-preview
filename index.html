@@ -183,11 +183,15 @@
           <div class="section-head settings-head"><h2>Appearance</h2></div>
           <div class="switch-row wide"><span class="switch-copy"><strong>Dark mode</strong><span>Easier on the eyes for evening sessions.</span></span><button class="switch" id="darkModeToggle" type="button" role="switch" aria-pressed="false" aria-label="Dark mode off"></button></div>
           <div class="theme-picker"><span class="switch-copy"><strong>Theme</strong><span>The default Cruciferous look, or an alternative palette.</span></span>
-            <div class="theme-pills" id="themePills" role="group" aria-label="Color theme">
-              <button type="button" data-theme-name="cruciferous" aria-pressed="true"><i style="background:#2e7d32"></i>Cruciferous</button>
-              <button type="button" data-theme-name="rosepine" aria-pressed="false"><i style="background:#b4637a"></i>Rosé</button>
-              <button type="button" data-theme-name="macchiato" aria-pressed="false"><i style="background:#f5a97f"></i>Asterid</button>
-              <button type="button" data-theme-name="mocha" aria-pressed="false"><i style="background:#a6e3a1"></i>Matcha</button>
+            <div class="theme-pills theme-families" id="themePills" role="group" aria-label="Color theme">
+              <div class="theme-family" role="group" aria-label="Cruciferous family">
+                <button type="button" data-theme-name="cruciferous" aria-pressed="true"><i style="background:#2e7d32"></i>Cruciferous</button>
+                <button type="button" data-theme-name="macchiato" aria-pressed="false"><i style="background:#f5a97f"></i>Asterid</button>
+              </div>
+              <div class="theme-family" role="group" aria-label="Matcha family">
+                <button type="button" data-theme-name="mocha" aria-pressed="false"><i style="background:#a6e3a1"></i>Matcha</button>
+                <button type="button" data-theme-name="rosepine" aria-pressed="false"><i style="background:#b4637a"></i>Rosé</button>
+              </div>
             </div>
           </div>
         </section>

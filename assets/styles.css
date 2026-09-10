@@ -849,6 +849,13 @@
     .theme-pills [data-theme-name] { display: inline-flex; align-items: center; gap: 7px; min-height: 36px; padding: 6px 14px 6px 10px; border: 1px solid var(--line); border-radius: 999px; background: var(--surface); color: var(--ink); font-size: 12px; font-weight: 700; cursor: pointer; }
     .theme-pills [data-theme-name] i { width: 14px; height: 14px; border-radius: 50%; border: 1px solid rgba(0,0,0,.15); }
     .theme-pills [data-theme-name][aria-pressed="true"] { border-color: var(--accent); background: var(--accent-soft); color: var(--accent); }
+    /* Theme families (Justin 2026-09-10): two columns — Cruciferous/Asterid and
+       Matcha/Rosé — with a subtle hairline separator between the families. */
+    .theme-pills.theme-families { display: flex; align-items: stretch; }
+    .theme-family { flex: 1 1 0; display: flex; flex-direction: column; gap: 8px; }
+    .theme-family:first-child { padding-right: 12px; }
+    .theme-family:last-child { border-left: 1px solid var(--line); padding-left: 12px; }
+    .theme-family [data-theme-name] { width: 100%; justify-content: flex-start; }
     .filter-group { position: relative; margin-top: 0; }
     .filter-group > label { position: absolute; top: -7px; left: 10px; z-index: 1; padding: 0 6px; background: var(--notch-bg, var(--bg)); }
     .filter-group > label + select { margin-top: 0; }
@@ -1466,10 +1473,10 @@
   
     /* ===== Desktop mode (laptop testing, Justin 2026-09-10) =====
        Purely additive: this block only applies at viewport widths >= 900px, so
-       the phone layout is untouched. Centers the app in a phone-width column and
-       constrains the fixed top bar / bottom nav to that column, making the full
-       app testable with a mouse on a laptop. */
+       the phone layout is untouched. Centers the app in a column exactly
+       393px wide — Justin's iPhone 14 Pro CSS resolution — so the desktop
+       render is pixel-identical to the phone, just centered in the browser. */
     @media (min-width: 900px) {
-      .app { width: 100%; max-width: 480px; margin: 0 auto; border-left: 1px solid var(--line); border-right: 1px solid var(--line); }
-      .top-bar, .bottom-nav { left: 50%; right: auto; width: min(480px, 100%); transform: translateX(-50%); }
+      .app { width: 100%; max-width: 393px; margin: 0 auto; border-left: 1px solid var(--line); border-right: 1px solid var(--line); }
+      .top-bar, .bottom-nav { left: 50%; right: auto; width: min(393px, 100%); transform: translateX(-50%); }
     }
